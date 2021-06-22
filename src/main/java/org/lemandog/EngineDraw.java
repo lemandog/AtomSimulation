@@ -6,6 +6,7 @@ import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -51,6 +52,10 @@ public class EngineDraw {
 
 
         Scene scene = new Scene(root, 600, 600);
+
+        Image icon = new Image("/atomSim.png");
+        draw.getIcons().add(icon);
+
         multiToFill = scene.getHeight()/(Arrays.stream(CHA_SIZE).max().getAsDouble() * 1.2); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
         chamber = new Box(getAdjustedCord(CHA_SIZE[0]),getAdjustedCord(CHA_SIZE[1]),getAdjustedCord(CHA_SIZE[2]));

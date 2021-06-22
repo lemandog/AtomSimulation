@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -38,6 +39,8 @@ public class App extends Application {
         userControlWindows.setResizable(false);
 
         FlowPane userControlPane = new FlowPane(); //Компоновка окна
+        Image icon = new Image("/atomSim.png");
+        userControlWindows.getIcons().add(icon);
 
         Scene userControl = new Scene(userControlPane,500,700); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
