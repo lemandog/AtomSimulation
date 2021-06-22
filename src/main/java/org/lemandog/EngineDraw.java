@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
+import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -11,10 +12,14 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.Sphere;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.util.Arrays;
 /*
 ---------------> X
@@ -24,7 +29,8 @@ import java.util.Arrays;
 |   ┘Z
 ↓
 Y
- */import static org.lemandog.Sim.*;
+ */import static org.lemandog.App.*;
+import static org.lemandog.Sim.*;
 
 public class EngineDraw {
     public static Timeline timeline;
@@ -34,14 +40,13 @@ public class EngineDraw {
     static Box chamber;
     static Box target;
     static Sphere[] drawing;
-    static TranslateTransition translateTransition;
 
     public static Sphere engine3D(Particle currPos) { //Отрисовываем частицы
                 Sphere toDraw = new Sphere(currPos.getCurrSphere().getRadius());
                 toDraw.setMaterial(currPos.getCurrSphere().getMaterial());
-                toDraw.setTranslateX(getAdjustedCord(currPos.getCurrSphere().getTranslateX()));
-                toDraw.setTranslateY(getAdjustedCord(currPos.getCurrSphere().getTranslateY()));
-                toDraw.setTranslateZ(getAdjustedCord(currPos.getCurrSphere().getTranslateZ()));
+                toDraw.translateXProperty().set(getAdjustedCord(currPos.getCurrSphere().getTranslateX()));
+                toDraw.translateYProperty().set(getAdjustedCord(currPos.getCurrSphere().getTranslateY()));
+                toDraw.translateZProperty().set(getAdjustedCord(currPos.getCurrSphere().getTranslateZ()));
                 return toDraw;
     }
 
@@ -96,17 +101,15 @@ public class EngineDraw {
         target.setMaterial(tarMat);
 
         drawing = new Sphere[N];
-        translateTransition = new TranslateTransition();
-        translateTransition.setAutoReverse(false);
 
         root.getChildren().add(target);
         root.getChildren().add(generator);
         root.getChildren().add(chamber);
 
         for (int i = 0; i < Sim.N; i++) {
-            App.setOutputLine("PART ADDED " + i + " X:" + Sim.container[i].obj.getTranslateX() + " Y:" +Sim.container[i].obj.getTranslateY() + " Z:" +Sim.container[i].obj.getTranslateZ());
             drawing[i] = engine3D(Sim.container[i]);
             EngineDraw.root.getChildren().add(drawing[i]);
+
         }
         draw.setTitle("Drawing simulation");
         draw.setScene(scene);
@@ -114,17 +117,39 @@ public class EngineDraw {
     }
 
     public static Timeline DrawingThread(Particle[] objects) {
-        timeline= new Timeline(new KeyFrame(Duration.millis(200), event -> {
+        timeline= new Timeline(new KeyFrame(Duration.millis(100), event -> {
+            if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);}
+            partStatusRunning.setText(" Частиц в работе: " + nbRunning);
+            partStatusReady.setText(" Частиц в очереди: " + (N - lastRunning));
+            partStatusDone.setText(" Частиц готово: " + lastRunning);
             for(int i = 0; i<objects.length; i++){
-                objects[i].getCurrSphere();
-                translateTransition.setNode(drawing[i]);
-                translateTransition.setToX(objects[i].coordinates[0]);
-                translateTransition.setToY(objects[i].coordinates[1]);
-                translateTransition.setToZ(objects[i].coordinates[2]);
-                translateTransition.play();
+                EngineDraw.root.getChildren().remove(drawing[i]);
+                drawing[i] = engine3D(Sim.container[i]);
+                EngineDraw.root.getChildren().add(drawing[i]);
+
             }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         return timeline;
     }
+
+    public static Cylinder createConnection(Point3D origin, Point3D target) {
+        Point3D yAxis = new Point3D(0, 1, 0);
+        Point3D diff = target.subtract(origin);
+        double height = diff.magnitude();
+
+        Point3D mid = target.midpoint(origin);
+        Translate moveToMidpoint = new Translate(mid.getX(), mid.getY(), mid.getZ());
+
+        Point3D axisOfRotation = diff.crossProduct(yAxis);
+        double angle = Math.acos(diff.normalize().dotProduct(yAxis));
+        Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
+
+        Cylinder line = new Cylinder(1, height);
+
+        line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
+
+        return line;
+    }
+
 }

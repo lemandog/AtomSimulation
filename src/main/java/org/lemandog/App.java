@@ -31,10 +31,8 @@ public class App extends Application {
     public static Label partStatusReady;
     public static Label partStatusRunning;
     public static Label partStatusDone;
-    public static Label outputLine;
 
     private static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 26); //Подгрузка шрифта
-    private static final Font mainFont2 = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 14); //Подгрузка шрифта 2 (мелкий)
     @Override
     public void start(Stage stage) throws Exception {
         Stage userControlWindows = new Stage();
@@ -184,23 +182,16 @@ public class App extends Application {
         userControlPane.getChildren().add(startSimButt);
         userControlPane.getChildren().add(genTest);
 
-        partStatusReady = new Label(" Частиц в очереди: 00000 ");
+        partStatusReady = new Label(" Частиц в очереди: 0 ");
         partStatusReady.setFont(mainFont);
         userControlPane.getChildren().add(partStatusReady);
-        partStatusRunning = new Label(" Частиц в работе: 00000 ");
+        partStatusRunning = new Label(" Частиц в работе: 0 ");
         partStatusRunning.setFont(mainFont);
         userControlPane.getChildren().add(partStatusRunning);
-        partStatusDone = new Label(" Частиц готово: 00000 ");
+        partStatusDone = new Label(" Частиц готово: 0 ");
         partStatusDone.setFont(mainFont);
         userControlPane.getChildren().add(partStatusDone);
-        outputLine = new Label("ГОТОВ");
-        outputLine.setFont(mainFont2);
-        userControlPane.getChildren().add(outputLine);
 
         userControlWindows.show();
-    }
-
-    public static void setOutputLine(String output) {
-        outputLine.setText(output);
     }
 }

@@ -2,7 +2,6 @@ package org.lemandog;
 
 
 import javafx.animation.Timeline;
-
 import static org.lemandog.EngineDraw.DrawingThread;
 
 public class Sim {
@@ -25,6 +24,7 @@ public class Sim {
     public static int avilableStreams;
     public static int nbRunning = 0;
     public static boolean simIsAlive = false;
+    static Thread mainContr;
 
     public static void setup(){
         EngineDraw.root = null;
@@ -68,9 +68,10 @@ public class Sim {
         Timeline mainanim = DrawingThread(container);
         mainanim.play();
 
-        Thread mainContr = new Thread(() ->{
+        mainContr = new Thread(() ->{
         while(lastRunning < N) {
             while (nbRunning < avilableStreams) {
+                System.out.println("LAST " + lastRunning + " N: "+ N);
                 System.out.println("ACTIVE THREADS " + nbRunning + " POSSIBLE " + avilableStreams + " LAST " + lastRunning);
                 try {
                     container[lastRunning].CreateThread().start(); //Создать и запустить поток последней частицы в списке
@@ -83,9 +84,15 @@ public class Sim {
                 System.out.println("PARTICLE THREAD RUNNING # " + lastRunning);
             }
         }
-        mainanim.stop();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            mainanim.stop();
         System.out.println("SIMULATION RUN ENDED");
         simIsAlive = false;
     });
+        mainContr.setPriority(Thread.MAX_PRIORITY);
         mainContr.start();
     }}

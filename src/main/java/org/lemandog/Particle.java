@@ -3,6 +3,7 @@ package org.lemandog;
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Sphere;
 
@@ -28,6 +29,7 @@ public class Particle{
     boolean tarIsHit;
     boolean wallIsHit;
     PhongMaterial thisParticleMat;
+    Cylinder[] paths = new Cylinder[LEN];
 
     Particle(){ //Конструктор класса, вызывается при создании экземпляра
         this.rand = new Random();//Генератор случайных числе нужен для генерации скоростей и координат
@@ -74,7 +76,7 @@ public class Particle{
     }
 
     public Thread CreateThread() {
-        return new Thread(() -> { //Лямбда-выражение с содержимым потока
+        Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
             long stepsPassed = 0;
 
@@ -84,11 +86,14 @@ public class Particle{
                     double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
                             2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
                     //Новые координаты
+                    Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
                     for(int i = 0; i<3; i++) {
                         coordinates[i] = coordinates[i] + dN * speeds[i];
                     }
+                    Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
+                    paths[(int) stepsPassed] = EngineDraw.createConnection(oldCord,newCord);
                     getCurrSphere();
-                    active = wallCheck() && tarNotMet();
+                    active = wallCheck(paths[(int) stepsPassed]) && tarNotMet(paths[(int) stepsPassed]);
                     //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                     //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
 
@@ -104,10 +109,12 @@ public class Particle{
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
             System.out.println("PARTICLE THREAD ENDED: " + Arrays.toString(coordinates) + " # OF RUNNING THREADS " + nbRunning);
         });
+        product.setPriority(Thread.MIN_PRIORITY);
+        return product;
     }
 
-    private boolean tarNotMet() {
-        if(target.intersects(obj.getBoundsInParent())){
+    private boolean tarNotMet(Cylinder path) {
+        if(target.intersects(path.getBoundsInParent())){
             System.out.println("PARTICLE HAS HIT TARGET!");
             thisParticleMat.setDiffuseColor(TarHitCol);
             return false;
@@ -115,8 +122,8 @@ public class Particle{
         return true;
     }
 
-    private boolean wallCheck() {
-        if(chamber.intersects(obj.getBoundsInParent())){
+    private boolean wallCheck(Cylinder path) {
+        if(chamber.intersects(path.getBoundsInParent())){
             return true;
         }
         thisParticleMat.setDiffuseColor(wallhitCol);
