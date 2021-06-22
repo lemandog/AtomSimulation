@@ -3,6 +3,7 @@ package org.lemandog;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
@@ -32,6 +33,8 @@ public class EngineDraw {
     static double multiToFill;
     static Box chamber;
     static Box target;
+    static Sphere[] drawing;
+    static TranslateTransition translateTransition;
 
     public static Sphere engine3D(Particle currPos) { //Отрисовываем частицы
                 Sphere toDraw = new Sphere(currPos.getCurrSphere().getRadius());
@@ -92,13 +95,18 @@ public class EngineDraw {
         tarMat.setSpecularPower(1);
         target.setMaterial(tarMat);
 
+        drawing = new Sphere[N];
+        translateTransition = new TranslateTransition();
+        translateTransition.setAutoReverse(false);
+
         root.getChildren().add(target);
         root.getChildren().add(generator);
         root.getChildren().add(chamber);
 
         for (int i = 0; i < Sim.N; i++) {
-            System.out.println("PART ADDED " + i + " X:" + Sim.container[i].obj.getTranslateX() + " Y:" +Sim.container[i].obj.getTranslateY() + " Z:" +Sim.container[i].obj.getTranslateZ());
-            EngineDraw.root.getChildren().add(engine3D(Sim.container[i]));
+            App.setOutputLine("PART ADDED " + i + " X:" + Sim.container[i].obj.getTranslateX() + " Y:" +Sim.container[i].obj.getTranslateY() + " Z:" +Sim.container[i].obj.getTranslateZ());
+            drawing[i] = engine3D(Sim.container[i]);
+            EngineDraw.root.getChildren().add(drawing[i]);
         }
         draw.setTitle("Drawing simulation");
         draw.setScene(scene);
@@ -106,11 +114,14 @@ public class EngineDraw {
     }
 
     public static Timeline DrawingThread(Particle[] objects) {
-        timeline= new Timeline(new KeyFrame(Duration.millis(60), event -> {
-            if(simIsAlive){
-                for(int i = 0; i<objects.length; i++){
-                    engine3D(objects[i]);
-                }
+        timeline= new Timeline(new KeyFrame(Duration.millis(200), event -> {
+            for(int i = 0; i<objects.length; i++){
+                objects[i].getCurrSphere();
+                translateTransition.setNode(drawing[i]);
+                translateTransition.setToX(objects[i].coordinates[0]);
+                translateTransition.setToY(objects[i].coordinates[1]);
+                translateTransition.setToZ(objects[i].coordinates[2]);
+                translateTransition.play();
             }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);

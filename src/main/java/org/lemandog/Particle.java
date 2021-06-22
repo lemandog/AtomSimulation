@@ -1,5 +1,6 @@
 package org.lemandog;
 
+import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Polyline;
@@ -13,7 +14,7 @@ import static org.lemandog.Sim.*;
 
 public class Particle{
     //Цвета состояний
-    Color activeCol = Color.rgb((int) (Math.random() * 255),(int) (Math.random() * 255),(int) (Math.random() * 255));
+    Color activeCol = Color.WHITE;
     Color wallhitCol = Color.INDIANRED;
     Color TarHitCol = Color.SKYBLUE;
 
@@ -32,9 +33,9 @@ public class Particle{
         this.rand = new Random();//Генератор случайных числе нужен для генерации скоростей и координат
 
         coordinates = generateCord();
-        this.speeds = generateSpeed();
+        this.speeds = generateSpeed(1);
         this.freerunLen = calcRandLen();
-        obj = getCurrSphere();
+        obj = new Sphere();
         this.isInUse = false;
         this.active = true;
         this.tarIsHit = false;
@@ -60,22 +61,15 @@ public class Particle{
         product[2] = (Sim.GEN_SIZE[2])*Math.random() - Sim.GEN_SIZE[2]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО Z ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
         return product;
     }
-    private double[] generateSpeed() {
+    private double[] generateSpeed(int mode) {
         double[] product = new double[3]; //XYZ
         double sv = Math.sqrt((Sim.k*Sim.T)/Sim.m);
 
-        product[1] = Math.abs(rand.nextGaussian())*sv;
-        product[0] = rand.nextGaussian()*sv;
-        double cos = Math.cos(Math.PI / 2 - Math.atan(product[1] / product[0]));
+        product[0] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));
+        product[2] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));
 
-        if (Math.random()>0.5){
-        product[0] = product[0]* cos;}
-        else{
-        product[0] = -product[0]* cos;
-        }
-
-        product[1] = Math.abs(product[1]* cos);
-        product[2] = Math.abs(product[1]* cos);
+        if(mode == 1){product[1] = Math.abs(rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
+        else {product[1] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
         return product;
     }
 
@@ -85,17 +79,15 @@ public class Particle{
             long stepsPassed = 0;
 
             while(active && stepsPassed<LEN){
-                getCurrSphere();
-                engine3D(this);
                 if(active) {
                     //Нынешнее приращение
                     double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
                             2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
                     //Новые координаты
-                    Polyline fromOldToNew = new Polyline(coordinates[0],coordinates[1],coordinates[2]);
                     for(int i = 0; i<3; i++) {
                         coordinates[i] = coordinates[i] + dN * speeds[i];
                     }
+                    getCurrSphere();
                     active = wallCheck() && tarNotMet();
                     //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                     //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
@@ -103,7 +95,7 @@ public class Particle{
                     //длина пробега
                     freerunLen = calcRandLen();
                     //скорости
-                    speeds = generateSpeed();
+                    speeds = generateSpeed(0);
                     stepsPassed++;
                 } else {
                     break;}//Остановка исполнения, если не активна
@@ -115,16 +107,16 @@ public class Particle{
     }
 
     private boolean tarNotMet() {
-        if(this.obj.intersects(target.getLayoutBounds())){
-            return true;
+        if(target.intersects(obj.getBoundsInParent())){
+            System.out.println("PARTICLE HAS HIT TARGET!");
+            thisParticleMat.setDiffuseColor(TarHitCol);
+            return false;
         }
-        System.out.println("PARTICLE HAS HIT TARGET!");
-        thisParticleMat.setDiffuseColor(TarHitCol);
-        return false;
+        return true;
     }
 
     private boolean wallCheck() {
-        if(this.obj.intersects(chamber.getLayoutBounds())){
+        if(chamber.intersects(obj.getBoundsInParent())){
             return true;
         }
         thisParticleMat.setDiffuseColor(wallhitCol);
@@ -133,12 +125,11 @@ public class Particle{
     }
 
     public Sphere getCurrSphere() {
-        obj = new Sphere();
         obj.setMaterial(thisParticleMat);
-        this.obj.setRadius(5);
-        this.obj.setTranslateX(coordinates[0]); //Установка координат визуализации атома
-        this.obj.setTranslateY(coordinates[1]);
-        this.obj.setTranslateZ(coordinates[2]);
-        return this.obj;
+        obj.setRadius(3);
+        obj.setTranslateX(coordinates[0]); //Установка координат визуализации атома
+        obj.setTranslateY(coordinates[1]);
+        obj.setTranslateZ(coordinates[2]);
+        return obj;
     }
 }

@@ -1,6 +1,10 @@
 package org.lemandog;
 
 
+import javafx.animation.Timeline;
+
+import static org.lemandog.EngineDraw.DrawingThread;
+
 public class Sim {
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
     private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
@@ -54,14 +58,17 @@ public class Sim {
     EngineDraw.DrawingThread(container).playFromStart();
     }
 
+
+
     public static void start() {
         setup(); //Установка выбраных параметров
-        EngineDraw.DrawingThread(container).playFromStart();
         simIsAlive = true;
         EngineDraw.esetup();
 
+        Timeline mainanim = DrawingThread(container);
+        mainanim.play();
+
         Thread mainContr = new Thread(() ->{
-            int active = N;
         while(lastRunning < N) {
             while (nbRunning < avilableStreams) {
                 System.out.println("ACTIVE THREADS " + nbRunning + " POSSIBLE " + avilableStreams + " LAST " + lastRunning);
@@ -76,8 +83,9 @@ public class Sim {
                 System.out.println("PARTICLE THREAD RUNNING # " + lastRunning);
             }
         }
+        mainanim.stop();
+        System.out.println("SIMULATION RUN ENDED");
         simIsAlive = false;
     });
         mainContr.start();
-
     }}
