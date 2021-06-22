@@ -105,9 +105,9 @@ public class Particle{
                 } else {
                     break;}//Остановка исполнения, если не активна
             }
-            nbRunning--;    //Перед завершением работы потока - отнять его от счёта запущенных
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
             System.out.println("PARTICLE THREAD ENDED: " + Arrays.toString(coordinates) + " # OF RUNNING THREADS " + nbRunning);
+            paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
         });
         product.setPriority(Thread.MIN_PRIORITY);
         return product;
@@ -115,7 +115,7 @@ public class Particle{
 
     private boolean tarNotMet(Cylinder path) {
         if(target.intersects(path.getBoundsInParent())){
-            System.out.println("PARTICLE HAS HIT TARGET!");
+            tarHitCounterI++;
             thisParticleMat.setDiffuseColor(TarHitCol);
             return false;
         }
@@ -127,7 +127,7 @@ public class Particle{
             return true;
         }
         thisParticleMat.setDiffuseColor(wallhitCol);
-        System.out.println("PARTICLE IS OUT OF BOUNDS!");
+        outOfBoundsCounterI++;
         return false;
     }
 

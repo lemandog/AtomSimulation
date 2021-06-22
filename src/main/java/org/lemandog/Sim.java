@@ -21,12 +21,18 @@ public class Sim {
     static int lastRunning;
     static Particle[] container; //XYZ
 
-    public static int avilableStreams;
+    public static int tarHitCounterI = 0;
+    public static int outOfBoundsCounterI = 0;
+
+    public static int avilableStreams = Runtime.getRuntime().availableProcessors();
     public static int nbRunning = 0;
     public static boolean simIsAlive = false;
     static Thread mainContr;
+    static Thread[] calculator;
 
     public static void setup(){
+        outOfBoundsCounterI = 0; //Обнуление счётчиков с предыдущего запуска
+        tarHitCounterI = 0;
         EngineDraw.root = null;
         p = Math.pow(Double.parseDouble(App.pressure.getText()),Double.parseDouble(App.pressurePow.getText()));
         T = Integer.parseInt(App.tempAm.getText());
@@ -46,6 +52,10 @@ public class Sim {
         GEN_SIZE[2] = CHA_SIZE[2] * App.genSizeZ.getValue();
         lastRunning = 0;
         avilableStreams = (int) App.threadCount.getValue();
+        calculator = new Thread[avilableStreams];
+        for (int i = 0; i < avilableStreams; i++) {
+            calculator[i] = new Thread();
+        }
 
         container = new Particle[N];
         for (int i = 0; i < N; i++) {
@@ -70,22 +80,23 @@ public class Sim {
 
         mainContr = new Thread(() ->{
         while(lastRunning < N) {
-            while (nbRunning < avilableStreams) {
-                System.out.println("LAST " + lastRunning + " N: "+ N);
-                System.out.println("ACTIVE THREADS " + nbRunning + " POSSIBLE " + avilableStreams + " LAST " + lastRunning);
-                try {
-                    container[lastRunning].CreateThread().start(); //Создать и запустить поток последней частицы в списке
-                }catch (ArrayIndexOutOfBoundsException e){
-                    System.out.println("THREAD CREATION MISSFIRE");
-                    break;
-                }
+            if(threadQuotaNotMet()){
+                for (int i = 0; i< avilableStreams;i++){
+                    if (!calculator[i].isAlive()){// Найти закончившийся тред
+                        try {
+                        calculator[i] = null;       // Удалить
+                        calculator[i] = container[lastRunning].CreateThread(); //Создать и запустить новый - на замену старому
+                        calculator[i].start();
+                        lastRunning++;
+                        System.out.println("PARTICLE THREAD RUNNING # " + lastRunning);
+                        }catch (ArrayIndexOutOfBoundsException e){System.out.println("THREAD CREATION MISSFIRE");break;}
+                    }
 
-                lastRunning++; nbRunning++; //Добавить кол-во запущенных потоков (вычитается, когда поток останавливается)
-                System.out.println("PARTICLE THREAD RUNNING # " + lastRunning);
+                }
             }
         }
             try {
-                Thread.sleep(3000);
+                Thread.sleep(3000); //Ожидание, чтобы анимация успела поместить все частицы. TODO: Исправить на что то более логичное
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -95,4 +106,19 @@ public class Sim {
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);
         mainContr.start();
-    }}
+    }
+
+    private static boolean threadQuotaNotMet() {
+        boolean thereAreDeadThreads = false;
+        nbRunning = 0;
+        for (int i = 0; i< avilableStreams;i++){
+            if (!calculator[i].isAlive()){
+                thereAreDeadThreads = true;// Есть не живые треды
+            } else {
+                nbRunning++;
+            }
+        }
+        return thereAreDeadThreads;
+
+    }
+}

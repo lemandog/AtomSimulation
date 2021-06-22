@@ -118,10 +118,16 @@ public class EngineDraw {
 
     public static Timeline DrawingThread(Particle[] objects) {
         timeline= new Timeline(new KeyFrame(Duration.millis(100), event -> {
-            if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);}
+
+            if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);} else {
+                partStatusRunning.setTextFill(Color.BLACK);
+            }
             partStatusRunning.setText(" Частиц в работе: " + nbRunning);
             partStatusReady.setText(" Частиц в очереди: " + (N - lastRunning));
             partStatusDone.setText(" Частиц готово: " + lastRunning);
+            targetHitCounter.setText(" Упало на мишень: " + tarHitCounterI);
+            outOfBoundsCounter.setText(" Упало на стены: " + outOfBoundsCounterI);
+
             for(int i = 0; i<objects.length; i++){
                 EngineDraw.root.getChildren().remove(drawing[i]);
                 drawing[i] = engine3D(Sim.container[i]);

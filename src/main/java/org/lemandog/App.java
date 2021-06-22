@@ -31,6 +31,8 @@ public class App extends Application {
     public static Label partStatusReady;
     public static Label partStatusRunning;
     public static Label partStatusDone;
+    public static Label targetHitCounter;
+    public static Label outOfBoundsCounter;
 
     private static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 26); //Подгрузка шрифта
     @Override
@@ -191,6 +193,12 @@ public class App extends Application {
         partStatusDone = new Label(" Частиц готово: 0 ");
         partStatusDone.setFont(mainFont);
         userControlPane.getChildren().add(partStatusDone);
+        targetHitCounter = new Label(" Упало на мишень: 0 ");
+        targetHitCounter.setFont(mainFont);
+        userControlPane.getChildren().add(targetHitCounter);
+        outOfBoundsCounter = new Label(" Упало на стены: 0 ");
+        outOfBoundsCounter.setFont(mainFont);
+        userControlPane.getChildren().add(outOfBoundsCounter);
 
         userControlWindows.show();
     }
