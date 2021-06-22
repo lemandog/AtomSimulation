@@ -43,8 +43,9 @@ public class App extends Application {
         FlowPane userControlPane = new FlowPane(); //Компоновка окна
         Image icon = new Image("/atomSim.png");
         userControlWindows.getIcons().add(icon);
+        userControlWindows.setTitle("Контроль");
 
-        Scene userControl = new Scene(userControlPane,500,700); //Новое окно с компоновкой
+        Scene userControl = new Scene(userControlPane,500,650); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
         //Добавляем органы управления
         particleAm = new TextField("500"); //Поле для ввода кол-ва частиц
@@ -106,7 +107,7 @@ public class App extends Application {
         threadCount = new Slider();
         threadCount.setMin(1);
         threadCount.setMax(20);
-        threadCount.setValue(10);
+        threadCount.setValue(Sim.avilableStreams);
         threadCount.setShowTickMarks(true);
         threadCount.setShowTickLabels(true);
         threadCount.setPrefWidth(userControl.getWidth());

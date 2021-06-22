@@ -65,6 +65,7 @@ public class Sim {
     public static void genTest() {
     setup();
     EngineDraw.esetup();
+    mainContr = new Thread(); //Иначе будет NullPointerException
     EngineDraw.DrawingThread(container).playFromStart();
     }
 
