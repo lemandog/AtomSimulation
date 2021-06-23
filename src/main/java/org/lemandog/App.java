@@ -34,7 +34,7 @@ public class App extends Application {
     public static Label targetHitCounter;
     public static Label outOfBoundsCounter;
 
-    private static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 26); //Подгрузка шрифта
+    private static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
     @Override
     public void start(Stage stage) throws Exception {
         Stage userControlWindows = new Stage();
