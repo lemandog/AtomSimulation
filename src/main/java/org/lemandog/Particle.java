@@ -1,11 +1,10 @@
 package org.lemandog;
 
+import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.Polyline;
-import javafx.scene.shape.Sphere;
+import javafx.scene.shape.*;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -30,6 +29,7 @@ public class Particle{
     boolean wallIsHit;
     PhongMaterial thisParticleMat;
     Cylinder[] paths = new Cylinder[LEN];
+    Cylinder[] pathsADJ = new Cylinder[LEN];
 
     Particle(){ //Конструктор класса, вызывается при создании экземпляра
         this.rand = new Random();//Генератор случайных числе нужен для генерации скоростей и координат
@@ -87,13 +87,19 @@ public class Particle{
                             2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
                     //Новые координаты
                     Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
+                    Point3D oldCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
+
                     for(int i = 0; i<3; i++) {
                         coordinates[i] = coordinates[i] + dN * speeds[i];
                     }
                     Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
+                    Point3D newCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
+
                     paths[(int) stepsPassed] = EngineDraw.createConnection(oldCord,newCord);
+                    pathsADJ[(int) stepsPassed] = EngineDraw.createConnection(oldCordADJ,newCordADJ);
+
                     getCurrSphere();
-                    active = wallCheck(paths[(int) stepsPassed]) && tarNotMet(paths[(int) stepsPassed]);
+                    active = wallCheck(paths[(int) stepsPassed], pathsADJ[(int) stepsPassed]) && tarNotMet(paths[(int) stepsPassed],pathsADJ[(int) stepsPassed]);
                     //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                     //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
 
@@ -106,26 +112,35 @@ public class Particle{
                     break;}//Остановка исполнения, если не активна
             }
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
-            System.out.println("PARTICLE THREAD ENDED: " + Arrays.toString(coordinates) + " # OF RUNNING THREADS " + nbRunning);
+
             paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+            pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
         });
         product.setPriority(Thread.MIN_PRIORITY);
         return product;
     }
 
-    private boolean tarNotMet(Cylinder path) {
-        if(target.intersects(path.getBoundsInParent())){
+    private boolean tarNotMet(Cylinder path, Cylinder pathADJ) {
+        Bounds pathB = path.getBoundsInParent();
+        Bounds tarB = targetR.getBoundsInParent();
+        if(pathB.intersects(tarB)){
             tarHitCounterI++;
             thisParticleMat.setDiffuseColor(TarHitCol);
+            pathADJ.setMaterial(thisParticleMat);
+            //EngineDraw.CylinderThread(pathADJ).play();
             return false;
         }
         return true;
     }
 
-    private boolean wallCheck(Cylinder path) {
-        if(chamber.intersects(path.getBoundsInParent())){
+    private boolean wallCheck(Cylinder path, Cylinder pathADJ) {
+        Bounds pathB = path.getBoundsInParent();
+        Bounds boxB = chamberR.getBoundsInParent();
+        if(pathB.intersects(boxB)){
             return true;
         }
+        pathADJ.setMaterial(thisParticleMat);
+        //EngineDraw.CylinderThread(pathADJ).play();
         thisParticleMat.setDiffuseColor(wallhitCol);
         outOfBoundsCounterI++;
         return false;

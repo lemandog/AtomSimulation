@@ -89,7 +89,6 @@ public class Sim {
                         calculator[i] = container[lastRunning].CreateThread(); //Создать и запустить новый - на замену старому
                         calculator[i].start();
                         lastRunning++;
-                        System.out.println("PARTICLE THREAD RUNNING # " + lastRunning);
                         }catch (ArrayIndexOutOfBoundsException e){System.out.println("THREAD CREATION MISSFIRE");break;}
                     }
 

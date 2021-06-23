@@ -3,7 +3,6 @@ package org.lemandog;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
@@ -38,7 +37,9 @@ public class EngineDraw {
     static Group root;
     static double multiToFill;
     static Box chamber;
+    static Box chamberR;
     static Box target;
+    static Box targetR;
     static Sphere[] drawing;
 
     public static Sphere engine3D(Particle currPos) { //Отрисовываем частицы
@@ -50,8 +51,11 @@ public class EngineDraw {
                 return toDraw;
     }
 
-    private static double getAdjustedCord(double patient) {
+    public static double getAdjustedCord(double patient) {
         return patient * multiToFill;
+    }
+    public static double getDeAdjustedCord(double patient) {
+        return patient / multiToFill;
     }
 
     public static void esetup() { //Отрисовка камеры
@@ -67,16 +71,21 @@ public class EngineDraw {
         multiToFill = scene.getHeight()/(Arrays.stream(CHA_SIZE).max().getAsDouble() * 1.2); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
         chamber = new Box(getAdjustedCord(CHA_SIZE[0]),getAdjustedCord(CHA_SIZE[1]),getAdjustedCord(CHA_SIZE[2]));
+        chamberR = new Box((CHA_SIZE[0]),(CHA_SIZE[1]),(CHA_SIZE[2]));
         chamber.setTranslateX(0);
         chamber.setTranslateY(0);
 
         target = new Box(getAdjustedCord(TAR_SIZE[0]),getAdjustedCord(TAR_SIZE[1]),getAdjustedCord(TAR_SIZE[2]));
+        targetR = new Box((TAR_SIZE[0]),(TAR_SIZE[1]),(TAR_SIZE[2]));
         target.setTranslateX(0);
+        targetR.setTranslateY((-CHA_SIZE[1]/2));
         target.setTranslateY(getAdjustedCord(-CHA_SIZE[1]/2));
         target.setTranslateZ(0);
         Box generator = new Box(getAdjustedCord(GEN_SIZE[0]),getAdjustedCord(GEN_SIZE[1]),getAdjustedCord(GEN_SIZE[2]));
+        Box generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
         generator.setTranslateX(0);
         generator.setTranslateY(getAdjustedCord(CHA_SIZE[1]/2));
+        generatorR.setTranslateY((CHA_SIZE[1]/2));
         generator.setTranslateZ(0);
 
         PerspectiveCamera main = new PerspectiveCamera();
@@ -137,6 +146,14 @@ public class EngineDraw {
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         return timeline;
+    }
+
+    public static Timeline CylinderThread(Cylinder path) {
+        Timeline cylTr = new Timeline(new KeyFrame(Duration.millis(100), event -> {
+           EngineDraw.root.getChildren().add(path);
+        }));
+        cylTr.setCycleCount(1);
+        return cylTr;
     }
 
     public static Cylinder createConnection(Point3D origin, Point3D target) {
