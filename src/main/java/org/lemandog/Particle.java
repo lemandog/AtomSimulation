@@ -28,8 +28,8 @@ public class Particle{
     boolean tarIsHit;
     boolean wallIsHit;
     PhongMaterial thisParticleMat;
-    Cylinder[] paths = new Cylinder[LEN];
-    Cylinder[] pathsADJ = new Cylinder[LEN];
+    Cylinder paths = new Cylinder();
+    Cylinder pathsADJ = new Cylinder();
 
     Particle(){ //Конструктор класса, вызывается при создании экземпляра
         this.rand = new Random();//Генератор случайных числе нужен для генерации скоростей и координат
@@ -95,14 +95,15 @@ public class Particle{
                     Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
                     Point3D newCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
 
-                    paths[(int) stepsPassed] = EngineDraw.createConnection(oldCord,newCord);
-                    pathsADJ[(int) stepsPassed] = EngineDraw.createConnection(oldCordADJ,newCordADJ);
+                    paths = EngineDraw.createConnection(oldCord,newCord);
+                    pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
 
                     getCurrSphere();
-                    active = wallCheck(paths[(int) stepsPassed], pathsADJ[(int) stepsPassed]) && tarNotMet(paths[(int) stepsPassed],pathsADJ[(int) stepsPassed]);
+                    active = wallCheck(paths, pathsADJ) && tarNotMet(paths,pathsADJ);
                     //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                     //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
-
+                    paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+                    pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
                     //длина пробега
                     freerunLen = calcRandLen();
                     //скорости
@@ -113,8 +114,7 @@ public class Particle{
             }
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
 
-            paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
-            pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+
         });
         product.setPriority(Thread.MIN_PRIORITY);
         return product;
@@ -126,8 +126,7 @@ public class Particle{
         if(pathB.intersects(tarB)){
             tarHitCounterI++;
             thisParticleMat.setDiffuseColor(TarHitCol);
-            pathADJ.setMaterial(thisParticleMat);
-            //EngineDraw.CylinderThread(pathADJ).play();
+            drawAPath(pathADJ);
             return false;
         }
         return true;
@@ -139,9 +138,9 @@ public class Particle{
         if(pathB.intersects(boxB)){
             return true;
         }
-        pathADJ.setMaterial(thisParticleMat);
-        //EngineDraw.CylinderThread(pathADJ).play();
         thisParticleMat.setDiffuseColor(wallhitCol);
+        drawAPath(pathADJ);
+
         outOfBoundsCounterI++;
         return false;
     }
@@ -153,5 +152,11 @@ public class Particle{
         obj.setTranslateY(coordinates[1]);
         obj.setTranslateZ(coordinates[2]);
         return obj;
+    }
+    private void drawAPath(Cylinder pathADJ){
+        if(pathsDr){
+            pathADJ.setMaterial(thisParticleMat);
+            EngineDraw.CylinderThread(pathADJ).play();
+        }
     }
 }

@@ -126,7 +126,7 @@ public class EngineDraw {
     }
 
     public static Timeline DrawingThread(Particle[] objects) {
-        timeline= new Timeline(new KeyFrame(Duration.millis(100), event -> {
+        timeline= new Timeline(new KeyFrame(Duration.millis(50), event -> {
 
             if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);} else {
                 partStatusRunning.setTextFill(Color.BLACK);
@@ -169,7 +169,7 @@ public class EngineDraw {
         Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
 
         Cylinder line = new Cylinder(1, height);
-
+        line.setRadius(0.1);
         line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
 
         return line;

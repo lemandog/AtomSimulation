@@ -2,10 +2,7 @@ package org.lemandog;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
@@ -27,6 +24,7 @@ public class App extends Application {
     public static TextField tempAm;
     public static TextField pressurePow;
     public static TextField pressure;
+    public static CheckBox pathDrawing;
 
     public static Label partStatusReady;
     public static Label partStatusRunning;
@@ -104,6 +102,10 @@ public class App extends Application {
         userControlPane.getChildren().add(pressure);
         userControlPane.getChildren().add(pressureText);
 
+        pathDrawing = new CheckBox("Отрисовка путей (Только малое число частиц)");
+        pathDrawing.setFont(mainFont);
+        userControlPane.getChildren().add(pathDrawing);
+
         threadCount = new Slider();
         threadCount.setMin(1);
         threadCount.setMax(20);
@@ -127,10 +129,10 @@ public class App extends Application {
         targetSizeX.setMax(1);
         targetSizeX.setValue(0.8);
         targetSizeX.setPrefWidth(userControl.getWidth());
-        Label targetSizeXText = new Label("Размер мишени по X (доли от камеры): 0,80");
+        Label targetSizeXText = new Label("Размер подложки по X (доли от камеры): 0,80");
         targetSizeXText.setFont(mainFont);
         targetSizeX.setOnMouseReleased((event) -> {
-            targetSizeXText.setText("Размер мишени по X (доли от камеры): "+ String.format("%3.2f", targetSizeX.getValue())); // Три знака всего, два после запятой
+            targetSizeXText.setText("Размер подложки по X (доли от камеры): "+ String.format("%3.2f", targetSizeX.getValue())); // Три знака всего, два после запятой
         });
         userControlPane.getChildren().add(targetSizeXText);
         userControlPane.getChildren().add(targetSizeX);
@@ -141,10 +143,10 @@ public class App extends Application {
         targetSizeZ.setMax(1);
         targetSizeZ.setValue(0.8);
         targetSizeZ.setPrefWidth(userControl.getWidth());
-        Label targetSizeYText = new Label("Размер мишени по Z (доли от камеры): 0,80");
+        Label targetSizeYText = new Label("Размер подложки по Z (доли от камеры): 0,80");
         targetSizeYText.setFont(mainFont);
         targetSizeZ.setOnMouseReleased((event) -> {
-            targetSizeYText.setText("Размер мишени по Z (доли от камеры): "+ String.format("%3.2f", targetSizeZ.getValue())); // Три знака всего, два после запятой
+            targetSizeYText.setText("Размер подложки по Z (доли от камеры): "+ String.format("%3.2f", targetSizeZ.getValue())); // Три знака всего, два после запятой
         });
         userControlPane.getChildren().add(targetSizeYText);
         userControlPane.getChildren().add(targetSizeZ);
@@ -176,6 +178,7 @@ public class App extends Application {
         userControlPane.getChildren().add(genSizeZ);
 
 
+
         Button startSimButt = new Button("Старт симуляции");
         startSimButt.setFont(mainFont);
         startSimButt.setOnAction(event -> {Sim.start();});
@@ -200,6 +203,7 @@ public class App extends Application {
         outOfBoundsCounter = new Label(" Упало на стены: 0 ");
         outOfBoundsCounter.setFont(mainFont);
         userControlPane.getChildren().add(outOfBoundsCounter);
+
 
         userControlWindows.show();
     }

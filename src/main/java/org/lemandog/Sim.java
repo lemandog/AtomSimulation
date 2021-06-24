@@ -27,6 +27,7 @@ public class Sim {
     public static int avilableStreams = Runtime.getRuntime().availableProcessors();
     public static int nbRunning = 0;
     public static boolean simIsAlive = false;
+    public static boolean pathsDr = false;
     static Thread mainContr;
     static Thread[] calculator;
 
@@ -53,6 +54,8 @@ public class Sim {
         lastRunning = 0;
         avilableStreams = (int) App.threadCount.getValue();
         calculator = new Thread[avilableStreams];
+        pathsDr = App.pathDrawing.isSelected();
+
         for (int i = 0; i < avilableStreams; i++) {
             calculator[i] = new Thread();
         }
