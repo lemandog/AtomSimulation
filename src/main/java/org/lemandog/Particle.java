@@ -6,7 +6,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static org.lemandog.EngineDraw.*;
@@ -135,14 +134,13 @@ public class Particle{
     private boolean wallCheck(Cylinder path, Cylinder pathADJ) {
         Bounds pathB = path.getBoundsInParent();
         Bounds boxB = chamberR.getBoundsInParent();
-        if(pathB.intersects(boxB)){
-            return true;
+        if(!pathB.intersects(boxB)){
+            thisParticleMat.setDiffuseColor(wallhitCol);
+            drawAPath(pathADJ);
+            outOfBoundsCounterI++;
+            return false;
         }
-        thisParticleMat.setDiffuseColor(wallhitCol);
-        drawAPath(pathADJ);
-
-        outOfBoundsCounterI++;
-        return false;
+        return true;
     }
 
     public Sphere getCurrSphere() {

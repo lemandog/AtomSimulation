@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -31,8 +32,9 @@ public class App extends Application {
     public static Label partStatusDone;
     public static Label targetHitCounter;
     public static Label outOfBoundsCounter;
+    public static Label outputMode;
 
-    private static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
+    public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
     @Override
     public void start(Stage stage) throws Exception {
         Stage userControlWindows = new Stage();
@@ -43,7 +45,7 @@ public class App extends Application {
         userControlWindows.getIcons().add(icon);
         userControlWindows.setTitle("Контроль");
 
-        Scene userControl = new Scene(userControlPane,500,650); //Новое окно с компоновкой
+        Scene userControl = new Scene(userControlPane,500,720); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
         //Добавляем органы управления
         particleAm = new TextField("500"); //Поле для ввода кол-ва частиц
@@ -177,6 +179,7 @@ public class App extends Application {
         userControlPane.getChildren().add(genSizeYText);
         userControlPane.getChildren().add(genSizeZ);
 
+        Output.ConstructOutputAFrame();
 
 
         Button startSimButt = new Button("Старт симуляции");
@@ -185,8 +188,15 @@ public class App extends Application {
         Button genTest = new Button("Тест генератора частиц");
         genTest.setFont(mainFont);
         genTest.setOnAction(event -> Sim.genTest());
+        Button outputOption = new Button("Парамеры вывода");
+        outputOption.setFont(mainFont);
+        outputOption.setOnAction(event -> {
+            Output.disp();
+            });
+
         userControlPane.getChildren().add(startSimButt);
         userControlPane.getChildren().add(genTest);
+        userControlPane.getChildren().add(outputOption);
 
         partStatusReady = new Label(" Частиц в очереди: 0 ");
         partStatusReady.setFont(mainFont);
@@ -204,6 +214,10 @@ public class App extends Application {
         outOfBoundsCounter.setFont(mainFont);
         userControlPane.getChildren().add(outOfBoundsCounter);
 
+        outputMode = new Label("Вывод выключен!");
+        outputMode.setTextFill(Color.INDIANRED);
+        outputMode.setFont(mainFont);
+        userControlPane.getChildren().add(outputMode);
 
         userControlWindows.show();
     }

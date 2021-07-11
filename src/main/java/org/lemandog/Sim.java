@@ -45,12 +45,13 @@ public class Sim {
         CHA_SIZE[2] = Integer.parseInt(App.zFrameLen.getText());
 
         TAR_SIZE[0] = CHA_SIZE[0] * App.targetSizeX.getValue();
-        TAR_SIZE[1] = 1;
+        TAR_SIZE[1] = CHA_SIZE[1]/100;
         TAR_SIZE[2] = CHA_SIZE[2] * App.targetSizeZ.getValue();
 
         GEN_SIZE[0] = CHA_SIZE[0] * App.genSizeX.getValue();
-        GEN_SIZE[1] = 1;
+        GEN_SIZE[1] = CHA_SIZE[1]/100;
         GEN_SIZE[2] = CHA_SIZE[2] * App.genSizeZ.getValue();
+
         lastRunning = 0;
         avilableStreams = (int) App.threadCount.getValue();
         calculator = new Thread[avilableStreams];
