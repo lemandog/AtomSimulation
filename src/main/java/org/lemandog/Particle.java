@@ -16,7 +16,7 @@ public class Particle{
     Color activeCol = Color.WHITE;
     Color wallhitCol = Color.INDIANRED;
     Color TarHitCol = Color.SKYBLUE;
-
+    int ordinal;
     double[] coordinates;
     double[] speeds;
     double freerunLen;
@@ -30,7 +30,8 @@ public class Particle{
     Cylinder paths = new Cylinder();
     Cylinder pathsADJ = new Cylinder();
 
-    Particle(){ //Конструктор класса, вызывается при создании экземпляра
+    Particle(int ordinal){ //Конструктор класса, вызывается при создании экземпляра
+        this.ordinal = ordinal; //Внутреннее порядковое число частицы. Нужно только для вывода
         this.rand = new Random();//Генератор случайных числе нужен для генерации скоростей и координат
 
         coordinates = generateCord();
@@ -80,37 +81,46 @@ public class Particle{
             long stepsPassed = 0;
 
             while(active && stepsPassed<LEN){
-                if(active) {
-                    //Нынешнее приращение
-                    double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
-                            2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
-                    //Новые координаты
-                    Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-                    Point3D oldCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
+                //Нынешнее приращение
+                double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
+                        2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
+                //Новые координаты
+                Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
+                Point3D oldCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
 
-                    for(int i = 0; i<3; i++) {
-                        coordinates[i] = coordinates[i] + dN * speeds[i];
-                    }
-                    Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-                    Point3D newCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
+                for(int i = 0; i<3; i++) {
+                    coordinates[i] = coordinates[i] + dN * speeds[i];
+                }
+                Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
+                Point3D newCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
 
-                    paths = EngineDraw.createConnection(oldCord,newCord);
-                    pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
+                paths = EngineDraw.createConnection(oldCord,newCord);
+                pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
+                getCurrSphere();
+                active = wallCheck(paths, pathsADJ,stepsPassed) && tarNotMet(paths,pathsADJ,stepsPassed);
 
-                    getCurrSphere();
-                    active = wallCheck(paths, pathsADJ) && tarNotMet(paths,pathsADJ);
-                    //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
-                    //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
-                    paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
-                    pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
-                    //длина пробега
-                    freerunLen = calcRandLen();
-                    //скорости
-                    speeds = generateSpeed(0);
-                    stepsPassed++;
-                } else {
-                    break;}//Остановка исполнения, если не активна
+                //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
+                //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
+                paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+                pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+                //длина пробега
+                freerunLen = calcRandLen();
+                //скорости
+                speeds = generateSpeed(0);
+                Output.statesF[this.ordinal][(int)stepsPassed] =  1;
+                if (!active){
+                    aliveCounterI--;
+                    Output.statesF[this.ordinal][(int)stepsPassed] =  0;}
+                if (wallIsHit && !tarIsHit){
+                    outOfBoundsCounterI++;
+                    Output.statesO[this.ordinal][(int)stepsPassed] =1;} else {Output.statesO[this.ordinal][(int)stepsPassed] =0;}
+                if (tarIsHit){
+                    tarHitCounterI++;
+                    Output.statesH[this.ordinal][(int)stepsPassed] =1;} else {Output.statesH[this.ordinal][(int)stepsPassed] =0;}
+
+                stepsPassed++;
             }
+
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
 
 
@@ -119,27 +129,31 @@ public class Particle{
         return product;
     }
 
-    private boolean tarNotMet(Cylinder path, Cylinder pathADJ) {
+    private boolean tarNotMet(Cylinder path, Cylinder pathADJ, long stepsPassed) {
         Bounds pathB = path.getBoundsInParent();
         Bounds tarB = targetR.getBoundsInParent();
         if(pathB.intersects(tarB)){
-            tarHitCounterI++;
+            this.tarIsHit = true;
             thisParticleMat.setDiffuseColor(TarHitCol);
             drawAPath(pathADJ);
             return false;
         }
+
+
+
         return true;
     }
 
-    private boolean wallCheck(Cylinder path, Cylinder pathADJ) {
+    private boolean wallCheck(Cylinder path, Cylinder pathADJ, long stepsPassed) {
         Bounds pathB = path.getBoundsInParent();
         Bounds boxB = chamberR.getBoundsInParent();
         if(!pathB.intersects(boxB)){
+            this.wallIsHit = true;
             thisParticleMat.setDiffuseColor(wallhitCol);
             drawAPath(pathADJ);
-            outOfBoundsCounterI++;
             return false;
         }
+
         return true;
     }
 

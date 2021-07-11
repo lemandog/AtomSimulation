@@ -2,6 +2,9 @@ package org.lemandog;
 
 
 import javafx.animation.Timeline;
+
+import java.util.Arrays;
+
 import static org.lemandog.EngineDraw.DrawingThread;
 
 public class Sim {
@@ -23,6 +26,7 @@ public class Sim {
 
     public static int tarHitCounterI = 0;
     public static int outOfBoundsCounterI = 0;
+    public static int aliveCounterI = 0;
 
     public static int avilableStreams = Runtime.getRuntime().availableProcessors();
     public static int nbRunning = 0;
@@ -38,6 +42,7 @@ public class Sim {
         p = Math.pow(Double.parseDouble(App.pressure.getText()),Double.parseDouble(App.pressurePow.getText()));
         T = Integer.parseInt(App.tempAm.getText());
         N = Integer.parseInt(App.particleAm.getText());
+        aliveCounterI = N;
         LEN = Integer.parseInt(App.stepsAm.getText());
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
         CHA_SIZE[0] = Integer.parseInt(App.xFrameLen.getText());
@@ -57,13 +62,17 @@ public class Sim {
         calculator = new Thread[avilableStreams];
         pathsDr = App.pathDrawing.isSelected();
 
+        Output.statesH = new int[N][LEN]; // Для переписи приземлившихся промахнувшихся и живых частиц
+        Output.statesO = new int[N][LEN];
+        Output.statesF = new int[N][LEN];
+
         for (int i = 0; i < avilableStreams; i++) {
             calculator[i] = new Thread();
         }
 
         container = new Particle[N];
         for (int i = 0; i < N; i++) {
-            container[i] = new Particle();
+            container[i] = new Particle(i);
         }
     }
     public static void genTest() {
@@ -106,6 +115,9 @@ public class Sim {
             }
             mainanim.stop();
         System.out.println("SIMULATION RUN ENDED");
+        if (Output.output){
+            Output.toFile();
+        }
         simIsAlive = false;
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);
@@ -123,6 +135,5 @@ public class Sim {
             }
         }
         return thereAreDeadThreads;
-
     }
 }

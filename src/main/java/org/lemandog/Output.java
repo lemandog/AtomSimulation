@@ -10,16 +10,23 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 
 import static org.lemandog.App.mainFont;
 import static org.lemandog.App.outputMode;
 
 public class Output {
+
     static DirectoryChooser directoryChooserOutputPath = new DirectoryChooser();
     public static boolean output = false;
     public static CheckBox outputAsk;
     public static CheckBox outputAskPic;
     public static Slider outputAskPicResolution;
+    public static int[][] statesH;
+    public static int[][] statesO;
+    public static int[][] statesF;
     static Stage setOutput = new Stage();
     static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
     public static void ConstructOutputAFrame() {
@@ -80,9 +87,15 @@ public class Output {
         returnBut.setOnAction(e -> {
             Output.disp();
         });
+        Button saveResNow = new Button("Сохранить результат");
+        saveResNow.setFont(mainFont);
+        saveResNow.setOnAction(e -> {
+            Output.toFile();
+        });
 
         compOutput.getChildren().add(choDir);
         compOutput.getChildren().add(dirChoBut);
+        compOutput.getChildren().add(saveResNow);
         compOutput.getChildren().add(returnBut);
 
         setOutput.setScene(setOutputSc);
@@ -100,6 +113,39 @@ public class Output {
         else{
             outputMode.setText("Вывод выключен!");
             outputMode.setTextFill(Color.INDIANRED);
+        }
+
+    }
+
+    public static void toFile() {
+        try {
+            PrintWriter active = new PrintWriter(selectedPath.getAbsolutePath() + "/actives.txt");
+            PrintWriter tarHits = new PrintWriter(selectedPath.getAbsolutePath() + "/tarHits.txt");
+            PrintWriter outOfBounds = new PrintWriter(selectedPath.getAbsolutePath() + "/outOfBounds.txt");
+
+            int thisStepWallHitSum=0;
+            int thisStepTarHitSum=0;
+
+            for(int y=0;y<Sim.LEN;y++){
+                int thisStepActiveSum=0;
+                for(int x=0;x<Sim.N;x++){
+                    thisStepActiveSum = thisStepActiveSum + statesF[x][y];
+                    thisStepWallHitSum= thisStepWallHitSum + statesO[x][y];
+                    thisStepTarHitSum = thisStepTarHitSum + statesH[x][y];
+                }
+                active.println(thisStepActiveSum);
+                outOfBounds.println(thisStepWallHitSum);
+                tarHits.println(thisStepTarHitSum);
+            }
+
+            active.close();
+            tarHits.close();
+            outOfBounds.close();
+            System.out.println("RESULTS ARE SAVED AT " + selectedPath.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            System.out.println("IT SEEMS, THAT DIRECTORY TO WHICH YOU WANT TO SAVE RESULTS IS READ ONLY OR UNAVAILABLE." +
+                    "TRY TO SAVE AGAIN, BY ENTERING DIFFERENT DIRECTORY IN OUTPUT OPTIONS AND PRESSING SAVE RESULTS");
+            e.printStackTrace();
         }
 
     }

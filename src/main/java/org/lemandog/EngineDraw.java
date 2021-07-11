@@ -141,7 +141,6 @@ public class EngineDraw {
                 EngineDraw.root.getChildren().remove(drawing[i]);
                 drawing[i] = engine3D(Sim.container[i]);
                 EngineDraw.root.getChildren().add(drawing[i]);
-
             }
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
