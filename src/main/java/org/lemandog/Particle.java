@@ -97,7 +97,7 @@ public class Particle{
                 paths = EngineDraw.createConnection(oldCord,newCord);
                 pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
                 getCurrSphere();
-                active = wallCheck(paths, pathsADJ,stepsPassed) && tarNotMet(paths,pathsADJ,stepsPassed);
+                active = wallCheck(paths, pathsADJ) && tarNotMet(paths,pathsADJ);
 
                 //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
@@ -107,6 +107,7 @@ public class Particle{
                 freerunLen = calcRandLen();
                 //скорости
                 speeds = generateSpeed(0);
+
                 Output.statesF[this.ordinal][(int)stepsPassed] =  1;
                 if (!active){
                     aliveCounterI--;
@@ -120,16 +121,14 @@ public class Particle{
 
                 stepsPassed++;
             }
-
+            if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
-
-
         });
         product.setPriority(Thread.MIN_PRIORITY);
         return product;
     }
 
-    private boolean tarNotMet(Cylinder path, Cylinder pathADJ, long stepsPassed) {
+    private boolean tarNotMet(Cylinder path, Cylinder pathADJ) {
         Bounds pathB = path.getBoundsInParent();
         Bounds tarB = targetR.getBoundsInParent();
         if(pathB.intersects(tarB)){
@@ -144,7 +143,7 @@ public class Particle{
         return true;
     }
 
-    private boolean wallCheck(Cylinder path, Cylinder pathADJ, long stepsPassed) {
+    private boolean wallCheck(Cylinder path, Cylinder pathADJ) {
         Bounds pathB = path.getBoundsInParent();
         Bounds boxB = chamberR.getBoundsInParent();
         if(!pathB.intersects(boxB)){

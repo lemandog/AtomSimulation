@@ -148,9 +148,7 @@ public class EngineDraw {
     }
 
     public static Timeline CylinderThread(Cylinder path) {
-        Timeline cylTr = new Timeline(new KeyFrame(Duration.millis(100), event -> {
-           EngineDraw.root.getChildren().add(path);
-        }));
+        Timeline cylTr = new Timeline(new KeyFrame(Duration.millis(100), event -> EngineDraw.root.getChildren().add(path)));
         cylTr.setCycleCount(1);
         return cylTr;
     }

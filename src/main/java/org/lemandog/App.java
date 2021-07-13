@@ -36,7 +36,7 @@ public class App extends Application {
 
     public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage){
         Stage userControlWindows = new Stage();
         userControlWindows.setResizable(false);
 
@@ -184,15 +184,13 @@ public class App extends Application {
 
         Button startSimButt = new Button("Старт симуляции");
         startSimButt.setFont(mainFont);
-        startSimButt.setOnAction(event -> {Sim.start();});
+        startSimButt.setOnAction(event -> Sim.start());
         Button genTest = new Button("Тест генератора частиц");
         genTest.setFont(mainFont);
         genTest.setOnAction(event -> Sim.genTest());
         Button outputOption = new Button("Парамеры вывода");
         outputOption.setFont(mainFont);
-        outputOption.setOnAction(event -> {
-            Output.disp();
-            });
+        outputOption.setOnAction(event -> Output.disp());
 
         userControlPane.getChildren().add(startSimButt);
         userControlPane.getChildren().add(genTest);

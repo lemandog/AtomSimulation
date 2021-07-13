@@ -2,8 +2,7 @@ package org.lemandog;
 
 
 import javafx.animation.Timeline;
-
-import java.util.Arrays;
+import javafx.scene.image.Image;
 
 import static org.lemandog.EngineDraw.DrawingThread;
 
@@ -12,7 +11,6 @@ public class Sim {
     private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
     static double m=m_Cr*1.660539040e-27; //масса ХРОМ, кг
     private static final double d = 130*10e-12;//Диаметр хрома (м)
-    private static final double R=8.31;
     public static int T;
     public static double p;
     static int N;
@@ -45,6 +43,7 @@ public class Sim {
         aliveCounterI = N;
         LEN = Integer.parseInt(App.stepsAm.getText());
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
+
         CHA_SIZE[0] = Integer.parseInt(App.xFrameLen.getText());
         CHA_SIZE[1] = Integer.parseInt(App.yFrameLen.getText());
         CHA_SIZE[2] = Integer.parseInt(App.zFrameLen.getText());
@@ -65,6 +64,10 @@ public class Sim {
         Output.statesH = new int[N][LEN]; // Для переписи приземлившихся промахнувшихся и живых частиц
         Output.statesO = new int[N][LEN];
         Output.statesF = new int[N][LEN];
+        Output.xSize = ((int) Output.outputAskPicResolution.getValue()*(int)TAR_SIZE[0]);
+        Output.zSize = ((int) Output.outputAskPicResolution.getValue()*(int)TAR_SIZE[2]);
+        Output.picState = new int[Output.xSize][Output.zSize];
+        Output.palette = new Image("/heatmap"+(int) Output.outputPallete.getValue()+".png");
 
         for (int i = 0; i < avilableStreams; i++) {
             calculator[i] = new Thread();
@@ -80,6 +83,11 @@ public class Sim {
     EngineDraw.esetup();
     mainContr = new Thread(); //Иначе будет NullPointerException
     EngineDraw.DrawingThread(container).playFromStart();
+        for (int x = 0; x<Output.xSize;x++){
+            for (int y = 0; y<Output.zSize;y++) {
+                Output.picState[x][y] = (int) (Math.random() * 15);
+            }}
+            Output.toFile();
     }
 
 
@@ -115,9 +123,7 @@ public class Sim {
             }
             mainanim.stop();
         System.out.println("SIMULATION RUN ENDED");
-        if (Output.output){
-            Output.toFile();
-        }
+        Output.toFile();
         simIsAlive = false;
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);
