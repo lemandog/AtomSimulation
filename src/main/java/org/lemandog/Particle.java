@@ -96,9 +96,11 @@ public class Particle{
 
                 paths = EngineDraw.createConnection(oldCord,newCord);
                 pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
-                getCurrSphere();
-                active = wallCheck(paths, pathsADJ) && tarNotMet(paths,pathsADJ);
 
+                getCurrSphere();
+                tarNotMet(paths,pathsADJ);
+                wallCheck(paths);
+                active = !wallIsHit && !tarIsHit;
                 //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
@@ -118,7 +120,6 @@ public class Particle{
                 if (tarIsHit){
                     tarHitCounterI++;
                     Output.statesH[this.ordinal][(int)stepsPassed] =1;} else {Output.statesH[this.ordinal][(int)stepsPassed] =0;}
-
                 stepsPassed++;
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
@@ -128,32 +129,27 @@ public class Particle{
         return product;
     }
 
-    private boolean tarNotMet(Cylinder path, Cylinder pathADJ) {
+    private void tarNotMet(Cylinder path, Cylinder pathADJ) {
         Bounds pathB = path.getBoundsInParent();
         Bounds tarB = targetR.getBoundsInParent();
-        if(pathB.intersects(tarB)){
+        if(tarB.intersects(pathB)){
             this.tarIsHit = true;
+            System.out.println("PARTICLE " + ordinal + " HIT TARGET!");
             thisParticleMat.setDiffuseColor(TarHitCol);
             drawAPath(pathADJ);
-            return false;
         }
 
-
-
-        return true;
     }
 
-    private boolean wallCheck(Cylinder path, Cylinder pathADJ) {
+    private void wallCheck(Cylinder path) {
         Bounds pathB = path.getBoundsInParent();
         Bounds boxB = chamberR.getBoundsInParent();
-        if(!pathB.intersects(boxB)){
+        if((boxB.getMaxX()<pathB.getMaxX() || boxB.getMinX()>pathB.getMinX() || // Если путь выходит за пределы коробки
+           boxB.getMaxY()<pathB.getMaxY() || boxB.getMinY()>pathB.getMinY() ||
+           boxB.getMaxZ()<pathB.getMaxZ() || boxB.getMinZ()>pathB.getMinZ()) && !this.tarIsHit){
             this.wallIsHit = true;
             thisParticleMat.setDiffuseColor(wallhitCol);
-            drawAPath(pathADJ);
-            return false;
         }
-
-        return true;
     }
 
     public Sphere getCurrSphere() {
@@ -167,7 +163,7 @@ public class Particle{
     private void drawAPath(Cylinder pathADJ){
         if(pathsDr){
             pathADJ.setMaterial(thisParticleMat);
-            EngineDraw.CylinderThread(pathADJ).play();
+            EngineDraw.CylinderThread(pathADJ);
         }
     }
 }

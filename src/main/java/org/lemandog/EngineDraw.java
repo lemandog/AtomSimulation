@@ -152,17 +152,14 @@ public class EngineDraw {
         return timeline;
     }
 
-    public static Timeline CylinderThread(Cylinder path) {
-        Timeline cylTr = new Timeline(new KeyFrame(Duration.millis(100), event -> EngineDraw.root.getChildren().add(path)));
-        cylTr.setCycleCount(1);
-        return cylTr;
+    public static void CylinderThread(Cylinder path) {
+        Platform.runLater(()-> EngineDraw.root.getChildren().add(path));
     }
 
     public static Cylinder createConnection(Point3D origin, Point3D target) {
         Point3D yAxis = new Point3D(0, 1, 0);
         Point3D diff = target.subtract(origin);
         double height = diff.magnitude();
-
         Point3D mid = target.midpoint(origin);
         Translate moveToMidpoint = new Translate(mid.getX(), mid.getY(), mid.getZ());
 
