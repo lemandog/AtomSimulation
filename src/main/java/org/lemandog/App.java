@@ -1,5 +1,6 @@
 package org.lemandog;
 
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -35,6 +36,8 @@ public class App extends Application {
     public static Label outputMode;
 
     public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
+    public static Timeline timelineT;
+
     @Override
     public void start(Stage stage){
         Stage userControlWindows = new Stage();
@@ -44,6 +47,8 @@ public class App extends Application {
         Image icon = new Image("/atomSim.png");
         userControlWindows.getIcons().add(icon);
         userControlWindows.setTitle("Контроль");
+
+        userControlWindows.setOnCloseRequest(event -> System.exit(0));
 
         Scene userControl = new Scene(userControlPane,500,720); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);

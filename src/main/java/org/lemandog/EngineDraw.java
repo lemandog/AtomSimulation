@@ -3,6 +3,7 @@ package org.lemandog;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
@@ -109,25 +110,23 @@ public class EngineDraw {
         tarMat.setSpecularPower(1);
         target.setMaterial(tarMat);
 
-        drawing = new Sphere[N];
+        drawing = new Sphere[N]; //Это сферы именно для отрисовки. Чтобы не было путаницы с ещё одними экземплярами сфер внутри частиц
 
         root.getChildren().add(target);
         root.getChildren().add(generator);
         root.getChildren().add(chamber);
 
         for (int i = 0; i < Sim.N; i++) {
-            drawing[i] = engine3D(Sim.container[i]);
-            EngineDraw.root.getChildren().add(drawing[i]);
-
+            drawing[i] = engine3D(Sim.container[i]); //Сферы к месту для отрисовки
+            EngineDraw.root.getChildren().add(drawing[i]); //Добавляем в сцену
         }
         draw.setTitle("Drawing simulation");
         draw.setScene(scene);
         draw.show();
     }
 
-    public static Timeline DrawingThread(Particle[] objects) {
-        timeline= new Timeline(new KeyFrame(Duration.millis(50), event -> {
-
+    public static Timeline TextUpdate() {
+        App.timelineT= new Timeline(new KeyFrame(Duration.millis(50), event -> {
             if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);} else {
                 partStatusRunning.setTextFill(Color.BLACK);
             }
@@ -136,12 +135,18 @@ public class EngineDraw {
             partStatusDone.setText(" Частиц готово: " + lastRunning);
             targetHitCounter.setText(" Упало на мишень: " + tarHitCounterI);
             outOfBoundsCounter.setText(" Упало на стены: " + outOfBoundsCounterI);
-
-            for(int i = 0; i<objects.length; i++){
+        }));
+        timelineT.setCycleCount(Animation.INDEFINITE);
+        return timelineT;
+    }
+    public static Timeline DrawingThreadFire() {
+        timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+        Platform.runLater(()-> {
+            for(int i = 0; i<drawing.length; i++){
                 EngineDraw.root.getChildren().remove(drawing[i]);
                 drawing[i] = engine3D(Sim.container[i]);
                 EngineDraw.root.getChildren().add(drawing[i]);
-            }
+            }});
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
         return timeline;

@@ -1,10 +1,8 @@
 package org.lemandog;
 
-
-import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 
-import static org.lemandog.EngineDraw.DrawingThread;
+import static org.lemandog.EngineDraw.*;
 
 public class Sim {
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
@@ -82,7 +80,7 @@ public class Sim {
     setup();
     EngineDraw.esetup();
     mainContr = new Thread(); //Иначе будет NullPointerException
-    EngineDraw.DrawingThread(container).playFromStart();
+    DrawingThreadFire();
         for (int x = 0; x<Output.xSize;x++){
             for (int y = 0; y<Output.zSize;y++) {
                 Output.picState[x][y] = (int) (Math.random() * 15);
@@ -97,8 +95,11 @@ public class Sim {
         simIsAlive = true;
         EngineDraw.esetup();
 
-        Timeline mainanim = DrawingThread(container);
-        mainanim.play();
+        DrawingThreadFire();//Поток на отрисовку в EngineDraw (EngineDraw.timeline)
+        TextUpdate(); //На отрисовку текста - отдельный тред в App (App.timelineT)
+        //Это делает код менее читабельным, но гораздо более быстрым.
+        timeline.play();
+        App.timelineT.play();
 
         mainContr = new Thread(() ->{
         while(lastRunning < N) {
@@ -121,7 +122,8 @@ public class Sim {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            mainanim.stop();
+            timeline.stop();
+            App.timelineT.stop();
         System.out.println("SIMULATION RUN ENDED");
         Output.toFile();
         simIsAlive = false;
