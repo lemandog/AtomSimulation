@@ -62,9 +62,10 @@ public class Sim {
         Output.statesH = new int[N][LEN]; // Для переписи приземлившихся промахнувшихся и живых частиц
         Output.statesO = new int[N][LEN];
         Output.statesF = new int[N][LEN];
-        Output.xSize = ((int) Output.outputAskPicResolution.getValue()*(int)TAR_SIZE[0]);
-        Output.zSize = ((int) Output.outputAskPicResolution.getValue()*(int)TAR_SIZE[2]);
-        Output.picState = new int[Output.xSize][Output.zSize];
+        Output.xSize = (int) TAR_SIZE[0];
+        Output.zSize = (int) TAR_SIZE[2];
+        Output.picState = new int[Output.xSize+2][Output.zSize+2]; //+2 - это для запаса.
+        // Иногда координата немного выходит за пределы из за перевода в целочисленное значение
         Output.palette = new Image("/heatmap"+(int) Output.outputPallete.getValue()+".png");
 
         for (int i = 0; i < avilableStreams; i++) {

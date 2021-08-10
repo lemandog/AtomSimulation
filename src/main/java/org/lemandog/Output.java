@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static org.lemandog.App.mainFont;
@@ -37,10 +36,8 @@ public class Output {
     public static CheckBox outputAskGraph;
     public static Slider outputAskPicResolution;
     public static Slider outputPallete;
-    static double minZ;
-    static double maxZ;
-    static double minX;
-    static double maxX;
+    static double maxDepth;
+    static double maxWidth;
     public static int[][] statesH;
     public static int[][] statesO;
     public static int[][] statesF;
@@ -249,7 +246,7 @@ public class Output {
 }
 
     private static Image toImage(int[][] modelRes){
-        WritableImage writeHere = new WritableImage(xSize,zSize);
+        WritableImage writeHere = new WritableImage((int) maxWidth,(int) maxDepth);
         PixelWriter outPix = writeHere.getPixelWriter();
 
         int biggest = 0;
@@ -272,16 +269,13 @@ public class Output {
         return writeHere;
     }
     public static void picStateReact(double xCord, double zCord){
-            int offsetX = (int) (Math.abs(minX) + Math.abs(maxX));
-            int offsetZ = (int) (Math.abs(minZ) + Math.abs(maxZ));
-            picState[offsetX - (int)xCord][offsetZ - (int)zCord] += 1;
-            System.out.println("AT "+ (offsetX - (int)xCord) + " & " + (offsetZ - (int)zCord) + " PIC IS WRITTEN");
+            System.out.println("OFFSET X " + xSize/2 +" OFFSET Z " + zSize/2);
+            System.out.println("AT X "+ (int)xCord + " & Z " + (int)zCord  + " PIC IS WRITTEN");
+            picState[xSize/2 - (int)xCord][zSize/2 - (int)zCord] += 1;
     }
 
     public static void setTargetSize(Bounds target) {
-        maxX = target.getMaxX();
-        minX = target.getMinX();
-        maxZ = target.getMaxZ();
-        minZ = target.getMinZ();
+        maxWidth = target.getWidth();
+        maxDepth = target.getDepth();
     }
 }
