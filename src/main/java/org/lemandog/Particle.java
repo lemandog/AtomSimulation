@@ -1,6 +1,5 @@
 package org.lemandog;
 
-import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
@@ -96,15 +95,12 @@ public class Particle{
 
                 paths = EngineDraw.createConnection(oldCord,newCord);
                 pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
-
                 getCurrSphere();
                 //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
                 tarNotMet(oldCord,newCord);
-                wallCheck(paths);
+                wallCheck(oldCord,newCord);
                 active = !wallIsHit && !tarIsHit;
-                paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
-                pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
                 //длина пробега
                 freerunLen = calcRandLen();
                 //скорости
@@ -115,12 +111,17 @@ public class Particle{
                     aliveCounterI--;
                     Output.statesF[this.ordinal][(int)stepsPassed] =  0;}
                 if (wallIsHit && !tarIsHit){
+                    drawAPath(pathsADJ);
                     outOfBoundsCounterI++;
                     Output.statesO[this.ordinal][(int)stepsPassed] =1;} else {Output.statesO[this.ordinal][(int)stepsPassed] =0;}
                 if (tarIsHit){
+                    Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
+                    drawAPath(pathsADJ);
                     tarHitCounterI++;
                     Output.statesH[this.ordinal][(int)stepsPassed] =1;} else {Output.statesH[this.ordinal][(int)stepsPassed] =0;}
                 stepsPassed++;
+                paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+                pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
@@ -130,7 +131,7 @@ public class Particle{
     }
 
     private void tarNotMet(Point3D oldCord, Point3D newCord) {
-        if(EngineDraw.takePoint(oldCord,newCord,this)){
+        if(EngineDraw.takePointOnTarget(oldCord,newCord,this)){
             this.tarIsHit = true;
             System.out.println("PARTICLE " + ordinal + " HIT TARGET!");
             thisParticleMat.setDiffuseColor(TarHitCol);
@@ -138,12 +139,8 @@ public class Particle{
 
     }
 
-    private void wallCheck(Cylinder path) {
-        Bounds pathB = path.getBoundsInParent();
-        Bounds boxB = chamberR.getBoundsInParent();
-        if((boxB.getMaxX()<pathB.getMaxX() || boxB.getMinX()>pathB.getMinX() || // Если путь выходит за пределы коробки
-           boxB.getMaxY()<pathB.getMaxY() || boxB.getMinY()>pathB.getMinY() ||
-           boxB.getMaxZ()<pathB.getMaxZ() || boxB.getMinZ()>pathB.getMinZ()) && !this.tarIsHit){
+    private void wallCheck(Point3D oldCord, Point3D newCord) {
+        if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
             this.wallIsHit = true;
             thisParticleMat.setDiffuseColor(wallhitCol);
         }
@@ -157,10 +154,5 @@ public class Particle{
         obj.setTranslateZ(coordinates[2]);
         return obj;
     }
-    private void drawAPath(Cylinder pathADJ){
-        if(pathsDr){
-            pathADJ.setMaterial(thisParticleMat);
-            EngineDraw.CylinderThread(pathADJ);
-        }
-    }
+
 }

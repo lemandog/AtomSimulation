@@ -62,8 +62,6 @@ public class EngineDraw {
     public static void esetup() { //Отрисовка камеры
         root = new Group();
         draw.setResizable(true);
-
-
         Scene scene = new Scene(root, 600, 600);
 
         Image icon = new Image("/atomSim.png");
@@ -82,6 +80,7 @@ public class EngineDraw {
         targetR.setTranslateY((-CHA_SIZE[1]/2));
         target.setTranslateY(getAdjustedCord(-CHA_SIZE[1]/2));
         target.setTranslateZ(0);
+        Output.setTargetSize(targetR.getBoundsInParent());
         Box generator = new Box(getAdjustedCord(GEN_SIZE[0]),getAdjustedCord(GEN_SIZE[1]),getAdjustedCord(GEN_SIZE[2]));
         Box generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
         generator.setTranslateX(0);
@@ -174,11 +173,14 @@ public class EngineDraw {
         return line;
     }
 
-    public static boolean takePoint(Point3D origin, Point3D target, Particle inUse){
+    public static boolean takePointOnTarget(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
-        //Так как мишень перпендикулярна оси Y, логично искать точку пересечения, естественно, от Y
-        //XYZ уравнение прямой
-        for (double i = 0; i < 1; i+=0.01) {
+        //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
+        //Всё потому что Bounds.intersect считает неверно.
+        double mixY = origin.getY();
+        double maxY = target.getY();
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*10);//Шаг обратно пропорционален пути который нужно пройти
+        for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
             product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
@@ -201,5 +203,37 @@ public class EngineDraw {
         }
         return false;
     }
+    public static boolean takePointOnChamber(Point3D origin, Point3D target, Particle inUse){
+        Sphere product = new Sphere();
+        //Так как мишень перпендикулярна оси Y, логично искать точку пересечения, естественно, от Y
+        //XYZ уравнение прямой
+        double chamberMinX = chamberR.getBoundsInParent().getMinX();
+        double chamberMaxX = chamberR.getBoundsInParent().getMaxX();
+        double chamberMinY = chamberR.getBoundsInParent().getMinY();
+        double chamberMaxY = chamberR.getBoundsInParent().getMaxY();
+        double chamberMinZ = chamberR.getBoundsInParent().getMinZ();
+        double chamberMaxZ = chamberR.getBoundsInParent().getMaxZ();
 
+        for (double i = 0; i < 1; i+=0.01) {
+            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
+            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
+            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+            if (chamberMinX>product.getBoundsInParent().getCenterX() || chamberMaxX<product.getBoundsInParent().getCenterX() ||
+                chamberMinY>product.getBoundsInParent().getCenterY() || chamberMaxY<product.getBoundsInParent().getCenterY() ||
+                chamberMinZ>product.getBoundsInParent().getCenterZ() || chamberMaxZ<product.getBoundsInParent().getCenterZ()
+            ){
+                        inUse.coordinates[0] = product.getTranslateX();
+                        inUse.coordinates[1] = product.getTranslateY();
+                        inUse.coordinates[2] = product.getTranslateZ();
+                        inUse.obj = product;
+                        return true;
+            }
+        }
+        return false;
+    }
+    static void drawAPath(Cylinder pathADJ){
+        if(pathsDr){
+            EngineDraw.CylinderThread(pathADJ);
+        }
+    }
 }

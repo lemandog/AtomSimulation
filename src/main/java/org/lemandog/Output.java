@@ -1,5 +1,6 @@
 package org.lemandog;
 
+import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.lemandog.App.mainFont;
@@ -35,6 +37,10 @@ public class Output {
     public static CheckBox outputAskGraph;
     public static Slider outputAskPicResolution;
     public static Slider outputPallete;
+    static double minZ;
+    static double maxZ;
+    static double minX;
+    static double maxX;
     public static int[][] statesH;
     public static int[][] statesO;
     public static int[][] statesF;
@@ -229,7 +235,7 @@ public class Output {
                 pen.setColor(x,y,Color.WHITE);
             }
             for (int y = 0; y < Sim.N; y++) {
-                //Х и У тут поменялись местами - дело в том, что изначально эта матрица была как бы повёрнута на 90 гр
+                //Х и У тут поменялись местами - дело в том, что изначально эта матрица была "повёрнута на 90 гр"
                 thisStepActiveSum = thisStepActiveSum + statesF[y][x];
                 thisStepWallHitSum = thisStepWallHitSum + statesO[y][x];
                 thisStepTarHitSum = thisStepTarHitSum + statesH[y][x];
@@ -247,8 +253,8 @@ public class Output {
         PixelWriter outPix = writeHere.getPixelWriter();
 
         int biggest = 0;
-        for (int x = 0; x<xSize;x++){
-            for (int y = 0; y<zSize;y++) {
+        for (int x = 0; x<writeHere.getWidth();x++){
+            for (int y = 0; y<writeHere.getHeight();y++) {
                 if(modelRes[x][y] > biggest){biggest = modelRes[x][y];} //Ищем наибольшее
             }}
 
@@ -264,5 +270,18 @@ public class Output {
                 outPix.setColor(x,y,colSel(modelRes[x][y]));//Вывод из палитры
             }}
         return writeHere;
+    }
+    public static void picStateReact(double xCord, double zCord){
+            int offsetX = (int) (Math.abs(minX) + Math.abs(maxX));
+            int offsetZ = (int) (Math.abs(minZ) + Math.abs(maxZ));
+            picState[offsetX - (int)xCord][offsetZ - (int)zCord] += 1;
+            System.out.println("AT "+ (offsetX - (int)xCord) + " & " + (offsetZ - (int)zCord) + " PIC IS WRITTEN");
+    }
+
+    public static void setTargetSize(Bounds target) {
+        maxX = target.getMaxX();
+        minX = target.getMinX();
+        maxZ = target.getMaxZ();
+        minZ = target.getMinZ();
     }
 }
