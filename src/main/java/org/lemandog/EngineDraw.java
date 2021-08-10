@@ -174,4 +174,32 @@ public class EngineDraw {
         return line;
     }
 
+    public static boolean takePoint(Point3D origin, Point3D target, Particle inUse){
+        Sphere product = new Sphere();
+        //Так как мишень перпендикулярна оси Y, логично искать точку пересечения, естественно, от Y
+        //XYZ уравнение прямой
+        for (double i = 0; i < 1; i+=0.01) {
+            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
+            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
+            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+            if (origin.getY() + (target.getY() - origin.getY())*i<targetR.getBoundsInParent().getMaxY()
+                    && origin.getY() + (target.getY() - origin.getY())*i>targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
+
+                if (product.getBoundsInParent().getMinX()>targetR.getBoundsInParent().getMinX()
+                        && product.getBoundsInParent().getMaxX()<targetR.getBoundsInParent().getMaxX()){ //Попадание по X
+                    if (product.getBoundsInParent().getMinZ()>targetR.getBoundsInParent().getMinZ()
+                            && product.getBoundsInParent().getMaxZ()<targetR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+                        inUse.coordinates[0] = product.getTranslateX();
+                        inUse.coordinates[1] = product.getTranslateY();
+                        inUse.coordinates[2] = product.getTranslateZ();
+                        inUse.obj = product;
+                        System.out.println(origin.getY() + (target.getY() - origin.getY())*i + " " + targetR.getBoundsInParent().getMaxY()
+                                + " " + targetR.getBoundsInParent().getMinY());
+                        return true;
+                    }
+                }}
+        }
+        return false;
+    }
+
 }

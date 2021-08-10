@@ -98,11 +98,11 @@ public class Particle{
                 pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
 
                 getCurrSphere();
-                tarNotMet(paths,pathsADJ);
-                wallCheck(paths);
-                active = !wallIsHit && !tarIsHit;
                 //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
+                tarNotMet(oldCord,newCord);
+                wallCheck(paths);
+                active = !wallIsHit && !tarIsHit;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
                 pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
                 //длина пробега
@@ -129,14 +129,11 @@ public class Particle{
         return product;
     }
 
-    private void tarNotMet(Cylinder path, Cylinder pathADJ) {
-        Bounds pathB = path.getBoundsInParent();
-        Bounds tarB = targetR.getBoundsInParent();
-        if(tarB.intersects(pathB)){
+    private void tarNotMet(Point3D oldCord, Point3D newCord) {
+        if(EngineDraw.takePoint(oldCord,newCord,this)){
             this.tarIsHit = true;
             System.out.println("PARTICLE " + ordinal + " HIT TARGET!");
             thisParticleMat.setDiffuseColor(TarHitCol);
-            drawAPath(pathADJ);
         }
 
     }
