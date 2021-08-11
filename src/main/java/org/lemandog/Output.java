@@ -12,8 +12,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.lemandog.util.SwingFXUtils;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -132,7 +130,7 @@ public class Output {
         currPal.setScaleY(10);
         outputPallete.setOnMouseReleased((event) -> currPal.setImage(new Image("/heatmap"+(int) outputPallete.getValue()+".png")));
         outputPallete.setMin(1);
-        outputPallete.setMax(2);
+        outputPallete.setMax(4);
 
         compOutput.getChildren().add(paletteText);
         compOutput.getChildren().add(currPal);
@@ -177,7 +175,8 @@ public class Output {
                 Image res = toImage(picState); //Это javafx image
                 BufferedImage tmp = fromFXImage(res, null); //Это awt
                 //Конвертация в awt, потому как оно почему то возвращает awt image, а не buffered
-                java.awt.Image res2 = tmp.getScaledInstance((int)maxWidth*10,(int)maxDepth*10,BufferedImage.SCALE_AREA_AVERAGING);
+                assert tmp != null;
+                java.awt.Image res2 = tmp.getScaledInstance((int)maxWidth*10,(int)maxDepth*10,BufferedImage.SCALE_FAST);
                 //Конвертация обратно в buffered
                 BufferedImage bimage = new BufferedImage(res2.getWidth(null), res2.getHeight(null), BufferedImage.TYPE_INT_ARGB);
                 Graphics2D bGr = bimage.createGraphics();
