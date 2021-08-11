@@ -106,24 +106,31 @@ public class Particle{
                 //скорости
                 speeds = generateSpeed(0);
 
-                Output.statesF[this.ordinal][(int)stepsPassed] =  1;
+                if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  1;}
                 if (!active){
                     aliveCounterI--;
-                    Output.statesF[this.ordinal][(int)stepsPassed] =  0;}
+                    if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  0;}}
                 if (wallIsHit && !tarIsHit){
                     drawAPath(pathsADJ);
                     outOfBoundsCounterI++;
-                    Output.statesO[this.ordinal][(int)stepsPassed] =1;} else {Output.statesO[this.ordinal][(int)stepsPassed] =0;}
+                    if (Output.output || Output.outputGraph){Output.statesO[this.ordinal][(int)stepsPassed] =1;}
+                } else {
+                    if (Output.output || Output.outputGraph){Output.statesO[this.ordinal][(int)stepsPassed] =0;}
+                }
                 if (tarIsHit){
                     Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     drawAPath(pathsADJ);
                     tarHitCounterI++;
-                    Output.statesH[this.ordinal][(int)stepsPassed] =1;} else {Output.statesH[this.ordinal][(int)stepsPassed] =0;}
+                    if (Output.output || Output.outputGraph){Output.statesH[this.ordinal][(int)stepsPassed] =1;}
+                } else {
+                    if (Output.output || Output.outputGraph){Output.statesH[this.ordinal][(int)stepsPassed] =0;}
+                }
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
                 pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
+            System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit);
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
         });
         product.setPriority(Thread.MIN_PRIORITY);
@@ -133,7 +140,6 @@ public class Particle{
     private void tarNotMet(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnTarget(oldCord,newCord,this)){
             this.tarIsHit = true;
-            System.out.println("PARTICLE " + ordinal + " HIT TARGET!");
             thisParticleMat.setDiffuseColor(TarHitCol);
         }
 

@@ -7,12 +7,16 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.lemandog.util.SwingFXUtils;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -122,7 +126,6 @@ public class Output {
         outputPallete.setMaxWidth(setOutputSc.getWidth()/3);
         outputPallete.setValue(2);
         Label paletteText = new Label("Выбор палитры");
-        System.out.println("/heatmap"+(int) outputPallete.getValue()+".png");
         ImageView currPal = new ImageView("/heatmap"+(int) outputPallete.getValue()+".png");
         paletteText.setFont(mainFont);
         currPal.setScaleX(setOutputSc.getWidth()/10);
@@ -169,7 +172,19 @@ public class Output {
         if (outputPic){
             File outputfile = new File(selectedPath.getAbsolutePath() + "/hitsDetector.png");
             try {
-                ImageIO.write(Objects.requireNonNull(fromFXImage(toImage(picState), null)), "png", outputfile);
+                //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из за несовместимых библиотек.
+                // А потом ещё раз, потому что мне нужно увеличить картинку
+                Image res = toImage(picState); //Это javafx image
+                BufferedImage tmp = fromFXImage(res, null); //Это awt
+                //Конвертация в awt, потому как оно почему то возвращает awt image, а не buffered
+                java.awt.Image res2 = tmp.getScaledInstance((int)maxWidth*10,(int)maxDepth*10,BufferedImage.SCALE_AREA_AVERAGING);
+                //Конвертация обратно в buffered
+                BufferedImage bimage = new BufferedImage(res2.getWidth(null), res2.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+                Graphics2D bGr = bimage.createGraphics();
+                bGr.drawImage(res2, 0, 0, null);
+                bGr.dispose();
+                //Пишем bufferedImage стандартной библиотекой
+                ImageIO.write(bimage, "png", outputfile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -269,9 +284,9 @@ public class Output {
         return writeHere;
     }
     public static void picStateReact(double xCord, double zCord){
-            System.out.println("OFFSET X " + xSize/2 +" OFFSET Z " + zSize/2);
-            System.out.println("AT X "+ (int)xCord + " & Z " + (int)zCord  + " PIC IS WRITTEN");
-            picState[xSize/2 - (int)xCord][zSize/2 - (int)zCord] += 1;
+        if (outputPic){
+            picState[(int) ((int) (maxWidth/2) + xCord)][(int) ((int) (maxDepth/2) + zCord)] += 1;
+        }
     }
 
     public static void setTargetSize(Bounds target) {

@@ -58,19 +58,23 @@ public class Sim {
         avilableStreams = (int) App.threadCount.getValue();
         calculator = new Thread[avilableStreams];
         pathsDr = App.pathDrawing.isSelected();
-
-        Output.statesH = new int[N][LEN]; // Для переписи приземлившихся промахнувшихся и живых частиц
-        Output.statesO = new int[N][LEN];
-        Output.statesF = new int[N][LEN];
-        Output.xSize = (int) TAR_SIZE[0];
-        Output.zSize = (int) TAR_SIZE[2];
-        Output.picState = new int[Output.xSize+2][Output.zSize+2]; //+2 - это для запаса.
-        // Иногда координата немного выходит за пределы из за перевода в целочисленное значение
-        Output.palette = new Image("/heatmap"+(int) Output.outputPallete.getValue()+".png");
-
+        //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
+        //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
+        if(Output.outputGraph || Output.output) {
+            Output.statesH = new int[N][LEN]; // Для переписи приземлившихся промахнувшихся и живых частиц
+            Output.statesO = new int[N][LEN];
+            Output.statesF = new int[N][LEN];
+        }
+        if(Output.outputPic) {
+            Output.xSize = (int) CHA_SIZE[0];
+            Output.zSize = (int) CHA_SIZE[2];
+            Output.palette = new Image("/heatmap" + (int) Output.outputPallete.getValue() + ".png");
+        }
+        //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
         for (int i = 0; i < avilableStreams; i++) {
             calculator[i] = new Thread();
         }
+
 
         container = new Particle[N];
         for (int i = 0; i < N; i++) {
@@ -80,7 +84,7 @@ public class Sim {
     public static void genTest() {
     setup();
     EngineDraw.esetup();
-    mainContr = new Thread(); //Иначе будет NullPointerException
+    mainContr = new Thread(); //Иначе будет NullPointerException. То же что и выше
     DrawingThreadFire();
         for (int x = 0; x<Output.xSize;x++){
             for (int y = 0; y<Output.zSize;y++) {

@@ -55,9 +55,6 @@ public class EngineDraw {
     public static double getAdjustedCord(double patient) {
         return patient * multiToFill;
     }
-    public static double getDeAdjustedCord(double patient) {
-        return patient / multiToFill;
-    }
 
     public static void esetup() { //Отрисовка камеры
         root = new Group();
@@ -80,7 +77,11 @@ public class EngineDraw {
         targetR.setTranslateY((-CHA_SIZE[1]/2));
         target.setTranslateY(getAdjustedCord(-CHA_SIZE[1]/2));
         target.setTranslateZ(0);
-        Output.setTargetSize(targetR.getBoundsInParent());
+
+        if(Output.outputPic) {
+            Output.setTargetSize(chamberR.getBoundsInParent());
+            Output.picState = new int[(int) Output.maxWidth][(int) Output.maxDepth];
+        }
         Box generator = new Box(getAdjustedCord(GEN_SIZE[0]),getAdjustedCord(GEN_SIZE[1]),getAdjustedCord(GEN_SIZE[2]));
         Box generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
         generator.setTranslateX(0);
@@ -119,12 +120,12 @@ public class EngineDraw {
             drawing[i] = engine3D(Sim.container[i]); //Сферы к месту для отрисовки
             EngineDraw.root.getChildren().add(drawing[i]); //Добавляем в сцену
         }
-        draw.setTitle("Drawing simulation");
+        draw.setTitle("Отрисовка");
         draw.setScene(scene);
         draw.show();
     }
 
-    public static Timeline TextUpdate() {
+    public static void TextUpdate() {
         App.timelineT= new Timeline(new KeyFrame(Duration.millis(50), event -> {
             if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);} else {
                 partStatusRunning.setTextFill(Color.BLACK);
@@ -136,9 +137,8 @@ public class EngineDraw {
             outOfBoundsCounter.setText(" Упало на стены: " + outOfBoundsCounterI);
         }));
         timelineT.setCycleCount(Animation.INDEFINITE);
-        return timelineT;
     }
-    public static Timeline DrawingThreadFire() {
+    public static void DrawingThreadFire() {
         timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
         Platform.runLater(()-> {
             for(int i = 0; i<drawing.length; i++){
@@ -148,7 +148,6 @@ public class EngineDraw {
             }});
         }));
         timeline.setCycleCount(Animation.INDEFINITE);
-        return timeline;
     }
 
     public static void CylinderThread(Cylinder path) {
@@ -195,8 +194,6 @@ public class EngineDraw {
                         inUse.coordinates[1] = product.getTranslateY();
                         inUse.coordinates[2] = product.getTranslateZ();
                         inUse.obj = product;
-                        System.out.println(origin.getY() + (target.getY() - origin.getY())*i + " " + targetR.getBoundsInParent().getMaxY()
-                                + " " + targetR.getBoundsInParent().getMinY());
                         return true;
                     }
                 }}
