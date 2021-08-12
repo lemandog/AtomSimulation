@@ -27,16 +27,9 @@ public class App extends Application {
     public static TextField pressurePow;
     public static TextField pressure;
     public static CheckBox pathDrawing;
-
-    public static Label partStatusReady;
-    public static Label partStatusRunning;
-    public static Label partStatusDone;
-    public static Label targetHitCounter;
-    public static Label outOfBoundsCounter;
     public static Label outputMode;
 
     public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
-    public static Timeline timelineT;
 
     @Override
     public void start(Stage stage){
@@ -50,7 +43,7 @@ public class App extends Application {
 
         userControlWindows.setOnCloseRequest(event -> System.exit(0));
 
-        Scene userControl = new Scene(userControlPane,500,720); //Новое окно с компоновкой
+        Scene userControl = new Scene(userControlPane,500,630); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
         //Добавляем органы управления
         particleAm = new TextField("500"); //Поле для ввода кол-ва частиц
@@ -201,21 +194,6 @@ public class App extends Application {
         userControlPane.getChildren().add(genTest);
         userControlPane.getChildren().add(outputOption);
 
-        partStatusReady = new Label(" Частиц в очереди: 0 ");
-        partStatusReady.setFont(mainFont);
-        userControlPane.getChildren().add(partStatusReady);
-        partStatusRunning = new Label(" Частиц в работе: 0 ");
-        partStatusRunning.setFont(mainFont);
-        userControlPane.getChildren().add(partStatusRunning);
-        partStatusDone = new Label(" Частиц готово: 0 ");
-        partStatusDone.setFont(mainFont);
-        userControlPane.getChildren().add(partStatusDone);
-        targetHitCounter = new Label(" Упало на мишень: 0 ");
-        targetHitCounter.setFont(mainFont);
-        userControlPane.getChildren().add(targetHitCounter);
-        outOfBoundsCounter = new Label(" Упало на стены: 0 ");
-        outOfBoundsCounter.setFont(mainFont);
-        userControlPane.getChildren().add(outOfBoundsCounter);
 
         outputMode = new Label("Вывод выключен!");
         outputMode.setTextFill(Color.INDIANRED);

@@ -83,7 +83,7 @@ public class Sim {
     }
     public static void genTest() {
     setup();
-    EngineDraw.esetup();
+    EngineDraw.eSetup();
     mainContr = new Thread(); //Иначе будет NullPointerException. То же что и выше
     if (Output.outputPic){
         for (int x = 0; x<Output.xSize;x++){
@@ -98,10 +98,8 @@ public class Sim {
     public static void start() {
         setup(); //Установка выбраных параметров
         simIsAlive = true;
-        EngineDraw.esetup();
-        TextUpdate(); //На отрисовку текста - отдельный тред в App (App.timelineT)
+        EngineDraw.eSetup();
         //Это делает код менее читабельным, но гораздо более быстрым.
-        App.timelineT.play();
 
         mainContr = new Thread(() ->{
         while(lastRunning < N) {
@@ -115,16 +113,9 @@ public class Sim {
                         lastRunning++;
                         }catch (ArrayIndexOutOfBoundsException e){System.out.println("THREAD CREATION MISSFIRE");break;}
                     }
-
                 }
             }
         }
-            try {
-                Thread.sleep(3000); //Ожидание, чтобы анимация успела поместить все частицы. TODO: Исправить на что то более логичное
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            App.timelineT.stop();
         System.out.println("SIMULATION RUN ENDED");
         Output.toFile();
         simIsAlive = false;

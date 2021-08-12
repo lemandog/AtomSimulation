@@ -55,7 +55,7 @@ public class EngineDraw {
         return patient * multiToFill;
     }
 
-    public static void esetup() { //Отрисовка камеры
+    public static void eSetup() { //Отрисовка камеры
         root = new Group();
         draw.setResizable(true);
         Scene scene = new Scene(root, 600, 600);
@@ -120,19 +120,7 @@ public class EngineDraw {
         draw.show();
     }
 
-    public static void TextUpdate() {
-        App.timelineT= new Timeline(new KeyFrame(Duration.millis(50), event -> {
-            if (!mainContr.isAlive()){partStatusRunning.setTextFill(Color.RED);} else {
-                partStatusRunning.setTextFill(Color.BLACK);
-            }
-            partStatusRunning.setText(" Частиц в работе: " + nbRunning);
-            partStatusReady.setText(" Частиц в очереди: " + (N - lastRunning));
-            partStatusDone.setText(" Частиц готово: " + lastRunning);
-            targetHitCounter.setText(" Упало на мишень: " + tarHitCounterI);
-            outOfBoundsCounter.setText(" Упало на стены: " + outOfBoundsCounterI);
-        }));
-        timelineT.setCycleCount(Animation.INDEFINITE);
-    }
+
     public static void DrawingThreadFire(Particle[] containerSet) {
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
