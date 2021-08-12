@@ -156,13 +156,12 @@ public class Particle{
         }
     }
 
-    public Sphere getCurrSphere() {
+    public void getCurrSphere() {
         obj.setMaterial(thisParticleMat);
         obj.setRadius(3);
         obj.setTranslateX(coordinates[0]); //Установка координат визуализации атома
         obj.setTranslateY(coordinates[1]);
         obj.setTranslateZ(coordinates[2]);
-        return obj;
     }
 
 }
