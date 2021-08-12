@@ -1,6 +1,5 @@
 package org.lemandog;
 
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
