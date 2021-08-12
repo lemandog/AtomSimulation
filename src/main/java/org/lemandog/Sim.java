@@ -85,13 +85,13 @@ public class Sim {
     setup();
     EngineDraw.esetup();
     mainContr = new Thread(); //Иначе будет NullPointerException. То же что и выше
-    DrawingThreadFire();
+    if (Output.outputPic){
         for (int x = 0; x<Output.xSize;x++){
             for (int y = 0; y<Output.zSize;y++) {
                 Output.picState[x][y] = (int) (Math.random() * 15);
             }}
             Output.toFile();
-    }
+    }}
 
 
 
@@ -99,11 +99,8 @@ public class Sim {
         setup(); //Установка выбраных параметров
         simIsAlive = true;
         EngineDraw.esetup();
-
-        DrawingThreadFire();//Поток на отрисовку в EngineDraw (EngineDraw.timeline)
         TextUpdate(); //На отрисовку текста - отдельный тред в App (App.timelineT)
         //Это делает код менее читабельным, но гораздо более быстрым.
-        timeline.play();
         App.timelineT.play();
 
         mainContr = new Thread(() ->{
@@ -127,7 +124,6 @@ public class Sim {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            timeline.stop();
             App.timelineT.stop();
         System.out.println("SIMULATION RUN ENDED");
         Output.toFile();

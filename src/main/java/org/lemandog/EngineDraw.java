@@ -33,7 +33,6 @@ Y
 import static org.lemandog.Sim.*;
 
 public class EngineDraw {
-    public static Timeline timeline;
     static Stage draw = new Stage();
     static Group root;
     static double multiToFill;
@@ -41,15 +40,15 @@ public class EngineDraw {
     static Box chamberR;
     static Box target;
     static Box targetR;
-    static Sphere[] drawing;
 
-    public static Sphere engine3D(Particle currPos) { //Отрисовываем частицы
-                Sphere toDraw = new Sphere(currPos.getCurrSphere().getRadius());
-                toDraw.setMaterial(currPos.getCurrSphere().getMaterial());
-                toDraw.translateXProperty().set(getAdjustedCord(currPos.getCurrSphere().getTranslateX()));
-                toDraw.translateYProperty().set(getAdjustedCord(currPos.getCurrSphere().getTranslateY()));
-                toDraw.translateZProperty().set(getAdjustedCord(currPos.getCurrSphere().getTranslateZ()));
-                return toDraw;
+    public static Sphere engine3D(Particle currPos) { //Скалирование частицы для отрисовки
+        currPos.getCurrSphere();
+        Sphere toDraw = new Sphere(currPos.obj.getRadius());
+        toDraw.setMaterial(currPos.obj.getMaterial());
+        toDraw.translateXProperty().set(getAdjustedCord(currPos.obj.getTranslateX()));
+        toDraw.translateYProperty().set(getAdjustedCord(currPos.obj.getTranslateY()));
+        toDraw.translateZProperty().set(getAdjustedCord(currPos.obj.getTranslateZ()));
+        return toDraw;
     }
 
     public static double getAdjustedCord(double patient) {
@@ -110,16 +109,12 @@ public class EngineDraw {
         tarMat.setSpecularPower(1);
         target.setMaterial(tarMat);
 
-        drawing = new Sphere[N]; //Это сферы именно для отрисовки. Чтобы не было путаницы с ещё одними экземплярами сфер внутри частиц
-
         root.getChildren().add(target);
         root.getChildren().add(generator);
         root.getChildren().add(chamber);
 
-        for (int i = 0; i < Sim.N; i++) {
-            drawing[i] = engine3D(Sim.container[i]); //Сферы к месту для отрисовки
-            EngineDraw.root.getChildren().add(drawing[i]); //Добавляем в сцену
-        }
+        DrawingThreadFire(Sim.container);
+
         draw.setTitle("Отрисовка");
         draw.setScene(scene);
         draw.show();
@@ -138,16 +133,17 @@ public class EngineDraw {
         }));
         timelineT.setCycleCount(Animation.INDEFINITE);
     }
-    public static void DrawingThreadFire() {
-        timeline = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+    public static void DrawingThreadFire(Particle[] containerSet) {
         Platform.runLater(()-> {
-            for(int i = 0; i<drawing.length; i++){
-                EngineDraw.root.getChildren().remove(drawing[i]);
-                drawing[i] = engine3D(Sim.container[i]);
-                EngineDraw.root.getChildren().add(drawing[i]);
-            }});
-        }));
-        timeline.setCycleCount(Animation.INDEFINITE);
+            for (Particle particle : containerSet) {
+                //Теоретически, использование собственного порядкового номера частицы как указателя в массиве может вызвать исключения,
+                //Но иначе тут не особо есть возможность поступить, увы.
+                EngineDraw.root.getChildren().remove(particle.drawObj);
+                particle.getCurrSphere();
+                particle.drawObj = engine3D(particle);
+                EngineDraw.root.getChildren().add(particle.drawObj);
+            }
+        });
     }
 
     public static void CylinderThread(Cylinder path) {
@@ -178,11 +174,12 @@ public class EngineDraw {
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*10);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
             product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+
             if (origin.getY() + (target.getY() - origin.getY())*i<targetR.getBoundsInParent().getMaxY()
                     && origin.getY() + (target.getY() - origin.getY())*i>targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
 
@@ -190,6 +187,7 @@ public class EngineDraw {
                         && product.getBoundsInParent().getMaxX()<targetR.getBoundsInParent().getMaxX()){ //Попадание по X
                     if (product.getBoundsInParent().getMinZ()>targetR.getBoundsInParent().getMinZ()
                             && product.getBoundsInParent().getMaxZ()<targetR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+
                         inUse.coordinates[0] = product.getTranslateX();
                         inUse.coordinates[1] = product.getTranslateY();
                         inUse.coordinates[2] = product.getTranslateZ();
@@ -210,8 +208,11 @@ public class EngineDraw {
         double chamberMaxY = chamberR.getBoundsInParent().getMaxY();
         double chamberMinZ = chamberR.getBoundsInParent().getMinZ();
         double chamberMaxZ = chamberR.getBoundsInParent().getMaxZ();
+        double mixY = origin.getY();
+        double maxY = target.getY();
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
 
-        for (double i = 0; i < 1; i+=0.01) {
+        for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
             product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);

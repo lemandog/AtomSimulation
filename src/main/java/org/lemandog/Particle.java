@@ -21,6 +21,7 @@ public class Particle{
     double freerunLen;
     Random rand;
     Sphere obj;
+    Sphere drawObj;
     boolean isInUse;
     boolean active;
     boolean tarIsHit;
@@ -30,13 +31,14 @@ public class Particle{
     Cylinder pathsADJ = new Cylinder();
 
     Particle(int ordinal){ //Конструктор класса, вызывается при создании экземпляра
-        this.ordinal = ordinal; //Внутреннее порядковое число частицы. Нужно только для вывода
-        this.rand = new Random();//Генератор случайных числе нужен для генерации скоростей и координат
+        this.ordinal = ordinal; //Внутреннее порядковое число частицы. Нужно только для вывода (И, возможно, кривых методов вывода частиц)
+        this.rand = new Random();//Генератор случайных чисел нужен для генерации скоростей и координат
 
         coordinates = generateCord();
         this.speeds = generateSpeed(1);
         this.freerunLen = calcRandLen();
-        obj = new Sphere();
+        obj = new Sphere();     //Реальная сфера в масштабе 1 к 1
+        drawObj = new Sphere(); //Скалированый obj для отрисовки
         this.isInUse = false;
         this.active = true;
         this.tarIsHit = false;
@@ -69,7 +71,7 @@ public class Particle{
         product[0] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));
         product[2] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));
 
-        if(mode == 1){product[1] = Math.abs(rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
+        if(mode == 1){product[1] = -Math.abs(rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
         else {product[1] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
         return product;
     }
@@ -80,6 +82,7 @@ public class Particle{
             long stepsPassed = 0;
 
             while(active && stepsPassed<LEN){
+                DrawingThreadFire(new Particle[]{this});
                 //Нынешнее приращение
                 double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
@@ -95,16 +98,17 @@ public class Particle{
 
                 paths = EngineDraw.createConnection(oldCord,newCord);
                 pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
-                getCurrSphere();
+
+                //длина пробега
+                freerunLen = calcRandLen();
+                //скорости
+                speeds = generateSpeed(0);
+
                 //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
                 tarNotMet(oldCord,newCord);
                 wallCheck(oldCord,newCord);
                 active = !wallIsHit && !tarIsHit;
-                //длина пробега
-                freerunLen = calcRandLen();
-                //скорости
-                speeds = generateSpeed(0);
 
                 if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  1;}
                 if (!active){

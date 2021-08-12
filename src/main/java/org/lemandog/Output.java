@@ -155,7 +155,7 @@ public class Output {
         if (setOutput.isShowing()){setOutput.hide();}
         else {setOutput.show();}
 
-        if(output){
+        if(output || outputPic || outputGraph){
             outputMode.setText("Вывод включен!");
             outputMode.setTextFill(Color.DARKOLIVEGREEN);
         }
