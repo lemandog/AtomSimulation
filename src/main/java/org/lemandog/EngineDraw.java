@@ -1,8 +1,5 @@
 package org.lemandog;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -18,8 +15,6 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-
 import java.util.Arrays;
 /*
 ---------------> X
@@ -29,7 +24,8 @@ import java.util.Arrays;
 |   ┘Z
 ↓
 Y
- */import static org.lemandog.App.*;
+*/
+
 import static org.lemandog.Sim.*;
 
 public class EngineDraw {
@@ -124,8 +120,6 @@ public class EngineDraw {
     public static void DrawingThreadFire(Particle[] containerSet) {
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
-                //Теоретически, использование собственного порядкового номера частицы как указателя в массиве может вызвать исключения,
-                //Но иначе тут не особо есть возможность поступить, увы.
                 EngineDraw.root.getChildren().remove(particle.drawObj);
                 particle.getCurrSphere();
                 particle.drawObj = engine3D(particle);
@@ -162,7 +156,7 @@ public class EngineDraw {
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*10);//Шаг обратно пропорционален пути который нужно пройти
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
@@ -198,7 +192,7 @@ public class EngineDraw {
         double chamberMaxZ = chamberR.getBoundsInParent().getMaxZ();
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*10);//Шаг обратно пропорционален пути который нужно пройти
 
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);

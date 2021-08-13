@@ -13,8 +13,9 @@ import static org.lemandog.Sim.*;
 public class Particle{
     //Цвета состояний
     Color activeCol = Color.WHITE;
-    Color wallhitCol = Color.INDIANRED;
-    Color TarHitCol = Color.SKYBLUE;
+    Color wallhitCol = Color.ORANGERED;
+    Color TarHitCol = Color.LIME;
+
     int ordinal;
     double[] coordinates;
     double[] speeds;
@@ -134,7 +135,7 @@ public class Particle{
                 pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
-            System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit);
+            System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit +" ON STEP " + stepsPassed);
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
         });
         product.setPriority(Thread.MIN_PRIORITY);

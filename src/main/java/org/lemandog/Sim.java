@@ -2,8 +2,6 @@ package org.lemandog;
 
 import javafx.scene.image.Image;
 
-import static org.lemandog.EngineDraw.*;
-
 public class Sim {
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
     private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
@@ -100,7 +98,6 @@ public class Sim {
         simIsAlive = true;
         EngineDraw.eSetup();
         //Это делает код менее читабельным, но гораздо более быстрым.
-
         mainContr = new Thread(() ->{
         while(lastRunning < N) {
             if(threadQuotaNotMet()){
