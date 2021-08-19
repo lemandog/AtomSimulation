@@ -114,6 +114,7 @@ public class Sim {
             }
         }
         System.out.println("SIMULATION RUN ENDED");
+        EngineDraw.DrawingThreadFire(container);
         Output.toFile();
         simIsAlive = false;
     });
