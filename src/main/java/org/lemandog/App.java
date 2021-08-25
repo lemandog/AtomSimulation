@@ -1,16 +1,17 @@
 package org.lemandog;
 
 import javafx.application.Application;
-import javafx.scene.Parent;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.Dragboard;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import java.net.URL;
+import org.lemandog.util.LoadConfig;
 import java.util.Objects;
 
 public class App extends Application {
@@ -29,7 +30,8 @@ public class App extends Application {
     public static TextField pressure;
     public static CheckBox pathDrawing;
     public static Label outputMode;
-
+    public static Label fileDropText;
+    public static Button startSimButt;
     public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
 
     @Override
@@ -45,7 +47,7 @@ public class App extends Application {
 
         userControlWindows.setOnCloseRequest(event -> System.exit(0));
 
-        Scene userControl = new Scene(userControlPane,500,630); //Новое окно с компоновкой
+        Scene userControl = new Scene(userControlPane,500,700); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
         //Добавляем органы управления
         particleAm = new TextField("500"); //Поле для ввода кол-ва частиц
@@ -182,20 +184,45 @@ public class App extends Application {
         Output.ConstructOutputAFrame();
 
 
-        Button startSimButt = new Button("Старт симуляции");
+
+        startSimButt = new Button("Старт симуляции");
         startSimButt.setFont(mainFont);
         startSimButt.setOnAction(event -> Sim.start());
-        Button genTest = new Button("Тест генератора частиц");
+        Button genTest = new Button("Тест генератора");
         genTest.setFont(mainFont);
         genTest.setOnAction(event -> Sim.genTest());
-        Button outputOption = new Button("Парамеры вывода");
+        Button outputOption = new Button("Вывод");
         outputOption.setFont(mainFont);
         outputOption.setOnAction(event -> Output.disp());
 
-        userControlPane.getChildren().add(startSimButt);
-        userControlPane.getChildren().add(genTest);
-        userControlPane.getChildren().add(outputOption);
+        HBox buttonPanel = new HBox();
+        buttonPanel.setPrefWidth(userControl.getWidth());
+        buttonPanel.getChildren().addAll(startSimButt,genTest,outputOption);
+        userControlPane.getChildren().add(buttonPanel);
+        buttonPanel.setSpacing(0);
+        HBox dragTarget = new HBox();
+        dragTarget.setOnDragEntered(event -> {
+            Dragboard db = event.getDragboard();
+            if (db.hasFiles()) {
 
+                LoadConfig.select(db.getFiles().get(0));
+            }
+            /* let the source know whether the string was successfully
+             * transferred and used */
+            event.consume();
+        });
+        fileDropText = new Label("Конфигурационный .txt переместите сюда");
+        fileDropText.setFont(mainFont);
+        fileDropText.setAlignment(Pos.CENTER);
+        dragTarget.getChildren().add(fileDropText);
+
+        dragTarget.setMinSize(userControl.getWidth(),30);
+        userControlPane.getChildren().add(dragTarget);
+
+        Button confInfo = new Button("О конфигурациях");
+        confInfo.setFont(mainFont);
+        confInfo.setOnAction(event -> LoadConfig.constructConfigInfoFrame());
+        userControlPane.getChildren().add(confInfo);
 
         outputMode = new Label("Вывод выключен!");
         outputMode.setTextFill(Color.INDIANRED);
