@@ -69,11 +69,11 @@ public class Particle{
         double[] product = new double[3]; //XYZ
         double sv = Math.sqrt((Sim.k*Sim.T)/Sim.m);
 
-        product[0] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));
-        product[2] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));
+        product[0] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));
+        product[2] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));
 
-        if(mode == 1){product[1] = -Math.abs(rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
-        else {product[1] = (rand.nextGaussian()*sv - 0.5*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv - 0.5*sv)/(rand.nextGaussian()*sv - 0.5*sv)));}
+        if(mode == 1){product[1] = -Math.abs(rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
+        else {product[1] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
         return product;
     }
 

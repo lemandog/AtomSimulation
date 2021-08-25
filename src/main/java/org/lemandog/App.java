@@ -1,6 +1,7 @@
 package org.lemandog;
 
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -9,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.net.URL;
 import java.util.Objects;
 
 public class App extends Application {
@@ -32,6 +34,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage){
+
         Stage userControlWindows = new Stage();
         userControlWindows.setResizable(false);
 
