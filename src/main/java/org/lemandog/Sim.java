@@ -11,9 +11,9 @@ public class Sim {
     public static double p;
     static int N;
     public static int LEN;
-    public static double[] CHA_SIZE = new double[3]; //XYZ
-    public static double[] TAR_SIZE = new double[3]; //XYZ
-    public static double[] GEN_SIZE = new double[3]; //XYZ
+    public static double[] CHA_SIZE; //XYZ
+    public static double[] TAR_SIZE; //XYZ
+    public static double[] GEN_SIZE; //XYZ
     public static double lambdaN;
     static int lastRunning;
     static Particle[] container; //XYZ
@@ -23,6 +23,8 @@ public class Sim {
     public static int aliveCounterI = 0;
 
     public static int avilableStreams = Runtime.getRuntime().availableProcessors();
+    public static int avilableDimensions = 3;
+    public static int maxDimensions = 3;
     public static int nbRunning = 0;
     public static boolean simIsAlive = false;
     public static boolean pathsDr = false;
@@ -40,6 +42,15 @@ public class Sim {
         LEN = Integer.parseInt(App.stepsAm.getText());
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
 
+        //Как сказано в Paticle, пользователь может сам ввести количество осей.
+        //Конечно, я не знаю кому нужна пятимерная симуляция газа, но гибкость кода - важная часть ООП
+        avilableDimensions = (int) App.dimensionCount.getValue();
+        if (avilableDimensions>3){maxDimensions=avilableDimensions;}//
+
+        GEN_SIZE = new double[maxDimensions]; //XYZ
+        TAR_SIZE = new double[maxDimensions]; //XYZ
+        CHA_SIZE = new double[maxDimensions]; //XYZ
+
         CHA_SIZE[0] = Integer.parseInt(App.xFrameLen.getText());
         CHA_SIZE[1] = Integer.parseInt(App.yFrameLen.getText());
         CHA_SIZE[2] = Integer.parseInt(App.zFrameLen.getText());
@@ -54,6 +65,7 @@ public class Sim {
 
         lastRunning = 0;
         avilableStreams = (int) App.threadCount.getValue();
+
         calculator = new Thread[avilableStreams];
         pathsDr = App.pathDrawing.isSelected();
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.

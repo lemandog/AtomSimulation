@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import static org.lemandog.EngineDraw.*;
@@ -59,21 +60,30 @@ public class Particle{
 
 
     private double[] generateCord() {
-        double[] product = new double[3]; //XYZ
-        product[0] = (Sim.GEN_SIZE[0])*Math.random() - Sim.GEN_SIZE[0]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
+        //Мы не знаем, что ударит в голову пользователю. Чтобы даже 100 осей были возможны, в Sim есть проверка на введённое кол-во
+        double[] product = new double[Sim.maxDimensions]; //XYZ
+        Arrays.fill(product,0);
+        // Измерений может быть меньше трёх, но дальше есть код жёстко прописанный под 3Д. (Всё что связано с визуализацией, например)
+        // Зануление неиспользуемых измерений заставляет всё работать и не вызывает Array out of bounds & NullPointerException
+        for (int i = 0; i < avilableDimensions; i++) {
+            product[i] = (Sim.GEN_SIZE[i])*Math.random() - Sim.GEN_SIZE[i]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
+        }
         product[1] = Sim.CHA_SIZE[1]/2 - GEN_SIZE[1];
-        product[2] = (Sim.GEN_SIZE[2])*Math.random() - Sim.GEN_SIZE[2]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО Z ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
         return product;
     }
+
     private double[] generateSpeed(int mode) {
-        double[] product = new double[3]; //XYZ
+        double[] product = new double[Sim.maxDimensions]; //XYZ
+        //В общем-то планируется механика переиспарения и добавление сюда жёсткого ограничения может пока вызвать проблемы
+        Arrays.fill(product,0);
         double sv = Math.sqrt((Sim.k*Sim.T)/Sim.m);
+        for (int i = 0; i < avilableDimensions; i++) {
+            product[i] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));
+        }
 
-        product[0] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));
-        product[2] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));
+        if(mode == 1 && avilableDimensions>2){
+            product[1] = -Math.abs(rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
 
-        if(mode == 1){product[1] = -Math.abs(rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
-        else {product[1] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
         return product;
     }
 
@@ -91,7 +101,7 @@ public class Particle{
                 Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
                 Point3D oldCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
 
-                for(int i = 0; i<3; i++) {
+                for(int i = 0; i<avilableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dN * speeds[i];
                 }
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);

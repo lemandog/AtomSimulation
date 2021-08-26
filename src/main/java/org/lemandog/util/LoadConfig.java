@@ -40,6 +40,7 @@ public class LoadConfig {
         layout.getChildren().add(new Label("GRAPH / Встроенный графопостроитель"));
         layout.getChildren().add(new Label("PALIT 1 / Выбор палитры"));
         layout.getChildren().add(new Label("START / Запустить симуляцию (После всех прочих команд!)"));
+        layout.getChildren().add(new Label("DIMEN 3 / Количество осей"));
         info.show();
     }
     public static void select(File file) {
@@ -66,6 +67,7 @@ public class LoadConfig {
                 if (line.contains("PRES*")){App.pressure.setText(line.trim().replaceAll("PRES\\* ",""));} //double
                 if (line.contains("DRAWP")){App.pathDrawing.setSelected(true);} //bool
                 if (line.contains("THREA")){App.threadCount.setValue(Integer.parseInt(line.trim().replaceAll("THREA ","")));} //int
+                if (line.contains("DIMEN")){App.dimensionCount.setValue(Integer.parseInt(line.trim().replaceAll("DIMEN ","")));} //int
                 if (line.contains("XTARS")){App.targetSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XTARS ","")));} //double
                 if (line.contains("ZTARS")){App.targetSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZTARS ","")));} //double
                 if (line.contains("XGENE")){App.genSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XGENE ","")));} //double

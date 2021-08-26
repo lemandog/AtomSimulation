@@ -269,7 +269,7 @@ public class Output {
                 if(modelRes[x][y] > biggest){biggest = modelRes[x][y];} //Ищем наибольшее
             }}
 
-        biggest = biggest/((int)palette.getWidth() + 1); //делим на количество цветов в палитре, так, что значения в диапозоне 0-9
+        biggest = biggest/((int)palette.getWidth()); //делим на количество цветов в палитре, так, что значения в диапозоне 0-9
 
         for (int x = 0; x<xSize;x++){
             for (int y = 0; y<zSize;y++) {

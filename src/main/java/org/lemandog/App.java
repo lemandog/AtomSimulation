@@ -20,6 +20,7 @@ public class App extends Application {
     public static Slider genSizeZ;
     public static Slider genSizeX;
     public static Slider threadCount;
+    public static Slider dimensionCount;
     public static TextField xFrameLen;
     public static TextField yFrameLen;
     public static TextField zFrameLen;
@@ -47,7 +48,7 @@ public class App extends Application {
 
         userControlWindows.setOnCloseRequest(event -> System.exit(0));
 
-        Scene userControl = new Scene(userControlPane,500,700); //Новое окно с компоновкой
+        Scene userControl = new Scene(userControlPane,500,730); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
         //Добавляем органы управления
         particleAm = new TextField("500"); //Поле для ввода кол-ва частиц
@@ -71,28 +72,28 @@ public class App extends Application {
         userControlPane.getChildren().add(tempAm);
         userControlPane.getChildren().add(tempAmText);
 
-        xFrameLen = new TextField("80");
+        xFrameLen = new TextField("10");
         Label xFrameLenText = new Label("Размеры камеры по оси X");
         xFrameLenText.setLabelFor(xFrameLen);
         xFrameLenText.setFont(mainFont);
         userControlPane.getChildren().add(xFrameLen);
         userControlPane.getChildren().add(xFrameLenText);
 
-        yFrameLen = new TextField("80");
+        yFrameLen = new TextField("10");
         Label yFrameLenText = new Label("Размеры камеры по оси Y");
         yFrameLenText.setLabelFor(yFrameLen);
         yFrameLenText.setFont(mainFont);
         userControlPane.getChildren().add(yFrameLen);
         userControlPane.getChildren().add(yFrameLenText);
 
-        zFrameLen = new TextField("80");
+        zFrameLen = new TextField("10");
         Label zFrameLenText = new Label("Размеры камеры по оси Z");
         zFrameLenText.setLabelFor(zFrameLen);
         zFrameLenText.setFont(mainFont);
         userControlPane.getChildren().add(zFrameLen);
         userControlPane.getChildren().add(zFrameLenText);
 
-        pressurePow = new TextField("-18");
+        pressurePow = new TextField("-8");
         Label pressurePowText = new Label("Давление - степень десятки");
         pressurePowText.setLabelFor(pressurePow);
         pressurePowText.setFont(mainFont);
@@ -126,6 +127,20 @@ public class App extends Application {
         userControlPane.getChildren().add(threadCountText);
         userControlPane.getChildren().add(threadCountTextAv);
         userControlPane.getChildren().add(threadCount);
+
+        dimensionCount = new Slider();
+        dimensionCount.setMin(1);
+        dimensionCount.setMax(3);
+        dimensionCount.setValue(3);
+        dimensionCount.setShowTickMarks(true);
+        dimensionCount.setShowTickLabels(true);
+        dimensionCount.setPrefWidth(userControl.getWidth());
+        Label dimensionCountText = new Label("Количество осей: " + 3);
+        dimensionCountText.setFont(mainFont);
+        dimensionCount.setOnMouseReleased((event) ->
+                dimensionCountText.setText("Количество осей: "+ Math.round(dimensionCount.getValue())));
+        userControlPane.getChildren().add(dimensionCountText);
+        userControlPane.getChildren().add(dimensionCount);
 
 
         targetSizeX = new Slider();
