@@ -26,6 +26,7 @@ public class Sim {
     public static int avilableDimensions = 3;
     public static int maxDimensions = 3;
     public static int nbRunning = 0;
+    public static int waitTimeMS;
     public static boolean simIsAlive = false;
     public static boolean pathsDr = false;
     static Thread mainContr;
@@ -62,6 +63,8 @@ public class Sim {
         GEN_SIZE[0] = CHA_SIZE[0] * App.genSizeX.getValue();
         GEN_SIZE[1] = CHA_SIZE[1]/100;
         GEN_SIZE[2] = CHA_SIZE[2] * App.genSizeZ.getValue();
+
+        waitTimeMS = (int) Math.round(App.waitTime.getValue());
 
         lastRunning = 0;
         avilableStreams = (int) App.threadCount.getValue();

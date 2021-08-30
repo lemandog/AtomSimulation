@@ -16,6 +16,7 @@ public class Particle{
     Color activeCol = Color.WHITE;
     Color wallhitCol = Color.ORANGERED;
     Color TarHitCol = Color.LIME;
+    Color GenHitCol = Color.VIOLET;
 
     int ordinal;
     double[] coordinates;
@@ -27,10 +28,10 @@ public class Particle{
     boolean isInUse;
     boolean active;
     boolean tarIsHit;
+    boolean genIsHit;
     boolean wallIsHit;
     PhongMaterial thisParticleMat;
     Cylinder paths = new Cylinder();
-    Cylinder pathsADJ = new Cylinder();
 
     Particle(int ordinal){ //Конструктор класса, вызывается при создании экземпляра
         this.ordinal = ordinal; //Внутреннее порядковое число частицы. Нужно только для вывода (И, возможно, кривых методов вывода частиц)
@@ -91,8 +92,15 @@ public class Particle{
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
             long stepsPassed = 0;
-
             while(active && stepsPassed<LEN){
+
+                if (waitTimeMS>=0){
+                    try {
+                        Thread.sleep(waitTimeMS);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }}
+
                 DrawingThreadFire(new Particle[]{this});
                 //Нынешнее приращение
                 double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
@@ -115,6 +123,7 @@ public class Particle{
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
                 tarNotMet(oldCord,newCord);
                 wallCheck(oldCord,newCord);
+                genNotMet(oldCord,newCord); //Проверяем, был ли удар по источнику
                 active = !wallIsHit && !tarIsHit;
 
                 if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  1;}
@@ -122,7 +131,7 @@ public class Particle{
                     aliveCounterI--;
                     if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  0;}}
                 if (wallIsHit && !tarIsHit){
-                    drawAPath(pathsADJ);
+                    drawAPath(paths);
                     outOfBoundsCounterI++;
                     if (Output.output || Output.outputGraph){Output.statesO[this.ordinal][(int)stepsPassed] =1;}
                 } else {
@@ -130,7 +139,7 @@ public class Particle{
                 }
                 if (tarIsHit){
                     Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
-                    drawAPath(pathsADJ);
+                    drawAPath(paths);
                     tarHitCounterI++;
                     if (Output.output || Output.outputGraph){Output.statesH[this.ordinal][(int)stepsPassed] =1;}
                 } else {
@@ -138,10 +147,9 @@ public class Particle{
                 }
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
-                pathsADJ = null; // Освобождаю память, иначе - более 2000 частиц не запустить
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
-            System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit +" ON STEP " + stepsPassed);
+            System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit +" GENHIT?: " + genIsHit +" ON STEP " + stepsPassed);
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
         });
         product.setPriority(Thread.MIN_PRIORITY);
@@ -153,14 +161,45 @@ public class Particle{
             this.tarIsHit = true;
             thisParticleMat.setDiffuseColor(TarHitCol);
         }
-
+    }
+    private void genNotMet(Point3D oldCord, Point3D newCord) {
+        if(EngineDraw.takePointOnGenerator(oldCord,newCord,this) && !wallIsHit){ //Есть ли пересечение?
+            if (bounceChance("GEN")){ //Испарения не происходит
+            this.genIsHit = true;
+            this.wallIsHit = true;
+            System.out.println("PARTICLE " + ordinal + " HIT GENERATOR AND STAYED!");
+            thisParticleMat.setDiffuseColor(GenHitCol);
+        }else { //Испарение происходит, Возвращаем частицу где была до удара
+            System.out.println("PARTICLE " + ordinal + " HAS HIT GENERATOR AND FLEW AWAY");
+            coordinates[0] = oldCord.getX();
+            coordinates[1] = oldCord.getY();
+            coordinates[2] = oldCord.getZ();
+            this.genIsHit = true;
+            this.wallIsHit = false;
+        }}
     }
 
     private void wallCheck(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
-            this.wallIsHit = true;
-            thisParticleMat.setDiffuseColor(wallhitCol);
+            if (bounceChance("WALL") && !genIsHit){
+                System.out.println("PARTICLE " + ordinal + " HIT WALL AND STAYED!");
+                this.wallIsHit = true;
+                thisParticleMat.setDiffuseColor(wallhitCol);}
+            else {
+                System.out.println("PARTICLE " + ordinal + " HAS HIT WALL AND FLEW AWAY");
+                genIsHit = false;
+                coordinates[0] = oldCord.getX();
+                coordinates[1] = oldCord.getY();
+                coordinates[2] = oldCord.getZ();
+                this.wallIsHit = false;
+        }}
+    }
+
+    private boolean bounceChance(String type) {
+        if (type.equals("WALL")) {
+            return Math.random() < App.bounceWallChance.getValue();
         }
+        return Math.random() < App.bounceGenChance.getValue();
     }
 
     public void getCurrSphere() {

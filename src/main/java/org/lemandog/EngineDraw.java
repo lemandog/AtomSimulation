@@ -35,6 +35,7 @@ public class EngineDraw {
     static double multiToFill;
     static Box chamberR;
     static Box targetR;
+    static Box generatorR;
 
     public static Sphere engine3D(Particle currPos) {
         currPos.getCurrSphere();
@@ -66,7 +67,7 @@ public class EngineDraw {
             Output.setTargetSize(chamberR.getBoundsInParent());
             Output.picState = new int[(int) Output.maxWidth][(int) Output.maxDepth];
         }
-        Box generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
+        generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
         generatorR.setTranslateX(0);
         generatorR.setTranslateY((CHA_SIZE[1]/2));
         generatorR.setTranslateZ(0);
@@ -75,11 +76,11 @@ public class EngineDraw {
 
         main.setTranslateX(-scene.getHeight()/2); //Чтобы камера в центре имела начало координат
         main.setTranslateY(-scene.getHeight()/2);
-        main.setTranslateZ(CHA_SIZE[2]*multiToFill*1.5 - CHA_SIZE[2]);
+        main.setTranslateZ((Arrays.stream(CHA_SIZE).max().getAsDouble())*multiToFill - CHA_SIZE[2]);
         System.out.println("POS " + main.getTranslateZ() + " FILL MULT " + multiToFill );
 
         main.setNearClip(0.001);
-        main.setFieldOfView(35);
+        main.setFieldOfView(51.5);
         scene.setCamera(main);
         // КОНТРОЛЬ КАМЕРЫ
         scene.setOnKeyPressed(keyEvent -> {
@@ -150,7 +151,7 @@ public class EngineDraw {
         Rotate rotateAroundCenter = new Rotate(-Math.toDegrees(angle), axisOfRotation);
 
         Cylinder line = new Cylinder(1, height);
-        line.setRadius(0.1);
+        line.setRadius(0.003);
         line.getTransforms().addAll(moveToMidpoint, rotateAroundCenter);
 
         return line;
@@ -217,9 +218,38 @@ public class EngineDraw {
         }
         return false;
     }
-    static void drawAPath(Cylinder pathADJ){
+    static void drawAPath(Cylinder path){
         if(pathsDr){
-            EngineDraw.CylinderThread(pathADJ);
+            EngineDraw.CylinderThread(path);
         }
+    }
+
+    public static boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
+        Sphere product = new Sphere();
+        //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
+        //Всё потому что Bounds.intersect считает неверно.
+        double mixY = origin.getY();
+        double maxY = target.getY();
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
+        for (double i = 0; i < 1; i+=optimalStep) {
+            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
+            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
+            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+
+            if (origin.getY() + (target.getY() - origin.getY())*i<generatorR.getBoundsInParent().getMaxY()
+                    && origin.getY() + (target.getY() - origin.getY())*i>generatorR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
+                if (product.getBoundsInParent().getMinX()>generatorR.getBoundsInParent().getMinX()
+                        && product.getBoundsInParent().getMaxX()<generatorR.getBoundsInParent().getMaxX()){ //Попадание по X
+                    if (product.getBoundsInParent().getMinZ()>generatorR.getBoundsInParent().getMinZ()
+                            && product.getBoundsInParent().getMaxZ()<generatorR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+                        inUse.coordinates[0] = product.getTranslateX();
+                        inUse.coordinates[1] = product.getTranslateY();
+                        inUse.coordinates[2] = product.getTranslateZ();
+                        inUse.obj = product;
+                        return true;
+                    }
+                }}
+        }
+        return false;
     }
 }

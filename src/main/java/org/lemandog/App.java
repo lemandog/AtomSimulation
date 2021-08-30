@@ -6,8 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -19,7 +18,10 @@ public class App extends Application {
     public static Slider targetSizeZ;
     public static Slider genSizeZ;
     public static Slider genSizeX;
+    public static Slider bounceWallChance;
+    public static Slider bounceGenChance;
     public static Slider threadCount;
+    public static Slider waitTime;
     public static Slider dimensionCount;
     public static TextField xFrameLen;
     public static TextField yFrameLen;
@@ -128,77 +130,130 @@ public class App extends Application {
         userControlPane.getChildren().add(threadCountTextAv);
         userControlPane.getChildren().add(threadCount);
 
+        HBox waitTimebox = new HBox();
+        waitTime = new Slider();
+        waitTime.setMin(0);
+        waitTime.setMax(200);
+        waitTime.setValue(0);
+        waitTime.setPrefWidth(userControl.getWidth()/2);
+        Label waitTimeText = new Label("Ожидание между шагами: " + Math.round(waitTime.getValue()));
+        waitTimeText.setFont(mainFont);
+        waitTime.setOnMouseReleased((event) ->
+                waitTimeText.setText("Ожидание между шагами: " + Math.round(waitTime.getValue())));
+        waitTimeText.setFont(mainFont);
+        waitTimeText.setPrefWidth(userControl.getWidth()/2);
+        waitTimebox.getChildren().addAll(waitTimeText,waitTime);
+        userControlPane.getChildren().add(waitTimebox);
+
+        HBox bounceChanceW = new HBox();
+        bounceWallChance = new Slider();
+        bounceWallChance.setMin(0);
+        bounceWallChance.setMax(1);
+        bounceWallChance.setValue(0.2);
+        bounceWallChance.setPrefWidth(userControl.getWidth()/2);
+        Label bounceWallChanceText = new Label("Отрыв от стен "+ String.format("%3.2f", bounceWallChance.getValue()));
+        bounceWallChanceText.setPrefWidth(userControl.getWidth()/2);
+        bounceWallChanceText.setFont(mainFont);
+        bounceWallChance.setOnMouseReleased((event) -> {
+            bounceWallChanceText.setText("Отрыв от стен "+ String.format("%3.2f", bounceWallChance.getValue())); // Три знака всего, два после запятой
+        });
+        bounceChanceW.getChildren().addAll(bounceWallChanceText,bounceWallChance);
+        userControlPane.getChildren().add(bounceChanceW);
+
+        HBox bounceChanceG = new HBox();
+        bounceGenChance = new Slider();
+        bounceGenChance.setMin(0);
+        bounceGenChance.setMax(1);
+        bounceGenChance.setValue(0.8);
+        bounceGenChance.setPrefWidth(userControl.getWidth()/2);
+        Label bounceGenChanceText = new Label("Отрыв от ген. "+ String.format("%3.2f", bounceGenChance.getValue()));
+        bounceGenChanceText.setPrefWidth(userControl.getWidth()/2);
+        bounceGenChanceText.setFont(mainFont);
+        bounceWallChance.setOnMouseReleased((event) -> {
+            bounceGenChanceText.setText("Отрыв от ген. "+ String.format("%3.2f", bounceGenChance.getValue())); // Три знака всего, два после запятой
+        });
+        bounceChanceG.getChildren().addAll(bounceGenChanceText,bounceGenChance);
+        userControlPane.getChildren().add(bounceChanceG);
+
+        HBox dimenParX = new HBox();
         dimensionCount = new Slider();
         dimensionCount.setMin(1);
         dimensionCount.setMax(3);
         dimensionCount.setValue(3);
         dimensionCount.setShowTickMarks(true);
         dimensionCount.setShowTickLabels(true);
-        dimensionCount.setPrefWidth(userControl.getWidth());
+        dimensionCount.setPrefWidth(userControl.getWidth()/2);
         Label dimensionCountText = new Label("Количество осей: " + 3);
+        dimensionCountText.setPrefWidth(userControl.getWidth()/2);
         dimensionCountText.setFont(mainFont);
         dimensionCount.setOnMouseReleased((event) ->
                 dimensionCountText.setText("Количество осей: "+ Math.round(dimensionCount.getValue())));
-        userControlPane.getChildren().add(dimensionCountText);
-        userControlPane.getChildren().add(dimensionCount);
+        dimenParX.getChildren().addAll(dimensionCountText,dimensionCount);
+        userControlPane.getChildren().add(dimenParX);
 
-
+        HBox tarParX = new HBox();
         targetSizeX = new Slider();
         targetSizeX.setMin(0);
         targetSizeX.setMax(1);
         targetSizeX.setValue(0.8);
-        targetSizeX.setPrefWidth(userControl.getWidth());
-        Label targetSizeXText = new Label("Размер подложки по X (доли от камеры): 0,80");
+        targetSizeX.setPrefWidth(userControl.getWidth()/2);
+        Label targetSizeXText = new Label("Размер подложки по X "+ String.format("%3.2f", targetSizeX.getValue()));
+        targetSizeXText.setPrefWidth(userControl.getWidth()/2);
         targetSizeXText.setFont(mainFont);
         targetSizeX.setOnMouseReleased((event) -> {
-            targetSizeXText.setText("Размер подложки по X (доли от камеры): "+ String.format("%3.2f", targetSizeX.getValue())); // Три знака всего, два после запятой
+            targetSizeXText.setText("Размер подложки по X "+ String.format("%3.2f", targetSizeX.getValue())); // Три знака всего, два после запятой
         });
-        userControlPane.getChildren().add(targetSizeXText);
-        userControlPane.getChildren().add(targetSizeX);
+        tarParX.getChildren().addAll(targetSizeXText,targetSizeX);
+        userControlPane.getChildren().add(tarParX);
 
-
+        HBox tarParZ = new HBox();
+        tarParZ.setPrefWidth(userControl.getWidth());
         targetSizeZ = new Slider();
         targetSizeZ.setMin(0);
         targetSizeZ.setMax(1);
         targetSizeZ.setValue(0.8);
-        targetSizeZ.setPrefWidth(userControl.getWidth());
-        Label targetSizeYText = new Label("Размер подложки по Z (доли от камеры): 0,80");
-        targetSizeYText.setFont(mainFont);
+        targetSizeZ.setPrefWidth(userControl.getWidth()/2);
+        Label targetSizeZText = new Label("Размер подложки по Z "+ String.format("%3.2f", targetSizeZ.getValue()));
+        targetSizeZText.setPrefWidth(userControl.getWidth()/2);
+        targetSizeZText.setFont(mainFont);
         targetSizeZ.setOnMouseReleased((event) -> {
-            targetSizeYText.setText("Размер подложки по Z (доли от камеры): "+ String.format("%3.2f", targetSizeZ.getValue())); // Три знака всего, два после запятой
+            targetSizeZText.setText("Размер подложки по Z "+ String.format("%3.2f", targetSizeZ.getValue())); // Три знака всего, два после запятой
         });
-        userControlPane.getChildren().add(targetSizeYText);
-        userControlPane.getChildren().add(targetSizeZ);
+        tarParZ.getChildren().addAll(targetSizeZText,targetSizeZ);
+        userControlPane.getChildren().add(tarParZ);
 
+        HBox generatorParX = new HBox();
+        generatorParX.setPrefWidth(userControl.getWidth());
         genSizeX = new Slider();
         genSizeX.setMin(0);
         genSizeX.setMax(1);
         genSizeX.setValue(0.8);
-        genSizeX.setPrefWidth(userControl.getWidth());
-        Label genSizeXText = new Label("Размер генератора по X (доли от камеры): 0,80");
+        genSizeX.setPrefWidth(userControl.getWidth()/2);
+        Label genSizeXText = new Label("Размер генератора X  "+ String.format("%3.2f", genSizeX.getValue()));
+        genSizeXText.setPrefWidth(userControl.getWidth()/2);
         genSizeXText.setFont(mainFont);
         genSizeX.setOnMouseReleased((event) -> {
-            genSizeXText.setText("Размер генератора по X (доли от камеры): "+ String.format("%3.2f", genSizeX.getValue())); // Три знака всего, два после запятой
+            genSizeXText.setText("Размер генератора X  "+ String.format("%3.2f", genSizeX.getValue())); // Три знака всего, два после запятой
         });
-        userControlPane.getChildren().add(genSizeXText);
-        userControlPane.getChildren().add(genSizeX);
+        generatorParX.getChildren().addAll(genSizeXText,genSizeX);
+        userControlPane.getChildren().add(generatorParX);
 
+        HBox generatorParZ = new HBox();
+        generatorParZ.setPrefWidth(userControl.getWidth());
         genSizeZ = new Slider();
         genSizeZ.setMin(0);
         genSizeZ.setMax(1);
         genSizeZ.setValue(0.8);
-        genSizeZ.setPrefWidth(userControl.getWidth());
-        Label genSizeYText = new Label("Размер генератора по Z (доли от камеры): 0,80");
-        genSizeYText.setFont(mainFont);
+        genSizeZ.setPrefWidth(userControl.getWidth()/2);
+        Label genSizeZText = new Label("Размер генератора Z  "+ String.format("%3.2f", genSizeZ.getValue()));
+        genSizeZText.setPrefWidth(userControl.getWidth()/2);
+        genSizeZText.setFont(mainFont);
         genSizeZ.setOnMouseReleased((event) -> {
-            genSizeYText.setText("Размер генератора по Z (доли от камеры): "+ String.format("%3.2f", genSizeZ.getValue())); // Три знака всего, два после запятой
+            genSizeZText.setText("Размер генератора Z  "+ String.format("%3.2f", genSizeZ.getValue())); // Три знака всего, два после запятой
         });
-        userControlPane.getChildren().add(genSizeYText);
-        userControlPane.getChildren().add(genSizeZ);
-
+        generatorParZ.getChildren().addAll(genSizeZText,genSizeZ);
+        userControlPane.getChildren().add(generatorParZ);
         Output.ConstructOutputAFrame();
-
-
 
         startSimButt = new Button("Старт симуляции");
         startSimButt.setFont(mainFont);
@@ -209,6 +264,7 @@ public class App extends Application {
         Button outputOption = new Button("Вывод");
         outputOption.setFont(mainFont);
         outputOption.setOnAction(event -> Output.disp());
+        outputOption.setPrefWidth(userControl.getWidth()/4);
 
         HBox buttonPanel = new HBox();
         buttonPanel.setPrefWidth(userControl.getWidth());
@@ -216,6 +272,8 @@ public class App extends Application {
         userControlPane.getChildren().add(buttonPanel);
         buttonPanel.setSpacing(0);
         HBox dragTarget = new HBox();
+        dragTarget.setPrefHeight(userControl.getWidth()/10);
+        dragTarget.setBackground(new Background(new BackgroundFill(Color.SKYBLUE, null, null)));
         dragTarget.setOnDragEntered(event -> {
             Dragboard db = event.getDragboard();
             if (db.hasFiles()) {
