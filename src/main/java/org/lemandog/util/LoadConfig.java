@@ -76,7 +76,7 @@ public class LoadConfig {
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
                 if (line.contains("GRAPH")){Output.outputGraph = true;}
-                if (line.contains("PALIT")){Output.outputPallete.setValue(Integer.parseInt(line));} //int
+                if (line.contains("PALIT")){Output.outputPallete.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("START")){App.startSimButt.fire();} //bool
             }
     } catch (IOException e) {

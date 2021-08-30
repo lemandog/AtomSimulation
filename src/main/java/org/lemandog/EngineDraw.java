@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
@@ -32,23 +33,14 @@ public class EngineDraw {
     static Stage draw = new Stage();
     static Group root;
     static double multiToFill;
-    static Box chamber;
     static Box chamberR;
-    static Box target;
     static Box targetR;
 
-    public static Sphere engine3D(Particle currPos) { //Скалирование частицы для отрисовки
+    public static Sphere engine3D(Particle currPos) {
         currPos.getCurrSphere();
-        Sphere toDraw = new Sphere(currPos.obj.getRadius());
+        Sphere toDraw = currPos.obj;
         toDraw.setMaterial(currPos.obj.getMaterial());
-        toDraw.translateXProperty().set(getAdjustedCord(currPos.obj.getTranslateX()));
-        toDraw.translateYProperty().set(getAdjustedCord(currPos.obj.getTranslateY()));
-        toDraw.translateZProperty().set(getAdjustedCord(currPos.obj.getTranslateZ()));
         return toDraw;
-    }
-
-    public static double getAdjustedCord(double patient) {
-        return patient * multiToFill;
     }
 
     public static void eSetup() { //Отрисовка камеры
@@ -59,55 +51,69 @@ public class EngineDraw {
         Image icon = new Image("/atomSim.png");
         draw.getIcons().add(icon);
 
-        multiToFill = scene.getHeight()/(Arrays.stream(CHA_SIZE).max().getAsDouble() * 1.2); // Множитель для установки размера окна в зависимости от размера монитора
+        multiToFill = scene.getHeight()/(Arrays.stream(CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
-        chamber = new Box(getAdjustedCord(CHA_SIZE[0]),getAdjustedCord(CHA_SIZE[1]),getAdjustedCord(CHA_SIZE[2]));
         chamberR = new Box((CHA_SIZE[0]),(CHA_SIZE[1]),(CHA_SIZE[2]));
-        chamber.setTranslateX(0);
-        chamber.setTranslateY(0);
+        chamberR.setTranslateX(0);
+        chamberR.setTranslateY(0);
 
-        target = new Box(getAdjustedCord(TAR_SIZE[0]),getAdjustedCord(TAR_SIZE[1]),getAdjustedCord(TAR_SIZE[2]));
         targetR = new Box((TAR_SIZE[0]),(TAR_SIZE[1]),(TAR_SIZE[2]));
-        target.setTranslateX(0);
+        targetR.setTranslateX(0);
         targetR.setTranslateY((-CHA_SIZE[1]/2));
-        target.setTranslateY(getAdjustedCord(-CHA_SIZE[1]/2));
-        target.setTranslateZ(0);
+        targetR.setTranslateZ(0);
 
         if(Output.outputPic) {
             Output.setTargetSize(chamberR.getBoundsInParent());
             Output.picState = new int[(int) Output.maxWidth][(int) Output.maxDepth];
         }
-        Box generator = new Box(getAdjustedCord(GEN_SIZE[0]),getAdjustedCord(GEN_SIZE[1]),getAdjustedCord(GEN_SIZE[2]));
         Box generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
-        generator.setTranslateX(0);
-        generator.setTranslateY(getAdjustedCord(CHA_SIZE[1]/2));
+        generatorR.setTranslateX(0);
         generatorR.setTranslateY((CHA_SIZE[1]/2));
-        generator.setTranslateZ(0);
+        generatorR.setTranslateZ(0);
 
         PerspectiveCamera main = new PerspectiveCamera();
-        scene.setCamera(main);
+
         main.setTranslateX(-scene.getHeight()/2); //Чтобы камера в центре имела начало координат
         main.setTranslateY(-scene.getHeight()/2);
-        main.setTranslateZ(-250);
-        main.setFieldOfView(70);
+        main.setTranslateZ(CHA_SIZE[2]*multiToFill*1.5 - CHA_SIZE[2]);
+        System.out.println("POS " + main.getTranslateZ() + " FILL MULT " + multiToFill );
 
-        chamber.setDrawMode(DrawMode.LINE);
+        main.setNearClip(0.001);
+        main.setFieldOfView(35);
+        scene.setCamera(main);
+        // КОНТРОЛЬ КАМЕРЫ
+        scene.setOnKeyPressed(keyEvent -> {
+            if(keyEvent.getCode() == KeyCode.NUMPAD1 || keyEvent.getCode() == KeyCode.NUMPAD4){
+                if(keyEvent.getCode() == KeyCode.NUMPAD1){main.setTranslateX(main.getTranslateX() + 1);} else {main.setTranslateX(main.getTranslateX() - 1);}
+                System.out.println("CURRENT CAMERA X POS " + main.getTranslateX());
+            }
+            if(keyEvent.getCode() == KeyCode.NUMPAD2 || keyEvent.getCode() == KeyCode.NUMPAD5){
+                if(keyEvent.getCode() == KeyCode.NUMPAD2){main.setTranslateY(main.getTranslateY() + 1);}else {main.setTranslateY(main.getTranslateY() - 1);}
+                System.out.println("CURRENT CAMERA Y POS " + main.getTranslateY());
+            }
+            if(keyEvent.getCode() == KeyCode.NUMPAD3 || keyEvent.getCode() == KeyCode.NUMPAD6){
+                if(keyEvent.getCode() == KeyCode.NUMPAD3){main.setTranslateZ(main.getTranslateZ() + 1);}else {main.setTranslateZ(main.getTranslateZ() - 1);}
+                System.out.println("CURRENT CAMERA Z POS " + main.getTranslateZ());
+            }
+        });
 
-        generator.setDrawMode(DrawMode.LINE);
+        chamberR.setDrawMode(DrawMode.LINE);
+
+        generatorR.setDrawMode(DrawMode.LINE);
         PhongMaterial genMat = new PhongMaterial();
         genMat.setDiffuseColor(Color.RED);
         genMat.setSpecularPower(1);
-        generator.setMaterial(genMat);
+        generatorR.setMaterial(genMat);
 
-        target.setDrawMode(DrawMode.LINE);
+        targetR.setDrawMode(DrawMode.LINE);
         PhongMaterial tarMat = new PhongMaterial();
         tarMat.setDiffuseColor(Color.GREEN);
         tarMat.setSpecularPower(1);
-        target.setMaterial(tarMat);
+        targetR.setMaterial(tarMat);
 
-        root.getChildren().add(target);
-        root.getChildren().add(generator);
-        root.getChildren().add(chamber);
+        root.getChildren().add(targetR);
+        root.getChildren().add(generatorR);
+        root.getChildren().add(chamberR);
 
         DrawingThreadFire(Sim.container);
 
@@ -156,7 +162,7 @@ public class EngineDraw {
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*10);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);

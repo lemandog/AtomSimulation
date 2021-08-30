@@ -99,17 +99,13 @@ public class Particle{
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
                 //Новые координаты
                 Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-                Point3D oldCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
 
                 for(int i = 0; i<avilableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dN * speeds[i];
                 }
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-                Point3D newCordADJ = new Point3D(getAdjustedCord(coordinates[0]),getAdjustedCord(coordinates[1]),getAdjustedCord(coordinates[2]));
 
                 paths = EngineDraw.createConnection(oldCord,newCord);
-                pathsADJ = EngineDraw.createConnection(oldCordADJ,newCordADJ);
-
                 //длина пробега
                 freerunLen = calcRandLen();
                 //скорости
@@ -169,7 +165,7 @@ public class Particle{
 
     public void getCurrSphere() {
         obj.setMaterial(thisParticleMat);
-        obj.setRadius(3);
+        obj.setRadius(1/multiToFill);
         obj.setTranslateX(coordinates[0]); //Установка координат визуализации атома
         obj.setTranslateY(coordinates[1]);
         obj.setTranslateZ(coordinates[2]);
