@@ -4,6 +4,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
+import org.lemandog.util.Output;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -91,7 +92,7 @@ public class Particle{
     public Thread CreateThread() {
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
-            long stepsPassed = 0;
+            int stepsPassed = 0;
             while(active && stepsPassed<LEN){
 
                 if (waitTimeMS>=0){
@@ -126,27 +127,16 @@ public class Particle{
                 genNotMet(oldCord,newCord); //Проверяем, был ли удар по источнику
                 active = !wallIsHit && !tarIsHit;
 
-                if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  1;}
-                if (!active){
-                    aliveCounterI--;
-                    if (Output.output || Output.outputGraph){Output.statesF[this.ordinal][(int)stepsPassed] =  0;}}
-                if (wallIsHit && !tarIsHit){
-                    drawAPath(paths);
-                    outOfBoundsCounterI++;
-                    if (Output.output || Output.outputGraph){Output.statesO[this.ordinal][(int)stepsPassed] =1;}
-                } else {
-                    if (Output.output || Output.outputGraph){Output.statesO[this.ordinal][(int)stepsPassed] =0;}
-                }
                 if (tarIsHit){
                     Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     drawAPath(paths);
                     tarHitCounterI++;
-                    if (Output.output || Output.outputGraph){Output.statesH[this.ordinal][(int)stepsPassed] =1;}
-                } else {
-                    if (Output.output || Output.outputGraph){Output.statesH[this.ordinal][(int)stepsPassed] =0;}
                 }
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
+                if (Output.outputCSV){
+                    Output.insertValuesToSCV(coordinates,stepsPassed,ordinal);
+                }
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
             System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit +" GENHIT?: " + genIsHit +" ON STEP " + stepsPassed);

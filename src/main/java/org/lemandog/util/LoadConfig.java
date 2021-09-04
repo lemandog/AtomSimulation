@@ -10,7 +10,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.lemandog.App;
-import org.lemandog.Output;
 
 public class LoadConfig {
     public static void constructConfigInfoFrame(){
@@ -41,6 +40,9 @@ public class LoadConfig {
         layout.getChildren().add(new Label("PALIT 1 / Выбор палитры"));
         layout.getChildren().add(new Label("START / Запустить симуляцию (После всех прочих команд!)"));
         layout.getChildren().add(new Label("DIMEN 3 / Количество осей"));
+        layout.getChildren().add(new Label("WAITT 5 / Задержка между шагами"));
+        layout.getChildren().add(new Label("VERWA 0 / Вероятность отражения от стен"));
+        layout.getChildren().add(new Label("VERGE 0.9 / Вероятность отражения от генератора"));
         info.show();
     }
     public static void select(File file) {
@@ -72,12 +74,15 @@ public class LoadConfig {
                 if (line.contains("ZTARS")){App.targetSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZTARS ","")));} //double
                 if (line.contains("XGENE")){App.genSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XGENE ","")));} //double
                 if (line.contains("ZGENE")){App.genSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZGENE ","")));} //double
-                if (line.contains("DIRPA")){App.genSizeX.setValue(Double.parseDouble(line.trim().replaceAll("DIRPA ","")));} //str
+                if (line.contains("DIRPA")){Output.directoryChooserOutputPath.setInitialDirectory(new File((line.trim().replaceAll("DIRPA ",""))));} //str
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
-                if (line.contains("GRAPH")){Output.outputGraph = true;}
+                if (line.contains("GRAPH")){Output.outputCSV = true;}
                 if (line.contains("PALIT")){Output.outputPallete.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("START")){App.startSimButt.fire();} //bool
+                if (line.contains("WAITT")){App.waitTime.setValue(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
+                if (line.contains("VERWA")){App.bounceWallChance.setValue(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
+                if (line.contains("VERGE")){App.bounceGenChance.setValue(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
             }
     } catch (IOException e) {
             e.printStackTrace();

@@ -11,6 +11,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.lemandog.util.LoadConfig;
+import org.lemandog.util.Output;
+import org.lemandog.util.Util;
+
 import java.util.Objects;
 
 public class App extends Application {
@@ -272,7 +275,7 @@ public class App extends Application {
         userControlPane.getChildren().add(buttonPanel);
         buttonPanel.setSpacing(0);
         HBox dragTarget = new HBox();
-        dragTarget.setPrefHeight(userControl.getWidth()/10);
+        dragTarget.setPrefHeight(userControl.getWidth()/14);
         dragTarget.setBackground(new Background(new BackgroundFill(Color.SKYBLUE, null, null)));
         dragTarget.setOnDragEntered(event -> {
             Dragboard db = event.getDragboard();
@@ -284,24 +287,30 @@ public class App extends Application {
              * transferred and used */
             event.consume();
         });
+        dragTarget.setAlignment(Pos.CENTER);
         fileDropText = new Label("Конфигурационный .txt переместите сюда");
         fileDropText.setFont(mainFont);
-        fileDropText.setAlignment(Pos.CENTER);
         dragTarget.getChildren().add(fileDropText);
 
         dragTarget.setMinSize(userControl.getWidth(),30);
         userControlPane.getChildren().add(dragTarget);
 
+        HBox buttonPanelSQL = new HBox();
         Button confInfo = new Button("О конфигурациях");
         confInfo.setFont(mainFont);
         confInfo.setOnAction(event -> LoadConfig.constructConfigInfoFrame());
-        userControlPane.getChildren().add(confInfo);
+
+
+        Button resetDatabase = new Button("О программе");
+        resetDatabase.setFont(mainFont);
+        resetDatabase.setOnAction(event -> Util.constructAWin());
+
 
         outputMode = new Label("Вывод выключен!");
         outputMode.setTextFill(Color.INDIANRED);
         outputMode.setFont(mainFont);
-        userControlPane.getChildren().add(outputMode);
-
+        buttonPanelSQL.getChildren().addAll(confInfo,resetDatabase,outputMode);
+        userControlPane.getChildren().add(buttonPanelSQL);
         userControlWindows.show();
     }
 }

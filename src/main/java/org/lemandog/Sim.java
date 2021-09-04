@@ -1,6 +1,7 @@
 package org.lemandog;
 
 import javafx.scene.image.Image;
+import org.lemandog.util.Output;
 
 public class Sim {
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
@@ -9,7 +10,7 @@ public class Sim {
     private static final double d = 130*10e-12;//Диаметр хрома (м)
     public static int T;
     public static double p;
-    static int N;
+    public static int N;
     public static int LEN;
     public static double[] CHA_SIZE; //XYZ
     public static double[] TAR_SIZE; //XYZ
@@ -33,6 +34,7 @@ public class Sim {
     static Thread[] calculator;
 
     public static void setup(){
+        if (Output.outputCSV){Output.CSVWriterBuild();}
         outOfBoundsCounterI = 0; //Обнуление счётчиков с предыдущего запуска
         tarHitCounterI = 0;
         EngineDraw.root = null;
@@ -73,10 +75,8 @@ public class Sim {
         pathsDr = App.pathDrawing.isSelected();
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
-        if(Output.outputGraph || Output.output) {
-            Output.statesH = new int[N][LEN]; // Для переписи приземлившихся промахнувшихся и живых частиц
-            Output.statesO = new int[N][LEN];
-            Output.statesF = new int[N][LEN];
+        if(Output.output) {
+            //TODO: к CSV
         }
         if(Output.outputPic) {
             Output.xSize = (int) CHA_SIZE[0];

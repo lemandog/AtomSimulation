@@ -16,6 +16,8 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
+import org.lemandog.util.Output;
+
 import java.util.Arrays;
 /*
 ---------------> X
