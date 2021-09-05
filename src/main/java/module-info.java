@@ -3,7 +3,11 @@ module AtomSimulation {
     requires javafx.graphics;
     requires java.desktop;
     requires java.sql;
-    requires com.opencsv;
     exports org.lemandog;
     exports org.lemandog.util;
+
+    requires java.xml;
+    requires java.scripting;
+
+    exports com.opencsv;
 }

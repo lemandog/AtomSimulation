@@ -6,7 +6,7 @@
 
     <groupId>org.lemandog</groupId>
     <artifactId>AtomSim</artifactId>
-    <version>0.2.30</version>
+    <version>0.2.50</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,15 +16,22 @@
 
 
 <dependencies>
-    <dependency>
-        <groupId>com.opencsv</groupId>
-        <artifactId>opencsv</artifactId>
-        <version>5.5.1</version>
-    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.panteleyev/jpackage-maven-plugin -->
     <dependency>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-controls</artifactId>
         <version>16</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.12.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven.surefire</groupId>
+        <artifactId>maven-surefire-common</artifactId>
+        <version>2.22.0</version>
     </dependency>
 </dependencies>
 

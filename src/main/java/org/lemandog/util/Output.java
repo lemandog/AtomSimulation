@@ -1,5 +1,6 @@
 package org.lemandog.util;
 
+import com.opencsv.CSVWriter;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,7 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import com.opencsv.*;
 import org.lemandog.App;
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,9 +20,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Vector;
 
@@ -31,7 +29,7 @@ import static org.lemandog.App.outputMode;
 import static org.lemandog.util.SwingFXUtils.fromFXImage;
 
 public class Output {
-    static DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("HH-mm-ss").withZone(ZoneOffset.systemDefault());
+    static DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd=MM=yyyy-HH=mm=ss");
     public static Image palette = new Image("heatmap2.png");
     public static int zSize = 10;
     public static int xSize = 10;
@@ -233,7 +231,9 @@ public class Output {
         maxDepth = target.getDepth();
     }
     public static void insertValuesToSCV(double[] cord, int passed, int ordinal){
-        assert global != null;
+        if (global == null){
+            CSVWriterBuild();
+        }
         Vector<String> ve = new Vector<>(0);
         for (double v : cord) {
             ve.add(String.valueOf(v));
@@ -249,9 +249,9 @@ public class Output {
 
     public static void CSVWriterBuild() {
         try {
+            LocalDateTime main = LocalDateTime.now();
             File csv = new File(selectedPath.getAbsolutePath()
-                    + "/ParticleStates"+sdfF.format(LocalDateTime.ofEpochSecond(Instant.now().getEpochSecond(),
-                    0, ZoneOffset.UTC))+".csv");
+                    + "/ParticleStates"+sdfF.format(main)+".csv");
             global = new CSVWriter(new FileWriter(csv),
                     ';',
                     CSVWriter.NO_QUOTE_CHARACTER,

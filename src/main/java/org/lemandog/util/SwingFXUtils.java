@@ -91,7 +91,7 @@ public class SwingFXUtils {
             if (iw < bw || ih < bh) {
                 wimg = null;
             } else if (bw < iw || bh < ih) {
-                int empty[] = new int[iw];
+                int[] empty = new int[iw];
                 PixelWriter pw = wimg.getPixelWriter();
                 PixelFormat<IntBuffer> pf = PixelFormat.getIntArgbPreInstance();
                 if (bw < iw) {
@@ -107,7 +107,7 @@ public class SwingFXUtils {
         }
         PixelWriter pw = wimg.getPixelWriter();
         DataBufferInt db = (DataBufferInt)bimg.getRaster().getDataBuffer();
-        int data[] = db.getData();
+        int[] data = db.getData();
         int offset = bimg.getRaster().getDataBuffer().getOffset();
         int scan =  0;
         SampleModel sm = bimg.getRaster().getSampleModel();
@@ -282,7 +282,7 @@ public class SwingFXUtils {
             bimg = new BufferedImage(iw, ih, prefBimgType);
         }
         DataBufferInt db = (DataBufferInt)bimg.getRaster().getDataBuffer();
-        int data[] = db.getData();
+        int[] data = db.getData();
         int offset = bimg.getRaster().getDataBuffer().getOffset();
         int scan =  0;
         SampleModel sm = bimg.getRaster().getSampleModel();
