@@ -159,36 +159,7 @@ public class EngineDraw {
         return line;
     }
 
-    public static boolean takePointOnTarget(Point3D origin, Point3D target, Particle inUse){
-        Sphere product = new Sphere();
-        //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
-        //Всё потому что Bounds.intersect считает неверно.
-        double mixY = origin.getY();
-        double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
-        for (double i = 0; i < 1; i+=optimalStep) {
-            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
-            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
-            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
 
-            if (origin.getY() + (target.getY() - origin.getY())*i<targetR.getBoundsInParent().getMaxY()
-                    && origin.getY() + (target.getY() - origin.getY())*i>targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
-
-                if (product.getBoundsInParent().getMinX()>targetR.getBoundsInParent().getMinX()
-                        && product.getBoundsInParent().getMaxX()<targetR.getBoundsInParent().getMaxX()){ //Попадание по X
-                    if (product.getBoundsInParent().getMinZ()>targetR.getBoundsInParent().getMinZ()
-                            && product.getBoundsInParent().getMaxZ()<targetR.getBoundsInParent().getMaxZ()){ //Попадание по Z
-
-                        inUse.coordinates[0] = product.getTranslateX();
-                        inUse.coordinates[1] = product.getTranslateY();
-                        inUse.coordinates[2] = product.getTranslateZ();
-                        inUse.obj = product;
-                        return true;
-                    }
-                }}
-        }
-        return false;
-    }
     public static boolean takePointOnChamber(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
         //Так как мишень перпендикулярна оси Y, логично искать точку пересечения, естественно, от Y
@@ -225,6 +196,36 @@ public class EngineDraw {
             EngineDraw.CylinderThread(path);
         }
     }
+    public static boolean takePointOnTarget(Point3D origin, Point3D target, Particle inUse){
+        Sphere product = new Sphere();
+        //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
+        //Всё потому что Bounds.intersect считает неверно.
+        double mixY = origin.getY();
+        double maxY = target.getY();
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
+        for (double i = 0; i < 1; i+=optimalStep) {
+            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
+            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
+            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+
+            if (origin.getY() + (target.getY() - origin.getY())*i<targetR.getBoundsInParent().getMaxY()
+                    && origin.getY() + (target.getY() - origin.getY())*i>targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
+
+                if (product.getTranslateX()>targetR.getBoundsInParent().getMinX()
+                        && product.getTranslateX()<targetR.getBoundsInParent().getMaxX()){ //Попадание по X
+                    if (product.getTranslateZ()>targetR.getBoundsInParent().getMinZ()
+                            && product.getTranslateZ()<targetR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+
+                        inUse.coordinates[0] = product.getTranslateX();
+                        inUse.coordinates[1] = product.getTranslateY();
+                        inUse.coordinates[2] = product.getTranslateZ();
+                        inUse.obj = product;
+                        return true;
+                    }
+                }}
+        }
+        return false;
+    }
 
     public static boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
@@ -240,10 +241,11 @@ public class EngineDraw {
 
             if (origin.getY() + (target.getY() - origin.getY())*i<generatorR.getBoundsInParent().getMaxY()
                     && origin.getY() + (target.getY() - origin.getY())*i>generatorR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
-                if (product.getBoundsInParent().getMinX()>generatorR.getBoundsInParent().getMinX()
-                        && product.getBoundsInParent().getMaxX()<generatorR.getBoundsInParent().getMaxX()){ //Попадание по X
-                    if (product.getBoundsInParent().getMinZ()>generatorR.getBoundsInParent().getMinZ()
-                            && product.getBoundsInParent().getMaxZ()<generatorR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+
+                if (product.getTranslateX()>generatorR.getBoundsInParent().getMinX()
+                        && product.getTranslateX()<generatorR.getBoundsInParent().getMaxX()){ //Попадание по X
+                    if (product.getTranslateZ()>generatorR.getBoundsInParent().getMinZ()
+                            && product.getTranslateZ()<generatorR.getBoundsInParent().getMaxZ()){ //Попадание по Z
                         inUse.coordinates[0] = product.getTranslateX();
                         inUse.coordinates[1] = product.getTranslateY();
                         inUse.coordinates[2] = product.getTranslateZ();

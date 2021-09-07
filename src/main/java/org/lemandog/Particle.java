@@ -95,14 +95,14 @@ public class Particle{
             int stepsPassed = 0;
             while(active && stepsPassed<LEN){
 
-                if (waitTimeMS>=0){
+                if (waitTimeMS>=0 && Output.output3D){
                     try {
                         Thread.sleep(waitTimeMS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }}
 
-                DrawingThreadFire(new Particle[]{this});
+                if (Output.output3D){DrawingThreadFire(new Particle[]{this});}
                 //Нынешнее приращение
                 double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
@@ -154,7 +154,7 @@ public class Particle{
     }
     private void genNotMet(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnGenerator(oldCord,newCord,this) && !wallIsHit){ //Есть ли пересечение?
-            if (bounceChance("GEN")){ //Испарения не происходит
+            if (!bounceChance("GEN")){ //Испарения не происходит
             this.genIsHit = true;
             this.wallIsHit = true;
             System.out.println("PARTICLE " + ordinal + " HIT GENERATOR AND STAYED!");
@@ -171,7 +171,7 @@ public class Particle{
 
     private void wallCheck(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
-            if (bounceChance("WALL") && !genIsHit){
+            if (!bounceChance("WALL") && !genIsHit){
                 System.out.println("PARTICLE " + ordinal + " HIT WALL AND STAYED!");
                 this.wallIsHit = true;
                 thisParticleMat.setDiffuseColor(wallhitCol);}

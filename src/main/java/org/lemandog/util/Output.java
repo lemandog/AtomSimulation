@@ -37,6 +37,8 @@ public class Output {
     public static boolean output = false;
     public static boolean outputPic = false;
     public static boolean outputCSV = false;
+    public static boolean output3D = true;
+    public static CheckBox output3d;
     public static CheckBox outputAsk;
     public static CheckBox outputAskPic;
     public static CheckBox outputAskGraph;
@@ -80,6 +82,13 @@ public class Output {
 
         compOutput.getChildren().add(saveResNow);
         compOutput.getChildren().add(returnBut);
+
+        output3d = new CheckBox();
+        output3d.setText("Показывать каждый шаг перемещения частиц");
+        output3d.setFont(mainFont);
+        output3d.setSelected(output3D);
+        output3d.setOnAction(event -> output3D = !output3D);
+        compOutput.getChildren().add(output3d);
 
         Label textDesk = new Label("Текстовый вывод");
         textDesk.setFont(mainFont);

@@ -75,9 +75,6 @@ public class Sim {
         pathsDr = App.pathDrawing.isSelected();
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
-        if(Output.output) {
-            //TODO: к CSV
-        }
         if(Output.outputPic) {
             Output.xSize = (int) CHA_SIZE[0];
             Output.zSize = (int) CHA_SIZE[2];

@@ -36,13 +36,14 @@ public class LoadConfig {
         layout.getChildren().add(new Label("DIRPA C:\\Users\\User\\Desktop  / Директория для сохранения результатов"));
         layout.getChildren().add(new Label("TEXTW / Текстовый вывод"));
         layout.getChildren().add(new Label("PNGZA / Плотность заселения"));
-        layout.getChildren().add(new Label("GRAPH / Встроенный графопостроитель"));
+        layout.getChildren().add(new Label("CSVOU / Вывод в CSV"));
         layout.getChildren().add(new Label("PALIT 1 / Выбор палитры"));
         layout.getChildren().add(new Label("START / Запустить симуляцию (После всех прочих команд!)"));
         layout.getChildren().add(new Label("DIMEN 3 / Количество осей"));
         layout.getChildren().add(new Label("WAITT 5 / Задержка между шагами"));
         layout.getChildren().add(new Label("VERWA 0 / Вероятность отражения от стен"));
         layout.getChildren().add(new Label("VERGE 0.9 / Вероятность отражения от генератора"));
+        layout.getChildren().add(new Label("3DNOT / Не отрисовывать 3Д. (Отключает и задержку!)"));
         info.show();
     }
     public static void select(File file) {
@@ -77,12 +78,13 @@ public class LoadConfig {
                 if (line.contains("DIRPA")){Output.directoryChooserOutputPath.setInitialDirectory(new File((line.trim().replaceAll("DIRPA ",""))));} //str
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
-                if (line.contains("GRAPH")){Output.outputCSV = true;}
+                if (line.contains("CSVOU")){Output.outputCSV = true;}
                 if (line.contains("PALIT")){Output.outputPallete.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("START")){App.startSimButt.fire();} //bool
                 if (line.contains("WAITT")){App.waitTime.setValue(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
                 if (line.contains("VERWA")){App.bounceWallChance.setValue(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
                 if (line.contains("VERGE")){App.bounceGenChance.setValue(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
+                if (line.contains("3DNOT")){Output.output3D = false;} //double
             }
     } catch (IOException e) {
             e.printStackTrace();
