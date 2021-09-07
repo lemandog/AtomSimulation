@@ -128,6 +128,7 @@ public class Particle{
                 active = !wallIsHit && !tarIsHit;
 
                 if (tarIsHit){
+                    Output.CSVStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     drawAPath(paths);
                     tarHitCounterI++;
@@ -154,7 +155,7 @@ public class Particle{
     }
     private void genNotMet(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnGenerator(oldCord,newCord,this) && !wallIsHit){ //Есть ли пересечение?
-            if (!bounceChance("GEN")){ //Испарения не происходит
+            if (bounceChance("GEN")){ //Испарения не происходит
             this.genIsHit = true;
             this.wallIsHit = true;
             System.out.println("PARTICLE " + ordinal + " HIT GENERATOR AND STAYED!");
@@ -171,7 +172,7 @@ public class Particle{
 
     private void wallCheck(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
-            if (!bounceChance("WALL") && !genIsHit){
+            if (bounceChance("WALL") && !genIsHit){
                 System.out.println("PARTICLE " + ordinal + " HIT WALL AND STAYED!");
                 this.wallIsHit = true;
                 thisParticleMat.setDiffuseColor(wallhitCol);}
@@ -187,9 +188,9 @@ public class Particle{
 
     private boolean bounceChance(String type) {
         if (type.equals("WALL")) {
-            return Math.random() < App.bounceWallChance.getValue();
+            return !(Math.random() < App.bounceWallChance.getValue());
         }
-        return Math.random() < App.bounceGenChance.getValue();
+        return !(Math.random() < App.bounceGenChance.getValue());
     }
 
     public void getCurrSphere() {

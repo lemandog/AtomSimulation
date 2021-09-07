@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import org.lemandog.util.LoadConfig;
 import org.lemandog.util.Output;
 import org.lemandog.util.Util;
-
 import java.util.Objects;
 
 public class App extends Application {
@@ -42,7 +41,6 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage){
-
         Stage userControlWindows = new Stage();
         userControlWindows.setResizable(false);
 

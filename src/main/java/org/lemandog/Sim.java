@@ -112,7 +112,7 @@ public class Sim {
         //Это делает код менее читабельным, но гораздо более быстрым.
         mainContr = new Thread(() ->{
         while(lastRunning < N) {
-            if(threadQuotaNotMet()){
+            if(threadQuotaNotMet()>0){
                 for (int i = 0; i< avilableStreams;i++){
                     if (!calculator[i].isAlive()){// Найти закончившийся тред
                         try {
@@ -125,7 +125,10 @@ public class Sim {
                 }
             }
         }
-        System.out.println("SIMULATION RUN ENDED");
+            try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
+                Thread.sleep(1000);
+            } catch (InterruptedException ignore) {}
+            System.out.println("SIMULATION RUN ENDED");
         EngineDraw.DrawingThreadFire(container);
         Output.toFile();
         simIsAlive = false;
@@ -134,16 +137,18 @@ public class Sim {
         mainContr.start();
     }
 
-    private static boolean threadQuotaNotMet() {
-        boolean thereAreDeadThreads = false;
+    private static int threadQuotaNotMet() {
+        int thereAreDeadThreads = 0;
         nbRunning = 0;
-        for (int i = 0; i< avilableStreams;i++){
-            if (!calculator[i].isAlive()){
-                thereAreDeadThreads = true;// Есть не живые треды
+        try{
+        for (int i = 0; i< avilableStreams;i++) {
+            if (!calculator[i].isAlive()) {
+                thereAreDeadThreads++;// Есть не живые треды
             } else {
                 nbRunning++;
             }
         }
+        }catch(NullPointerException e){thereAreDeadThreads++;}
         return thereAreDeadThreads;
     }
 }

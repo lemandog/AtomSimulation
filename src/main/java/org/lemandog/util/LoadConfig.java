@@ -35,7 +35,8 @@ public class LoadConfig {
         layout.getChildren().add(new Label("ZGENE 0.8  / Количество потоков для счёта"));
         layout.getChildren().add(new Label("DIRPA C:\\Users\\User\\Desktop  / Директория для сохранения результатов"));
         layout.getChildren().add(new Label("TEXTW / Текстовый вывод"));
-        layout.getChildren().add(new Label("PNGZA / Плотность заселения"));
+        layout.getChildren().add(new Label("PNGZA / Плотность заселения (PNG)"));
+        layout.getChildren().add(new Label("CSVZA / Плотность заселения (CSV)"));
         layout.getChildren().add(new Label("CSVOU / Вывод в CSV"));
         layout.getChildren().add(new Label("PALIT 1 / Выбор палитры"));
         layout.getChildren().add(new Label("START / Запустить симуляцию (После всех прочих команд!)"));
@@ -78,6 +79,7 @@ public class LoadConfig {
                 if (line.contains("DIRPA")){Output.directoryChooserOutputPath.setInitialDirectory(new File((line.trim().replaceAll("DIRPA ",""))));} //str
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
+                if (line.contains("CSVZA")){Output.outputPicCSV = true;} //bool
                 if (line.contains("CSVOU")){Output.outputCSV = true;}
                 if (line.contains("PALIT")){Output.outputPallete.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("START")){App.startSimButt.fire();} //bool

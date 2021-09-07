@@ -36,11 +36,13 @@ public class Output {
     public static DirectoryChooser directoryChooserOutputPath = new DirectoryChooser();
     public static boolean output = false;
     public static boolean outputPic = false;
+    public static boolean outputPicCSV = false;
     public static boolean outputCSV = false;
     public static boolean output3D = true;
     public static CheckBox output3d;
     public static CheckBox outputAsk;
     public static CheckBox outputAskPic;
+    public static CheckBox outputAskCSVHits;
     public static CheckBox outputAskGraph;
     public static Slider outputAskPicResolution;
     public static Slider outputPallete;
@@ -51,6 +53,7 @@ public class Output {
     static Stage setOutput = new Stage();
     static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
     static CSVWriter global;
+    static CSVWriter global2;
     public static void ConstructOutputAFrame() {
         VBox compOutput = new VBox();
         Scene setOutputSc = new Scene(compOutput,500,500);
@@ -111,6 +114,13 @@ public class Output {
         outputAskPic.setFont(mainFont);
         outputAskPic.setOnAction(event -> outputPic = !outputPic);
         compOutput.getChildren().add(outputAskPic);
+
+        outputAskCSVHits = new CheckBox();
+        outputAskCSVHits.setText("Вывод плотности заселения в CSV?");
+        outputAskCSVHits.setFont(mainFont);
+        outputAskCSVHits.setOnAction(event -> outputPicCSV = !outputPicCSV);
+        compOutput.getChildren().add(outputAskCSVHits);
+
         outputAsk = new CheckBox();
         outputAsk.setText("Вывод плотности заселения в .TXT?");
         outputAsk.setFont(mainFont);
@@ -194,8 +204,16 @@ public class Output {
         }
         if (outputCSV) {
             try {
-                global.close();
+                global.flush();
                 System.out.println("GLOBAL STREAM CLOSED");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (outputPicCSV) {
+            try {
+                global2.flush();
+                System.out.println("GLOBAL STREAM2 CLOSED");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -231,7 +249,7 @@ public class Output {
     }
     public static void picStateReact(double xCord, double zCord){
         if (outputPic){
-            picState[(int) ((int) (maxWidth/2) + xCord)][(int) ((int) (maxDepth/2) + zCord)] += 1;
+            picState[(int) ((maxWidth/2) + xCord)][(int) ((maxDepth/2) + zCord)] += 1;
         }
     }
 
@@ -281,5 +299,25 @@ public class Output {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void CSVStateReact(double translateX, double translateZ) {
+        if (outputPicCSV){
+        if (global2 == null){
+            LocalDateTime main = LocalDateTime.now();
+            File csv = new File(selectedPath.getAbsolutePath()
+                    + "/Hits"+sdfF.format(main)+".csv");
+            try {
+                global2 = new CSVWriter(new FileWriter(csv),
+                        ';',
+                        CSVWriter.NO_QUOTE_CHARACTER,
+                        CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                        CSVWriter.RFC4180_LINE_END);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        global2.writeNext(new String[]{String.valueOf(translateX),String.valueOf(translateZ)});
+    }
     }
 }
