@@ -112,7 +112,7 @@ public class Sim {
         EngineDraw.eSetup();
         //Это делает код менее читабельным, но гораздо более быстрым.
         mainContr = new Thread(() ->{
-        while(lastRunning < N) {
+        while(lastRunning < N && simIsAlive) {
             if(threadQuotaNotMet()>0){
                 for (int i = 0; i< avilableStreams;i++){
                     if (!calculator[i].isAlive()){// Найти закончившийся тред

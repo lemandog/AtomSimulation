@@ -117,6 +117,10 @@ public class EngineDraw {
         draw.setTitle("Отрисовка");
         draw.setScene(scene);
         draw.show();
+        draw.setOnCloseRequest(windowEvent -> {
+            simIsAlive = false;
+            draw.hide();
+        });
     }
 
 

@@ -29,6 +29,7 @@ public class Util {
         layout.getChildren().add(new Label("4-1 - Влево - вправо"));
         layout.getChildren().add(new Label("Если вам нужны нестандартные параметры симуляции, используйте конфигурационный txt"));
         layout.getChildren().add(new Label("Проверки на адекватность введённых данных там нет и не планируется"));
+        layout.getChildren().add(new Label("Чтобы остановить текущую симуляцию, закройте окно отрисовки"));
         layout.getChildren().add(new Label());
         layout.getChildren().add(new Label("Скачивайте последнюю версию программы по ссылке:"));
         Hyperlink mylink = new Hyperlink("https://github.com/lemandog/AtomSimulation/releases");
