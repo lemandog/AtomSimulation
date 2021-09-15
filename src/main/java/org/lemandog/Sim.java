@@ -1,5 +1,6 @@
 package org.lemandog;
 
+import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
 import org.lemandog.util.Output;
 
@@ -8,47 +9,43 @@ public class Sim {
     private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
     static double m=m_Cr*1.660539040e-27; //масса ХРОМ, кг
     private static final double d = 130*10e-12;//Диаметр хрома (м)
-    public static int T;
-    public static double p;
-    public static int N;
-    public static int LEN;
-    public static double[] CHA_SIZE; //XYZ
-    public static double[] TAR_SIZE; //XYZ
-    public static double[] GEN_SIZE; //XYZ
-    public static double lambdaN;
+    static int T;
+    static double p;
+    static int N;
+    static int LEN;
+    static double[] CHA_SIZE; //XYZ
+    static double[] TAR_SIZE; //XYZ
+    static double[] GEN_SIZE; //XYZ
+    static double lambdaN;
+    static Point3D center;
     static int lastRunning;
     static Particle[] container; //XYZ
 
-    public static int tarHitCounterI = 0;
-    public static int outOfBoundsCounterI = 0;
-    public static int aliveCounterI = 0;
-
-    public static int avilableStreams = Runtime.getRuntime().availableProcessors();
-    public static int avilableDimensions = 3;
-    public static int maxDimensions = 3;
-    public static int nbRunning = 0;
-    public static int waitTimeMS;
-    public static boolean simIsAlive = false;
-    public static boolean pathsDr = false;
+    static int avilableStreams = Runtime.getRuntime().availableProcessors();
+    static int avilableDimensions = 3;
+    static int maxDimensions = 3;
+    static int nbRunning = 0;
+    static int waitTimeMS;
+    static double wallBounce;
+    static double genBounce;
+    static boolean simIsAlive = false;
+    static boolean pathsDr = false;
     static Thread mainContr;
     static Thread[] calculator;
 
     public static void setup(){
         if (Output.outputCSV){Output.CSVWriterBuild();}
-        outOfBoundsCounterI = 0; //Обнуление счётчиков с предыдущего запуска
-        tarHitCounterI = 0;
         EngineDraw.root = null;
         p = Math.pow(Double.parseDouble(App.pressure.getText()),Double.parseDouble(App.pressurePow.getText()));
         T = Integer.parseInt(App.tempAm.getText());
         N = Integer.parseInt(App.particleAm.getText());
-        aliveCounterI = N;
         LEN = Integer.parseInt(App.stepsAm.getText());
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
 
         //Как сказано в Paticle, пользователь может сам ввести количество осей.
         //Конечно, я не знаю кому нужна пятимерная симуляция газа, но гибкость кода - важная часть ООП
         avilableDimensions = (int) App.dimensionCount.getValue();
-        if (avilableDimensions>3){maxDimensions=avilableDimensions;}//
+        if (avilableDimensions>3){maxDimensions=avilableDimensions;}
 
         GEN_SIZE = new double[maxDimensions]; //XYZ
         TAR_SIZE = new double[maxDimensions]; //XYZ
@@ -57,6 +54,8 @@ public class Sim {
         CHA_SIZE[0] = Integer.parseInt(App.xFrameLen.getText());
         CHA_SIZE[1] = Integer.parseInt(App.yFrameLen.getText());
         CHA_SIZE[2] = Integer.parseInt(App.zFrameLen.getText());
+
+        center = new Point3D(0,0,0);//Центр камеры для механики переизлучения
 
         TAR_SIZE[0] = CHA_SIZE[0] * App.targetSizeX.getValue();
         TAR_SIZE[1] = CHA_SIZE[1]/100;
@@ -67,6 +66,8 @@ public class Sim {
         GEN_SIZE[2] = CHA_SIZE[2] * App.genSizeZ.getValue();
 
         waitTimeMS = (int) Math.round(App.waitTime.getValue());
+        wallBounce = App.bounceWallChance.getValue();
+        genBounce = App.bounceGenChance.getValue();
 
         lastRunning = 0;
         avilableStreams = (int) App.threadCount.getValue();

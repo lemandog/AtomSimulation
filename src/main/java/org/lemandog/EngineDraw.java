@@ -57,22 +57,16 @@ public class EngineDraw {
         multiToFill = scene.getHeight()/(Arrays.stream(CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
         chamberR = new Box((CHA_SIZE[0]),(CHA_SIZE[1]),(CHA_SIZE[2]));
-        chamberR.setTranslateX(0);
-        chamberR.setTranslateY(0);
 
         targetR = new Box((TAR_SIZE[0]),(TAR_SIZE[1]),(TAR_SIZE[2]));
-        targetR.setTranslateX(0);
         targetR.setTranslateY((-CHA_SIZE[1]/2));
-        targetR.setTranslateZ(0);
 
         if(Output.outputPic) {
             Output.setTargetSize(chamberR.getBoundsInParent());
             Output.picState = new int[(int) Output.maxWidth][(int) Output.maxDepth];
         }
         generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
-        generatorR.setTranslateX(0);
         generatorR.setTranslateY((CHA_SIZE[1]/2));
-        generatorR.setTranslateZ(0);
 
         PerspectiveCamera main = new PerspectiveCamera();
 
@@ -178,6 +172,7 @@ public class EngineDraw {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
             product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+
             if (chamberMinX>product.getBoundsInParent().getCenterX() || chamberMaxX<product.getBoundsInParent().getCenterX() ||
                 chamberMinY>product.getBoundsInParent().getCenterY() || chamberMaxY<product.getBoundsInParent().getCenterY() ||
                 chamberMinZ>product.getBoundsInParent().getCenterZ() || chamberMaxZ<product.getBoundsInParent().getCenterZ()

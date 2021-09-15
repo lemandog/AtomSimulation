@@ -101,7 +101,6 @@ public class Particle{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }}
-
                 if (Output.output3D){DrawingThreadFire(new Particle[]{this});}
                 //Нынешнее приращение
                 double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
@@ -131,7 +130,6 @@ public class Particle{
                     Output.CSVStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     drawAPath(paths);
-                    tarHitCounterI++;
                 }
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
@@ -158,13 +156,10 @@ public class Particle{
             if (bounceChance("GEN")){ //Испарения не происходит
             this.genIsHit = true;
             this.wallIsHit = true;
-            System.out.println("PARTICLE " + ordinal + " HIT GENERATOR AND STAYED!");
             thisParticleMat.setDiffuseColor(GenHitCol);
         }else { //Испарение происходит, Возвращаем частицу где была до удара
             System.out.println("PARTICLE " + ordinal + " HAS HIT GENERATOR AND FLEW AWAY");
-            coordinates[0] = oldCord.getX();
-            coordinates[1] = oldCord.getY();
-            coordinates[2] = oldCord.getZ();
+            toCenter(oldCord);
             this.genIsHit = true;
             this.wallIsHit = false;
         }}
@@ -173,24 +168,29 @@ public class Particle{
     private void wallCheck(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
             if (bounceChance("WALL") && !genIsHit){
-                System.out.println("PARTICLE " + ordinal + " HIT WALL AND STAYED!");
                 this.wallIsHit = true;
                 thisParticleMat.setDiffuseColor(wallhitCol);}
             else {
                 System.out.println("PARTICLE " + ordinal + " HAS HIT WALL AND FLEW AWAY");
                 genIsHit = false;
-                coordinates[0] = oldCord.getX();
-                coordinates[1] = oldCord.getY();
-                coordinates[2] = oldCord.getZ();
+                //TODO: Переизлучение в сторону центра
+                toCenter(oldCord);
                 this.wallIsHit = false;
         }}
     }
 
+    private void toCenter(Point3D oldCord) {
+        Point3D product = center.interpolate(oldCord,(Math.random()/2));//Точка между старой координатой и центром в случайной линейной пропорции
+        coordinates[0] = product.getX();
+        coordinates[1] = product.getY();
+        coordinates[2] = product.getZ();
+    }
+
     private boolean bounceChance(String type) {
         if (type.equals("WALL")) {
-            return !(Math.random() < App.bounceWallChance.getValue());
+            return !(Math.random() < wallBounce);
         }
-        return !(Math.random() < App.bounceGenChance.getValue());
+        return !(Math.random() < genBounce);
     }
 
     public void getCurrSphere() {

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -15,6 +16,8 @@ public class LoadConfig {
     public static void constructConfigInfoFrame(){
         Stage info = new Stage();
         VBox layout = new VBox();
+        info.getIcons().add(new Image("/config.png"));
+        info.setTitle("Конфигурации");
         Scene infoPane = new Scene(layout);
         info.setScene(infoPane);
         layout.getChildren().add(new Label("Инструкция: как использовать конфигурационный файл?"));
@@ -45,6 +48,10 @@ public class LoadConfig {
         layout.getChildren().add(new Label("VERWA 0 / Вероятность отражения от стен"));
         layout.getChildren().add(new Label("VERGE 0.9 / Вероятность отражения от генератора"));
         layout.getChildren().add(new Label("3DNOT / Не отрисовывать 3Д. (Отключает и задержку!)"));
+        layout.getChildren().add(new Label("Не обязательно указывать все команды. Конфигурационный файл"));
+        layout.getChildren().add(new Label("может быть как и в одну команду, так и в двадцать."));
+        layout.getChildren().add(new Label("Перетащите получившийся файл в бирюзовую панель."));
+        layout.getChildren().add(new Label("Строки без ключевых слов будут проигнорированы."));
         info.show();
     }
     public static void select(File file) {

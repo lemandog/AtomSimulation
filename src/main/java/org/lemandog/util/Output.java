@@ -190,7 +190,7 @@ public class Output {
                 BufferedImage tmp = fromFXImage(res, null); //Это awt
                 //Конвертация в awt, потому как оно почему то возвращает awt image, а не buffered
                 assert tmp != null;
-                java.awt.Image res2 = tmp.getScaledInstance((int)maxWidth*10,(int)maxDepth*10,BufferedImage.SCALE_FAST);
+                java.awt.Image res2 = tmp.getScaledInstance(1200,1200,BufferedImage.SCALE_FAST);
                 //Конвертация обратно в buffered
                 BufferedImage bimage = new BufferedImage(res2.getWidth(null), res2.getHeight(null), BufferedImage.TYPE_INT_ARGB);
                 Graphics2D bGr = bimage.createGraphics();
