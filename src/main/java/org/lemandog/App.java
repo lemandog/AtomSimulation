@@ -170,7 +170,7 @@ public class App extends Application {
         Label bounceGenChanceText = new Label("Отрыв от ген. "+ String.format("%3.2f", bounceGenChance.getValue()));
         bounceGenChanceText.setPrefWidth(userControl.getWidth()/2);
         bounceGenChanceText.setFont(mainFont);
-        bounceWallChance.setOnMouseReleased((event) -> {
+        bounceGenChance.setOnMouseReleased((event) -> {
             bounceGenChanceText.setText("Отрыв от ген. "+ String.format("%3.2f", bounceGenChance.getValue())); // Три знака всего, два после запятой
         });
         bounceChanceG.getChildren().addAll(bounceGenChanceText,bounceGenChance);
