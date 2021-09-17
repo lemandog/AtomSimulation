@@ -6,34 +6,50 @@
 
     <groupId>org.lemandog</groupId>
     <artifactId>AtomSim</artifactId>
-    <version>0.2.52</version>
+    <version>0.2.60</version>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>16</maven.compiler.release>
         <maven.compiler.source>16</maven.compiler.source>
         <maven.compiler.target>16</maven.compiler.target>
+        <javafx.version>16</javafx.version>
     </properties>
 
+    <name>AtomSim</name>
 
-<dependencies>
-    <!-- https://mvnrepository.com/artifact/org.panteleyev/jpackage-maven-plugin -->
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-controls</artifactId>
-        <version>16</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-    <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.12.0</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.maven.surefire</groupId>
-        <artifactId>maven-surefire-common</artifactId>
-        <version>2.22.0</version>
-    </dependency>
-</dependencies>
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+          <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>linux</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>mac</classifier>
+        </dependency>
+    </dependencies>
 
 <build>
 <plugins>
@@ -42,19 +58,23 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
-            <release>16</release>
+            <release>${maven.compiler.release}</release>
         </configuration>
     </plugin>
     <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.6</version>
+        <version>0.0.7</version>
         <configuration>
+            <stripDebug>true</stripDebug>
             <mainClass>org.lemandog.App</mainClass>
             <launcher>launch</launcher>
-            <compress>1</compress>
-            <jlinkZipName>Particle</jlinkZipName>
-            <jlinkImageName>particle</jlinkImageName>
+                <commandLineArg>
+                    MODE 60,30 color 0C
+                </commandLineArg>
+            <compress>2</compress>
+            <jlinkZipName>AtomSimRedist</jlinkZipName>
+            <jlinkImageName>runtime</jlinkImageName>
             <noManPages>true</noManPages>
             <noHeaderFiles>true</noHeaderFiles>
         </configuration>
@@ -70,6 +90,30 @@
                 </manifest>
             </archive>
         </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+            <execution>
+                <phase>package</phase>
+                <goals>
+                    <goal>shade</goal>
+                </goals>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>project-classifier</shadedClassifierName>
+                    <outputFile>shade\${project.artifactId}.jar</outputFile>
+                    <transformers>
+                        <transformer implementation=
+                                             "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>org.lemandog.NonApplLauncher</mainClass>
+                        </transformer>
+                    </transformers>
+                </configuration>
+            </execution>
+        </executions>
     </plugin>
 </plugins>
 </build>

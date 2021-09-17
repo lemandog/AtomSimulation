@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.lemandog.util.Console;
 import org.lemandog.util.LoadConfig;
 import org.lemandog.util.Output;
 import org.lemandog.util.Util;
@@ -41,6 +42,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage){
+        Console.ready();
         Stage userControlWindows = new Stage();
         userControlWindows.setResizable(false);
 
@@ -310,5 +312,9 @@ public class App extends Application {
         buttonPanelSQL.getChildren().addAll(confInfo,resetDatabase,outputMode);
         userControlPane.getChildren().add(buttonPanelSQL);
         userControlWindows.show();
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 }

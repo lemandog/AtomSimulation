@@ -24,9 +24,9 @@ public class Util {
         info.setTitle("О программе");
 
         layout.getChildren().add(new Label("Для контроля вида на камеру используйте NUMPAD"));
-        layout.getChildren().add(new Label("6-3 - Назад - вперёд"));
-        layout.getChildren().add(new Label("5-2 - Вверх - вниз"));
-        layout.getChildren().add(new Label("4-1 - Влево - вправо"));
+        layout.getChildren().add(new Label("6-3 - Назад - вперёд (Ось Z)"));
+        layout.getChildren().add(new Label("5-2 - Вверх - вниз   (Ось Y)"));
+        layout.getChildren().add(new Label("4-1 - Влево - вправо (Ось X)"));
         layout.getChildren().add(new Label("Если вам нужны нестандартные параметры симуляции, используйте конфигурационный txt"));
         layout.getChildren().add(new Label("Проверки на адекватность введённых данных там нет и не планируется"));
         layout.getChildren().add(new Label("Чтобы остановить текущую симуляцию, закройте окно отрисовки"));

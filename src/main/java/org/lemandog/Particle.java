@@ -31,6 +31,8 @@ public class Particle{
     boolean tarIsHit;
     boolean genIsHit;
     boolean wallIsHit;
+    int timesHitWall = 0;
+    int timesHitGen = 0;
     PhongMaterial thisParticleMat;
     Cylinder paths = new Cylinder();
 
@@ -138,7 +140,7 @@ public class Particle{
                 }
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
-            System.out.println("PARTICLE " +ordinal + " IS DONE WALLHIT?: " + wallIsHit + " TARHIT?: " + tarIsHit +" GENHIT?: " + genIsHit +" ON STEP " + stepsPassed);
+            System.out.println("PARTICLE " +ordinal + " IS DONE. WALLH.?: " + wallIsHit + " TARH.?: " + tarIsHit +" GENH.?: " + genIsHit + " TIMES W/G REFL: " + timesHitWall + "/" + timesHitGen + " LAST STEP " + stepsPassed);
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
         });
         product.setPriority(Thread.MIN_PRIORITY);
@@ -158,7 +160,7 @@ public class Particle{
             this.wallIsHit = true;
             thisParticleMat.setDiffuseColor(GenHitCol);
         }else { //Испарение происходит, Возвращаем частицу где была до удара
-            System.out.println("PARTICLE " + ordinal + " HAS HIT GENERATOR AND FLEW AWAY");
+            timesHitGen++;
             toCenter(oldCord);
             this.genIsHit = true;
             this.wallIsHit = false;
@@ -171,7 +173,7 @@ public class Particle{
                 this.wallIsHit = true;
                 thisParticleMat.setDiffuseColor(wallhitCol);}
             else {
-                System.out.println("PARTICLE " + ordinal + " HAS HIT WALL AND FLEW AWAY");
+                timesHitWall++;
                 genIsHit = false;
                 //TODO: Переизлучение в сторону центра
                 toCenter(oldCord);
