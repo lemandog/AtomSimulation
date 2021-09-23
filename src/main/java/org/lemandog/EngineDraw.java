@@ -16,6 +16,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
+import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
 import java.util.Arrays;
@@ -29,11 +30,10 @@ import java.util.Arrays;
 Y
 */
 
-import static org.lemandog.Sim.*;
-
 public class EngineDraw {
     static Stage draw = new Stage();
-    static Group root;
+    static Group root = new Group();
+    static Scene scene = new Scene(root, 600, 600);
     static double multiToFill;
     static Box chamberR;
     static Box targetR;
@@ -47,33 +47,30 @@ public class EngineDraw {
     }
 
     public static void eSetup() { //Отрисовка камеры
-        root = new Group();
         draw.setResizable(true);
-        Scene scene = new Scene(root, 600, 600);
-
         Image icon = new Image("/atomSim.png");
         draw.getIcons().add(icon);
 
-        multiToFill = scene.getHeight()/(Arrays.stream(CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
+        multiToFill = scene.getHeight()/(Arrays.stream(Sim.currentSim.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
-        chamberR = new Box((CHA_SIZE[0]),(CHA_SIZE[1]),(CHA_SIZE[2]));
+        chamberR = new Box((Sim.currentSim.CHA_SIZE[0]),(Sim.currentSim.CHA_SIZE[1]),(Sim.currentSim.CHA_SIZE[2]));
 
-        targetR = new Box((TAR_SIZE[0]),(TAR_SIZE[1]),(TAR_SIZE[2]));
-        targetR.setTranslateY((-CHA_SIZE[1]/2));
+        targetR = new Box((Sim.currentSim.TAR_SIZE[0]),(Sim.currentSim.TAR_SIZE[1]),(Sim.currentSim.TAR_SIZE[2]));
+        targetR.setTranslateY((-Sim.currentSim.CHA_SIZE[1]/2));
 
         if(Output.outputPic) {
             Output.setTargetSize(chamberR.getBoundsInParent());
             Output.picState = new int[(int) Output.maxWidth][(int) Output.maxDepth];
         }
-        generatorR = new Box((GEN_SIZE[0]),(GEN_SIZE[1]),(GEN_SIZE[2]));
-        generatorR.setTranslateY((CHA_SIZE[1]/2));
+        generatorR = new Box((Sim.currentSim.GEN_SIZE[0]),(Sim.currentSim.GEN_SIZE[1]),(Sim.currentSim.GEN_SIZE[2]));
+        generatorR.setTranslateY((Sim.currentSim.CHA_SIZE[1]/2));
 
         PerspectiveCamera main = new PerspectiveCamera();
 
         main.setTranslateX(-scene.getHeight()/2); //Чтобы камера в центре имела начало координат
         main.setTranslateY(-scene.getHeight()/2);
-        main.setTranslateZ((Arrays.stream(CHA_SIZE).max().getAsDouble())*multiToFill - CHA_SIZE[2]);
-        System.out.println("POS " + main.getTranslateZ() + " FILL MULT " + multiToFill );
+        main.setTranslateZ((Arrays.stream(Sim.currentSim.CHA_SIZE).max().getAsDouble())*multiToFill - Sim.currentSim.CHA_SIZE[2]);
+        Console.coolPrintout("POS " + main.getTranslateZ() + " FILL MULTI " + multiToFill );
 
         main.setNearClip(0.001);
         main.setFieldOfView(51.5);
@@ -112,13 +109,11 @@ public class EngineDraw {
         root.getChildren().add(generatorR);
         root.getChildren().add(chamberR);
 
-        DrawingThreadFire(Sim.container);
-
         draw.setTitle("Отрисовка");
         draw.setScene(scene);
         draw.show();
         draw.setOnCloseRequest(windowEvent -> {
-            simIsAlive = false;
+            Sim.currentSim.simIsAlive = false;
             draw.hide();
         });
     }
@@ -127,10 +122,12 @@ public class EngineDraw {
     public static void DrawingThreadFire(Particle[] containerSet) {
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
-                EngineDraw.root.getChildren().remove(particle.drawObj);
-                particle.getCurrSphere();
-                particle.drawObj = engine3D(particle);
-                EngineDraw.root.getChildren().add(particle.drawObj);
+                if (particle != null) {
+                    EngineDraw.root.getChildren().remove(particle.drawObj);
+                    particle.getCurrSphere();
+                    particle.drawObj = engine3D(particle);
+                    EngineDraw.root.getChildren().add(particle.drawObj);
+                }
             }
         });
     }
@@ -191,7 +188,7 @@ public class EngineDraw {
         return false;
     }
     static void drawAPath(Cylinder path){
-        if(pathsDr){
+        if(Sim.currentSim.pathsDr){
             EngineDraw.CylinderThread(path);
         }
     }
@@ -201,7 +198,10 @@ public class EngineDraw {
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = (targetR.getBoundsInParent().getMaxY() - targetR.getBoundsInParent().getMinY())/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
+        if (optimalStep < 1E-5){optimalStep = 1E-5;} // В предельных случаях один шаг становится ОЧЕНЬ долгим. Это вот искусственное ограничение.
+        //Эта величина найдена практически и представляет собой компромисс между производительностью и точностью регистрации.
+        //Да, если задать размер камеры в пару микрометров, удары не будут регистрироваться. Но никто же не вздумает вписывать настолько малые значения для практических целей
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
@@ -232,7 +232,8 @@ public class EngineDraw {
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = (generatorR.getBoundsInParent().getMaxY() - generatorR.getBoundsInParent().getMinY())/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
+        if (optimalStep < 1E-5){optimalStep = 1E-5;} // В предельных случаях один шаг становится ОЧЕНЬ долгим. Это вот искусственное ограничение.
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
@@ -254,5 +255,9 @@ public class EngineDraw {
                 }}
         }
         return false;
+    }
+
+    public static void reset() {
+        EngineDraw.root.getChildren().clear();
     }
 }

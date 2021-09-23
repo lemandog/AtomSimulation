@@ -40,12 +40,11 @@ public class Output {
     public static boolean outputCSV = false;
     public static boolean output3D = true;
     public static CheckBox output3d;
-    public static CheckBox outputAsk;
     public static CheckBox outputAskPic;
     public static CheckBox outputAskCSVHits;
     public static CheckBox outputAskGraph;
     public static Slider outputAskPicResolution;
-    public static Slider outputPallete;
+    public static Slider outputPalette;
     public static double maxDepth;
     public static double maxWidth;
     public static int[][] picState;
@@ -54,6 +53,7 @@ public class Output {
     static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
     static CSVWriter global;
     static CSVWriter global2;
+    public static CheckBox pathDrawing;
     public static void ConstructOutputAFrame() {
         VBox compOutput = new VBox();
         Scene setOutputSc = new Scene(compOutput,500,500);
@@ -76,14 +76,13 @@ public class Output {
         compOutput.getChildren().add(dirChoBut);
         compOutput.getChildren().add(choDir);
 
+        pathDrawing = new CheckBox("Отрисовка путей (Только малое число частиц)");
+        pathDrawing.setFont(mainFont);
+        compOutput.getChildren().add(pathDrawing);
+
         Button returnBut = new Button("Вернуться назад");
         returnBut.setFont(mainFont);
         returnBut.setOnAction(e -> Output.disp());
-        Button saveResNow = new Button("Сохранить результат");
-        saveResNow.setFont(mainFont);
-        saveResNow.setOnAction(e -> Output.toFile());
-
-        compOutput.getChildren().add(saveResNow);
         compOutput.getChildren().add(returnBut);
 
         output3d = new CheckBox();
@@ -121,45 +120,39 @@ public class Output {
         outputAskCSVHits.setOnAction(event -> outputPicCSV = !outputPicCSV);
         compOutput.getChildren().add(outputAskCSVHits);
 
-        outputAsk = new CheckBox();
-        outputAsk.setText("Вывод плотности заселения в .TXT?");
-        outputAsk.setFont(mainFont);
-        outputAsk.setOnAction(event -> output = !output);
-        compOutput.getChildren().add(outputAsk);
-
         Label resolutionWarnText = new Label("Не ставьте большое разрешение для больших подложек!");
         resolutionWarnText.setFont(mainFont);
         compOutput.getChildren().add(resolutionWarnText);
 
         outputAskPicResolution = new Slider();
         outputAskPicResolution.setMaxWidth(setOutputSc.getWidth()/3);
-        outputAskPicResolution.setValue(3);
+        outputAskPicResolution.setValue(0.5);
         Label resolutionText = new Label("Разрешение сейчас: " + String.format("%3.0f", outputAskPicResolution.getValue()));
         resolutionText.setFont(mainFont);
         outputAskPicResolution.setOnMouseReleased((event) -> {
             resolutionText.setText("Разрешение сейчас: "+ String.format("%3.0f", outputAskPicResolution.getValue())); // Три знака всего, два после запятой
         });
-        outputAskPicResolution.setMin(1);
-        outputAskPicResolution.setMax(10);
+        outputAskPicResolution.setMin(0.01);
+        outputAskPicResolution.setMax(1);
 
         compOutput.getChildren().add(resolutionText);
         compOutput.getChildren().add(outputAskPicResolution);
 
-        outputPallete = new Slider();
-        outputPallete.setMaxWidth(setOutputSc.getWidth()/3);
-        outputPallete.setValue(2);
+        outputPalette = new Slider();
+        outputPalette.setMaxWidth(setOutputSc.getWidth()/3);
+        outputPalette.setValue(2);
         Label paletteText = new Label("Выбор палитры");
-        ImageView currPal = new ImageView("/heatmap"+(int) outputPallete.getValue()+".png");
+        ImageView currPal = new ImageView("/heatmap"+(int) outputPalette.getValue()+".png");
         paletteText.setFont(mainFont);
         currPal.setScaleX(setOutputSc.getWidth()/10);
         currPal.setScaleY(10);
-        outputPallete.setOnMouseReleased((event) -> currPal.setImage(new Image("/heatmap"+(int) outputPallete.getValue()+".png")));
-        outputPallete.setMin(1);
-        outputPallete.setMax(4);
+        outputPalette.setOnMouseReleased((event) -> currPal.setImage(new Image("/heatmap"+(int) outputPalette.getValue()+".png")));
+        outputPalette.setMin(1);
+        outputPalette.setMax(4);
 
         compOutput.getChildren().add(paletteText);
         compOutput.getChildren().add(currPal);
-        compOutput.getChildren().add(outputPallete);
+        compOutput.getChildren().add(outputPalette);
 
         setOutput.setScene(setOutputSc);
         setOutput.setResizable(false);
@@ -182,22 +175,22 @@ public class Output {
 
     public static void toFile() {
         if (outputPic){
-            File outputfile = new File(selectedPath.getAbsolutePath() + "/hitsDetector.png");
+            File outputFile = new File(selectedPath.getAbsolutePath() + "/hitsDetector.png");
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
                 Image res = toImage(picState); //Это javafx image
                 BufferedImage tmp = fromFXImage(res, null); //Это awt
-                //Конвертация в awt, потому как оно почему то возвращает awt image, а не buffered
+                //Конвертация в awt, потому как оно почему-то возвращает awt image, а не buffered
                 assert tmp != null;
                 java.awt.Image res2 = tmp.getScaledInstance(1200,1200,BufferedImage.SCALE_FAST);
                 //Конвертация обратно в buffered
-                BufferedImage bimage = new BufferedImage(res2.getWidth(null), res2.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-                Graphics2D bGr = bimage.createGraphics();
+                BufferedImage bImage = new BufferedImage(res2.getWidth(null), res2.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+                Graphics2D bGr = bImage.createGraphics();
                 bGr.drawImage(res2, 0, 0, null);
                 bGr.dispose();
                 //Пишем bufferedImage стандартной библиотекой
-                ImageIO.write(bimage, "png", outputfile);
+                ImageIO.write(bImage, "png", outputFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -206,6 +199,7 @@ public class Output {
             try {
                 global.flush();
                 System.out.println("GLOBAL STREAM CLOSED");
+                global=null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -214,6 +208,7 @@ public class Output {
             try {
                 global2.flush();
                 System.out.println("GLOBAL STREAM2 CLOSED");
+                global2=null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -234,7 +229,7 @@ public class Output {
                 if(modelRes[x][y] > biggest){biggest = modelRes[x][y];} //Ищем наибольшее
             }}
 
-        biggest = biggest/((int)palette.getWidth()); //делим на количество цветов в палитре, так, что значения в диапозоне 0-9
+        biggest = biggest/((int)palette.getWidth()); //делим на количество цветов в палитре, так, что значения в диапазоне 0-9
 
         for (int x = 0; x<xSize;x++){
             for (int y = 0; y<zSize;y++) {
@@ -278,7 +273,7 @@ public class Output {
         try {
             LocalDateTime main = LocalDateTime.now();
             File csv = new File(selectedPath.getAbsolutePath()
-                    + "/ParticleStates"+sdfF.format(main)+".csv");
+                    + "/"+App.simQueue.size()+"ParticleStates"+sdfF.format(main)+".csv");
             global = new CSVWriter(new FileWriter(csv),
                     ';',
                     CSVWriter.NO_QUOTE_CHARACTER,
@@ -305,8 +300,8 @@ public class Output {
         if (outputPicCSV){
         if (global2 == null){
             LocalDateTime main = LocalDateTime.now();
-            File csv = new File(selectedPath.getAbsolutePath()
-                    + "/Hits"+sdfF.format(main)+".csv");
+            File csv = new File( selectedPath.getAbsolutePath()
+                    + "/"+App.simQueue.size()+"Hits"+sdfF.format(main)+".csv");
             try {
                 global2 = new CSVWriter(new FileWriter(csv),
                         ';',

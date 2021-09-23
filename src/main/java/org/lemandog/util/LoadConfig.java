@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.lemandog.App;
+import org.lemandog.Sim;
 
 public class LoadConfig {
     public static void constructConfigInfoFrame(){
@@ -25,9 +26,9 @@ public class LoadConfig {
         layout.getChildren().add(new Label("PARTS 500 / Количество частиц"));
         layout.getChildren().add(new Label("STEPS 5000 / Количество максимальное шагов"));
         layout.getChildren().add(new Label("TEMPE 273 / Температура, в кельвинах (>0)"));
-        layout.getChildren().add(new Label("CAMSX 5  / Размеры камеры по осям. Могут быть дробными."));
-        layout.getChildren().add(new Label("CAMSY 5"));
-        layout.getChildren().add(new Label("CAMSZ 5"));
+        layout.getChildren().add(new Label("CAMSX 5 (Лево/право)/ Размеры камеры по осям. Могут быть дробными."));
+        layout.getChildren().add(new Label("CAMSY 5 (Вверх/вниз)"));
+        layout.getChildren().add(new Label("CAMSZ 5 (Дальше/ближе)"));
         layout.getChildren().add(new Label("PRES^ -5  / Степень 1*10^X в паскалях"));
         layout.getChildren().add(new Label("PRES* 1   / Степень X*10^-5 в паскалях"));
         layout.getChildren().add(new Label("DRAWP     / Рисовать пути частиц (Осторожно, ресурсоёмко!)"));
@@ -48,6 +49,9 @@ public class LoadConfig {
         layout.getChildren().add(new Label("VERWA 0 / Вероятность отражения от стен"));
         layout.getChildren().add(new Label("VERGE 0.9 / Вероятность отражения от генератора"));
         layout.getChildren().add(new Label("3DNOT / Не отрисовывать 3Д. (Отключает и задержку!)"));
+        layout.getChildren().add(new Label("Очереди:"));
+        layout.getChildren().add(new Label("RUNAN - Добавить одну симуляцию. "));
+        layout.getChildren().add(new Label("RUNMO 10 -Добавить ещё 10 нынешних симуляций в очередь. "));
         layout.getChildren().add(new Label("Не обязательно указывать все команды. Конфигурационный файл"));
         layout.getChildren().add(new Label("может быть как и в одну команду, так и в двадцать."));
         layout.getChildren().add(new Label("Перетащите получившийся файл в бирюзовую панель."));
@@ -76,7 +80,7 @@ public class LoadConfig {
                 if (line.contains("CAMSZ")){App.zFrameLen.setText(line.trim().replaceAll("CAMSZ ",""));} //double
                 if (line.contains("PRES^")){App.pressurePow.setText(line.trim().replaceAll("PRES\\^ ",""));} //double
                 if (line.contains("PRES*")){App.pressure.setText(line.trim().replaceAll("PRES\\* ",""));} //double
-                if (line.contains("DRAWP")){App.pathDrawing.setSelected(true);} //bool
+                if (line.contains("DRAWP")){Output.pathDrawing.setSelected(true);} //bool
                 if (line.contains("THREA")){App.threadCount.setValue(Integer.parseInt(line.trim().replaceAll("THREA ","")));} //int
                 if (line.contains("DIMEN")){App.dimensionCount.setValue(Integer.parseInt(line.trim().replaceAll("DIMEN ","")));} //int
                 if (line.contains("XTARS")){App.targetSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XTARS ","")));} //double
@@ -88,12 +92,18 @@ public class LoadConfig {
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
                 if (line.contains("CSVZA")){Output.outputPicCSV = true;} //bool
                 if (line.contains("CSVOU")){Output.outputCSV = true;}
-                if (line.contains("PALIT")){Output.outputPallete.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
+                if (line.contains("PALIT")){Output.outputPalette.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("START")){App.startSimButt.fire();} //bool
                 if (line.contains("WAITT")){App.waitTime.setValue(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
                 if (line.contains("VERWA")){App.bounceWallChance.setValue(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
                 if (line.contains("VERGE")){App.bounceGenChance.setValue(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
-                if (line.contains("3DNOT")){Output.output3D = false;} //double
+                if (line.contains("3DNOT")){Output.output3d.setSelected(false);} //double
+                if (line.contains("RUNAN")){App.simQueue.add(new Sim());} //double
+                if (line.contains("RUNMO")){
+                    int threa_ = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));
+                    for (int i = 0; i < threa_; i++) {
+                        App.simQueue.add(new Sim());
+                    }} //double
             }
     } catch (IOException e) {
             e.printStackTrace();

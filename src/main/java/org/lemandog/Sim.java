@@ -1,41 +1,44 @@
 package org.lemandog;
 
+import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
+import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
 public class Sim {
+    static Sim currentSim;
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
     private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
-    static double m=m_Cr*1.660539040e-27; //масса ХРОМ, кг
+    static final double m=m_Cr*1.660539040e-27; //масса ХРОМ, кг
     private static final double d = 130*10e-12;//Диаметр хрома (м)
-    static int T;
-    static double p;
-    static int N;
-    static int LEN;
-    static double[] CHA_SIZE; //XYZ
-    static double[] TAR_SIZE; //XYZ
-    static double[] GEN_SIZE; //XYZ
-    static double lambdaN;
-    static Point3D center;
-    static int lastRunning;
-    static Particle[] container; //XYZ
+
+    int T;
+    double p;
+    int N;
+    int LEN;
+    double[] CHA_SIZE; //XYZ
+    double[] TAR_SIZE; //XYZ
+    double[] GEN_SIZE; //XYZ
+    double lambdaN;
+    Point3D center;
+    int lastRunning;
+    Particle[] container; //XYZ
 
     static int avilableStreams = Runtime.getRuntime().availableProcessors();
-    static int avilableDimensions = 3;
-    static int maxDimensions = 3;
-    static int nbRunning = 0;
-    static int waitTimeMS;
-    static double wallBounce;
-    static double genBounce;
-    static boolean simIsAlive = false;
-    static boolean pathsDr = false;
-    static Thread mainContr;
-    static Thread[] calculator;
+    int avilableDimensions;
+    int maxDimensions = 3;
+    int nbRunning = 0;
+    int waitTimeMS;
+    double wallBounce;
+    double genBounce;
+    boolean simIsAlive = false;
+    boolean pathsDr;
+    Thread mainContr;
+    Thread[] calculator;
 
-    public static void setup(){
+    public Sim(){
         if (Output.outputCSV){Output.CSVWriterBuild();}
-        EngineDraw.root = null;
         p = Math.pow(Double.parseDouble(App.pressure.getText()),Double.parseDouble(App.pressurePow.getText()));
         T = Integer.parseInt(App.tempAm.getText());
         N = Integer.parseInt(App.particleAm.getText());
@@ -51,9 +54,9 @@ public class Sim {
         TAR_SIZE = new double[maxDimensions]; //XYZ
         CHA_SIZE = new double[maxDimensions]; //XYZ
 
-        CHA_SIZE[0] = Integer.parseInt(App.xFrameLen.getText());
-        CHA_SIZE[1] = Integer.parseInt(App.yFrameLen.getText());
-        CHA_SIZE[2] = Integer.parseInt(App.zFrameLen.getText());
+        CHA_SIZE[0] = Double.parseDouble(App.xFrameLen.getText());
+        CHA_SIZE[1] = Double.parseDouble(App.yFrameLen.getText());
+        CHA_SIZE[2] = Double.parseDouble(App.zFrameLen.getText());
 
         center = new Point3D(0,0,0);//Центр камеры для механики переизлучения
 
@@ -73,29 +76,29 @@ public class Sim {
         avilableStreams = (int) App.threadCount.getValue();
 
         calculator = new Thread[avilableStreams];
-        pathsDr = App.pathDrawing.isSelected();
+        pathsDr = Output.pathDrawing.isSelected();
+        Console.setAm();
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
         if(Output.outputPic) {
             Output.xSize = (int) CHA_SIZE[0];
             Output.zSize = (int) CHA_SIZE[2];
-            Output.palette = new Image("/heatmap" + (int) Output.outputPallete.getValue() + ".png");
+            Output.palette = new Image("/heatmap" + (int) Output.outputPalette.getValue() + ".png");
         }
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
         for (int i = 0; i < avilableStreams; i++) {
             calculator[i] = new Thread();
         }
-
-
         container = new Particle[N];
-        for (int i = 0; i < N; i++) {
-            container[i] = new Particle(i);
-        }
     }
     public static void genTest() {
-    setup();
+    currentSim = new Sim();
     EngineDraw.eSetup();
-    mainContr = new Thread(); //Иначе будет NullPointerException. То же что и выше
+        for (int i = 0; i < currentSim.N; i++) {
+            currentSim.container[i] = new Particle(i);
+        }
+     EngineDraw.DrawingThreadFire(Sim.currentSim.container);
+    currentSim.mainContr = new Thread(); //Иначе будет NullPointerException. То же что и выше
     if (Output.outputPic){
         for (int x = 0; x<Output.xSize;x++){
             for (int y = 0; y<Output.zSize;y++) {
@@ -106,10 +109,17 @@ public class Sim {
 
 
 
-    public static void start() {
-        setup(); //Установка выбраных параметров
+    public void start() {
+        currentSim = new Sim(); //Установка выбраных параметров
         simIsAlive = true;
+        EngineDraw.reset();
         EngineDraw.eSetup();
+        for (int i = 0; i < N; i++) {
+            container[i] = new Particle(i);
+        }
+        //Тут условие для быстродействия. Очень большие симуляции занимают много времени для изначальной отрисовки, так что
+        //Первый шаг будет отрисован только если пользователь захочет
+        if (Output.output3D){EngineDraw.DrawingThreadFire(Sim.currentSim.container);}
         //Это делает код менее читабельным, но гораздо более быстрым.
         mainContr = new Thread(() ->{
         while(lastRunning < N && simIsAlive) {
@@ -121,24 +131,33 @@ public class Sim {
                         calculator[i] = container[lastRunning].CreateThread(); //Создать и запустить новый - на замену старому
                         calculator[i].start();
                         lastRunning++;
-                        }catch (ArrayIndexOutOfBoundsException e){System.out.println("THREAD CREATION MISSFIRE");break;}
+                        }catch (ArrayIndexOutOfBoundsException e){Console.coolPrintout("THREAD CREATION MISSFIRE");break;}
                     }
                 }
             }
         }
             try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             } catch (InterruptedException ignore) {}
-            System.out.println("SIMULATION RUN ENDED");
+            Console.printLine('X');
+            Console.coolPrintout("SIMULATION RUN IS OVER!");
         EngineDraw.DrawingThreadFire(container);
         Output.toFile();
         simIsAlive = false;
+        if (!App.simQueue.isEmpty()){
+            currentSim = App.simQueue.pop();
+            try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
+                Console.coolPrintout("Another Sim will start shortly...");
+                Thread.sleep(1000);
+            } catch (InterruptedException ignore) {}
+            Platform.runLater(() -> currentSim.start()); //Надо обязательно делать это на потоке JavaFX
+        }
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);
         mainContr.start();
     }
 
-    private static int threadQuotaNotMet() {
+    private int threadQuotaNotMet() {
         int thereAreDeadThreads = 0;
         nbRunning = 0;
         try{

@@ -1,4 +1,5 @@
 module AtomSimulation {
+    requires javafx.base;
     requires javafx.controls;
     requires javafx.graphics;
     requires java.desktop;

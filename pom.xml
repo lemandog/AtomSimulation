@@ -6,7 +6,7 @@
 
     <groupId>org.lemandog</groupId>
     <artifactId>AtomSim</artifactId>
-    <version>0.2.60</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -37,6 +37,7 @@
             <version>${javafx.version}</version>
             <classifier>win</classifier>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
@@ -48,7 +49,8 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
             <classifier>mac</classifier>
-        </dependency>
+        </dependency>-->
+
     </dependencies>
 
 <build>
@@ -66,14 +68,10 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.7</version>
         <configuration>
-            <stripDebug>true</stripDebug>
             <mainClass>org.lemandog.App</mainClass>
             <launcher>launch</launcher>
-                <commandLineArg>
-                    MODE 60,30 color 0C
-                </commandLineArg>
             <compress>2</compress>
-            <jlinkZipName>AtomSimRedist</jlinkZipName>
+            <jlinkZipName>AtomSimStandalone</jlinkZipName>
             <jlinkImageName>runtime</jlinkImageName>
             <noManPages>true</noManPages>
             <noHeaderFiles>true</noHeaderFiles>

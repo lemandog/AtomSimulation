@@ -14,7 +14,11 @@ import org.lemandog.util.Console;
 import org.lemandog.util.LoadConfig;
 import org.lemandog.util.Output;
 import org.lemandog.util.Util;
+
+import java.util.ArrayDeque;
 import java.util.Objects;
+
+import static org.lemandog.Sim.currentSim;
 
 public class App extends Application {
     public static Slider targetSizeX;
@@ -34,10 +38,12 @@ public class App extends Application {
     public static TextField tempAm;
     public static TextField pressurePow;
     public static TextField pressure;
-    public static CheckBox pathDrawing;
+
     public static Label outputMode;
     public static Label fileDropText;
     public static Button startSimButt;
+
+    public static ArrayDeque<Sim> simQueue = new ArrayDeque<>();
     public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
 
     @Override
@@ -112,10 +118,12 @@ public class App extends Application {
         userControlPane.getChildren().add(pressure);
         userControlPane.getChildren().add(pressureText);
 
-        pathDrawing = new CheckBox("Отрисовка путей (Только малое число частиц)");
-        pathDrawing.setFont(mainFont);
-        userControlPane.getChildren().add(pathDrawing);
-
+        HBox queuePanel = new HBox();
+        Button queueWinBuilder = new Button("Очередь симуляции");
+        queueWinBuilder.setFont(mainFont);
+        queueWinBuilder.setOnAction(actionEvent -> Util.constructAWinQueue());
+        queuePanel.getChildren().add(queueWinBuilder);
+        userControlPane.getChildren().add(queuePanel);
         threadCount = new Slider();
         threadCount.setMin(1);
         threadCount.setMax(20);
@@ -123,13 +131,10 @@ public class App extends Application {
         threadCount.setShowTickMarks(true);
         threadCount.setShowTickLabels(true);
         threadCount.setPrefWidth(userControl.getWidth());
-        Label threadCountText = new Label("Количество потоков для счёта: " + Sim.avilableStreams);
-        threadCountText.setFont(mainFont);
+        Label threadCountTextAv = new Label("Потоков у вашего CPU: " + Sim.avilableStreams + " Выбрано: " + Math.round(threadCount.getValue()));
         threadCount.setOnMouseReleased((event) ->
-                threadCountText.setText("Количество потоков для счёта: "+ Math.round(threadCount.getValue())));
-        Label threadCountTextAv = new Label("Всего найдено доступных потоков: " + Sim.avilableStreams);
+                threadCountTextAv.setText("Потоков у вашего CPU: " + Sim.avilableStreams + " Выбрано: " + Math.round(threadCount.getValue())));
         threadCountTextAv.setFont(mainFont);
-        userControlPane.getChildren().add(threadCountText);
         userControlPane.getChildren().add(threadCountTextAv);
         userControlPane.getChildren().add(threadCount);
 
@@ -260,7 +265,11 @@ public class App extends Application {
 
         startSimButt = new Button("Старт симуляции");
         startSimButt.setFont(mainFont);
-        startSimButt.setOnAction(event -> Sim.start());
+        startSimButt.setOnAction(event -> {
+            if (simQueue.isEmpty()){simQueue.add(new Sim());} // Если Пользователь не использует очередь,
+            currentSim = simQueue.pop();
+            currentSim.start();
+        });
         Button genTest = new Button("Тест генератора");
         genTest.setFont(mainFont);
         genTest.setOnAction(event -> Sim.genTest());
@@ -295,7 +304,7 @@ public class App extends Application {
         dragTarget.setMinSize(userControl.getWidth(),30);
         userControlPane.getChildren().add(dragTarget);
 
-        HBox buttonPanelSQL = new HBox();
+        HBox buttonPanelConfig = new HBox();
         Button confInfo = new Button("О конфигурациях");
         confInfo.setFont(mainFont);
         confInfo.setOnAction(event -> LoadConfig.constructConfigInfoFrame());
@@ -309,8 +318,8 @@ public class App extends Application {
         outputMode = new Label("Вывод выключен!");
         outputMode.setTextFill(Color.INDIANRED);
         outputMode.setFont(mainFont);
-        buttonPanelSQL.getChildren().addAll(confInfo,resetDatabase,outputMode);
-        userControlPane.getChildren().add(buttonPanelSQL);
+        buttonPanelConfig.getChildren().addAll(confInfo,resetDatabase,outputMode);
+        userControlPane.getChildren().add(buttonPanelConfig);
         userControlWindows.show();
     }
 
