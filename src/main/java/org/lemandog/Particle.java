@@ -124,9 +124,10 @@ public class Particle{
 
                 //Проверка стен - если столкнулось, возвращает false; Мишень - если столкновение, возвращает false
                 //Так, частица активна (active == true) только тогда, когда нет столкновения со стенами =И= нет столкновения с мишенью
-                tarNotMet(oldCord,newCord);
                 wallCheck(oldCord,newCord);
+                tarNotMet(oldCord,newCord);
                 genNotMet(oldCord,newCord); //Проверяем, был ли удар по источнику
+
                 active = !wallIsHit && !tarIsHit;
 
                 if (tarIsHit){
@@ -170,13 +171,14 @@ public class Particle{
 
     private void wallCheck(Point3D oldCord, Point3D newCord) {
         if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
-            if (bounceChance("WALL") && !genIsHit){
+            if (bounceChance("WALL")){
+                if (!genIsHit){
                 this.wallIsHit = true;
                 thisParticleMat.setDiffuseColor(wallhitCol);}
+            }
             else {
                 timesHitWall++;
                 genIsHit = false;
-                //TODO: Переизлучение в сторону центра
                 toCenter(oldCord);
                 this.wallIsHit = false;
         }}

@@ -157,8 +157,9 @@ public class EngineDraw {
 
     public static boolean takePointOnChamber(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
-        //Так как мишень перпендикулярна оси Y, логично искать точку пересечения, естественно, от Y
-        //XYZ уравнение прямой
+        //Это более глупый алгоритм нежели чем тот, что используется для нахождения точек пересечения с мишенью и генератором.
+        //Однако, так не нужно искать положение стенки в пространстве, что нивелирует выигрыш от "более умного" алгоритма.
+        //К тому же нам ведь не важна точность осаждения на стенках, нам важен сам факт вылета
         double chamberMinX = chamberR.getBoundsInParent().getMinX();
         double chamberMaxX = chamberR.getBoundsInParent().getMaxX();
         double chamberMinY = chamberR.getBoundsInParent().getMinY();
@@ -181,7 +182,7 @@ public class EngineDraw {
                         inUse.coordinates[0] = product.getTranslateX();
                         inUse.coordinates[1] = product.getTranslateY();
                         inUse.coordinates[2] = product.getTranslateZ();
-                        inUse.obj = product;
+                        inUse.getCurrSphere();
                         return true;
             }
         }
@@ -192,23 +193,81 @@ public class EngineDraw {
             EngineDraw.CylinderThread(path);
         }
     }
+
     public static boolean takePointOnTarget(Point3D origin, Point3D target, Particle inUse){
+        //ВНИМАНИЕ: Мишень НИЖЕ нуля по Y (!!!), поэтому нужно не путать условия (как это делал я до сих пор)
+        Sphere product = new Sphere();
+        if (origin.getY() >= targetR.getBoundsInParent().getMaxY() && target.getY() <= targetR.getBoundsInParent().getMaxY()){ //Проходит через высоту мишени
+            double i = (targetR.getBoundsInParent().getCenterY()-origin.getY())/(target.getY() - origin.getY());
+            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
+            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
+            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+
+            if (origin.getY() + (target.getY() - origin.getY())*i<=targetR.getBoundsInParent().getMaxY()
+                    && origin.getY() + (target.getY() - origin.getY())*i>=targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
+
+                if (product.getTranslateX()>targetR.getBoundsInParent().getMinX()
+                        && product.getTranslateX()<targetR.getBoundsInParent().getMaxX()){ //Попадание по X
+                    if (product.getTranslateZ()>targetR.getBoundsInParent().getMinZ()
+                            && product.getTranslateZ()<targetR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+                        inUse.coordinates[0] = product.getTranslateX();
+                        inUse.coordinates[1] = product.getTranslateY();
+                        inUse.coordinates[2] = product.getTranslateZ();
+                        return true;
+                    }
+                }}
+        }
+        return false;
+    }
+    public static boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
+        Sphere product = new Sphere();
+        //ВНИМАНИЕ: Генератор ВЫШЕ нуля по Y (!!!), поэтому нужно не путать условия (как это делал я до сих пор)
+        if (origin.getY() <= generatorR.getBoundsInParent().getMaxY() && target.getY() >= generatorR.getBoundsInParent().getMaxY()){ //Проходит через высоту мишени
+            double i = (generatorR.getBoundsInParent().getCenterY()-origin.getY())/(target.getY() - origin.getY());
+            product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
+            product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
+            product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
+
+            if (origin.getY() + (target.getY() - origin.getY())*i<=generatorR.getBoundsInParent().getMaxY()
+                    && origin.getY() + (target.getY() - origin.getY())*i>=generatorR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
+
+                if (product.getTranslateX()>generatorR.getBoundsInParent().getMinX()
+                        && product.getTranslateX()<generatorR.getBoundsInParent().getMaxX()){ //Попадание по X
+                    if (product.getTranslateZ()>generatorR.getBoundsInParent().getMinZ()
+                            && product.getTranslateZ()<generatorR.getBoundsInParent().getMaxZ()){ //Попадание по Z
+                        inUse.coordinates[0] = product.getTranslateX();
+                        inUse.coordinates[1] = product.getTranslateY();
+                        inUse.coordinates[2] = product.getTranslateZ();
+                        return true;
+                    }
+                }}
+            }
+        return false;
+    }
+
+
+    public static void reset() {
+        EngineDraw.root.getChildren().clear();
+    }
+
+    //Дальше идёт старый код который жалко удалять
+
+    public static boolean takePointOnTargetAlt(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
         //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
         double optimalStep = (targetR.getBoundsInParent().getMaxY() - targetR.getBoundsInParent().getMinY())/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
-        if (optimalStep < 1E-5){optimalStep = 1E-5;} // В предельных случаях один шаг становится ОЧЕНЬ долгим. Это вот искусственное ограничение.
+        if (optimalStep < 1E-12){optimalStep = 1E-12;} // В предельных случаях один шаг становится ОЧЕНЬ долгим. Это вот искусственное ограничение.
         //Эта величина найдена практически и представляет собой компромисс между производительностью и точностью регистрации.
         //Да, если задать размер камеры в пару микрометров, удары не будут регистрироваться. Но никто же не вздумает вписывать настолько малые значения для практических целей
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
             product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
-
-            if (origin.getY() + (target.getY() - origin.getY())*i<targetR.getBoundsInParent().getMaxY()
-                    && origin.getY() + (target.getY() - origin.getY())*i>targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
+            if (origin.getY() + (target.getY() - origin.getY())*i<=targetR.getBoundsInParent().getMaxY()
+                    && origin.getY() + (target.getY() - origin.getY())*i>=targetR.getBoundsInParent().getMinY()){ //Проходит через высоту мишени
 
                 if (product.getTranslateX()>targetR.getBoundsInParent().getMinX()
                         && product.getTranslateX()<targetR.getBoundsInParent().getMaxX()){ //Попадание по X
@@ -225,15 +284,14 @@ public class EngineDraw {
         }
         return false;
     }
-
-    public static boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
+    public static boolean takePointOnGeneratorAlt(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
         //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
         //Всё потому что Bounds.intersect считает неверно.
         double mixY = origin.getY();
         double maxY = target.getY();
         double optimalStep = (generatorR.getBoundsInParent().getMaxY() - generatorR.getBoundsInParent().getMinY())/((Math.abs(mixY)+Math.abs(maxY))*30);//Шаг обратно пропорционален пути который нужно пройти
-        if (optimalStep < 1E-5){optimalStep = 1E-5;} // В предельных случаях один шаг становится ОЧЕНЬ долгим. Это вот искусственное ограничение.
+        if (optimalStep < 1E-8){optimalStep = 1E-8;} // В предельных случаях один шаг становится ОЧЕНЬ долгим. Это вот искусственное ограничение.
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
@@ -255,9 +313,5 @@ public class EngineDraw {
                 }}
         }
         return false;
-    }
-
-    public static void reset() {
-        EngineDraw.root.getChildren().clear();
     }
 }
