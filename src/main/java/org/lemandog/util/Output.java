@@ -89,7 +89,7 @@ public class Output {
         compOutput.getChildren().add(returnBut);
 
         output3d = new CheckBox();
-        output3d.setText("Показывать каждый шаг перемещения частиц");
+        output3d.setText("Показывать перемещения частиц");
         output3d.setFont(mainFont);
         output3d.setSelected(output3D);
         output3d.setOnAction(event -> output3D = !output3D);

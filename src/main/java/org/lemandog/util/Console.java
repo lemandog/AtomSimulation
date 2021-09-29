@@ -13,7 +13,7 @@ public class Console {
     }
     public static void ready(){
         printLine('@');
-        coolPrintout("Atom simulation v 0.3.5 ");
+        coolPrintout("Atom simulation v 0.3.5hf ");
         printLine('@');
     }
 
