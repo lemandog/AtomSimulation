@@ -140,7 +140,7 @@ public class Sim {
             } catch (InterruptedException ignore) {}
             Console.printLine('X');
             Console.coolPrintout("SIMULATION RUN IS OVER!");
-        EngineDraw.DrawingThreadFire(container);
+            if (Output.output3D){EngineDraw.DrawingThreadFire(container);}
         Output.toFile();
         simIsAlive = false;
         if (!App.simQueue.isEmpty()){
