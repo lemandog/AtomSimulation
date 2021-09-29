@@ -97,7 +97,7 @@ public class LoadConfig {
                 if (line.contains("WAITT")){App.waitTime.setValue(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
                 if (line.contains("VERWA")){App.bounceWallChance.setValue(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
                 if (line.contains("VERGE")){App.bounceGenChance.setValue(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
-                if (line.contains("3DNOT")){Output.output3d.setSelected(false);} //double
+                if (line.contains("3DNOT")){Output.output3dCHK.setSelected(false);} //double
                 if (line.contains("RUNAN")){App.simQueue.add(new Sim());} //double
                 if (line.contains("RUNMO")){
                     int threa_ = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));

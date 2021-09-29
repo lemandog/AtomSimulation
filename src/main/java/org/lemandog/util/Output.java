@@ -38,7 +38,7 @@ public class Output {
     public static boolean outputPicCSV = false;
     public static boolean outputCSV = false;
     public static boolean output3D = true;
-    public static CheckBox output3d;
+    public static CheckBox output3dCHK;
     public static CheckBox outputAskPic;
     public static CheckBox outputAskCSVHits;
     public static CheckBox outputAskGraph;
@@ -88,12 +88,12 @@ public class Output {
         returnBut.setOnAction(e -> Output.disp());
         compOutput.getChildren().add(returnBut);
 
-        output3d = new CheckBox();
-        output3d.setText("Показывать перемещения частиц");
-        output3d.setFont(mainFont);
-        output3d.setSelected(output3D);
-        output3d.setOnAction(event -> output3D = !output3D);
-        compOutput.getChildren().add(output3d);
+        output3dCHK = new CheckBox();
+        output3dCHK.setText("Показывать перемещения частиц");
+        output3dCHK.setFont(mainFont);
+        output3dCHK.setSelected(output3D);
+        output3dCHK.setOnAction(event -> output3D = output3dCHK.isSelected());
+        compOutput.getChildren().add(output3dCHK);
 
         Label textDesk = new Label("Текстовый вывод");
         textDesk.setFont(mainFont);

@@ -124,6 +124,8 @@ public class EngineDraw {
 
 
     public static void DrawingThreadFire(Particle[] containerSet) {
+        if (Output.output3D){
+            System.out.println("OUTPUT = " + Output.output3D);
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
                 if (particle != null) {
@@ -134,6 +136,7 @@ public class EngineDraw {
                 }
             }
         });
+    }
     }
 
     public static void CylinderThread(Cylinder path) {

@@ -104,7 +104,7 @@ public class Particle{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }}
-                if (Output.output3D){DrawingThreadFire(new Particle[]{this});}
+                DrawingThreadFire(new Particle[]{this});
                 //Нынешнее приращение
                 double dN = freerunLen/Math.sqrt(Math.pow(speeds[0],
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));

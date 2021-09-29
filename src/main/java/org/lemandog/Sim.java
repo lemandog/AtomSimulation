@@ -118,7 +118,7 @@ public class Sim {
         }
         //Тут условие для быстродействия. Очень большие симуляции занимают много времени для изначальной отрисовки, так что
         //Первый шаг будет отрисован только если пользователь захочет
-        if (Output.output3D){EngineDraw.DrawingThreadFire(Sim.currentSim.container);}
+        EngineDraw.DrawingThreadFire(Sim.currentSim.container);
         //Это делает код менее читабельным, но гораздо более быстрым.
         mainContr = new Thread(() ->{
         while(lastRunning < N && currentSim.simIsAlive) {
@@ -140,7 +140,7 @@ public class Sim {
             } catch (InterruptedException ignore) {}
             Console.printLine('X');
             Console.coolPrintout("SIMULATION RUN IS OVER!");
-            if (Output.output3D){EngineDraw.DrawingThreadFire(container);}
+            EngineDraw.DrawingThreadFire(container);
         Output.toFile();
         simIsAlive = false;
         if (!App.simQueue.isEmpty()){
