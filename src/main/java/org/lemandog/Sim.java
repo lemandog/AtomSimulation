@@ -149,7 +149,8 @@ public class Sim {
                 Console.coolPrintout("Another Sim will start shortly...");
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) {}
-            Platform.runLater(() -> currentSim.start()); //Надо обязательно делать это на потоке JavaFX
+            EngineDraw.reset();
+            Platform.startup(() -> currentSim.start()); //Надо обязательно делать это на потоке JavaFX
         }
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);

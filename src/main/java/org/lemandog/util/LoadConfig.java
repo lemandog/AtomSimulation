@@ -87,7 +87,7 @@ public class LoadConfig {
                 if (line.contains("ZTARS")){App.targetSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZTARS ","")));} //double
                 if (line.contains("XGENE")){App.genSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XGENE ","")));} //double
                 if (line.contains("ZGENE")){App.genSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZGENE ","")));} //double
-                if (line.contains("DIRPA")){Output.directoryChooserOutputPath.setInitialDirectory(new File((line.trim().replaceAll("DIRPA ",""))));} //str
+                if (line.contains("DIRPA")){Output.selectedPath = (new File((line.trim().replaceAll("DIRPA ",""))));} //str
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
                 if (line.contains("CSVZA")){Output.outputPicCSV = true;} //bool
