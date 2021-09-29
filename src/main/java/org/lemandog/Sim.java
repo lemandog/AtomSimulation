@@ -38,7 +38,6 @@ public class Sim {
     Thread[] calculator;
 
     public Sim(){
-        if (Output.outputCSV){Output.CSVWriterBuild();}
         p = Math.pow(Double.parseDouble(App.pressure.getText()),Double.parseDouble(App.pressurePow.getText()));
         T = Integer.parseInt(App.tempAm.getText());
         N = Integer.parseInt(App.particleAm.getText());
@@ -111,7 +110,7 @@ public class Sim {
 
     public void start() {
         currentSim = new Sim(); //Установка выбраных параметров
-        simIsAlive = true;
+        currentSim.simIsAlive = true;
         EngineDraw.reset();
         EngineDraw.eSetup();
         for (int i = 0; i < N; i++) {
@@ -122,7 +121,7 @@ public class Sim {
         if (Output.output3D){EngineDraw.DrawingThreadFire(Sim.currentSim.container);}
         //Это делает код менее читабельным, но гораздо более быстрым.
         mainContr = new Thread(() ->{
-        while(lastRunning < N && simIsAlive) {
+        while(lastRunning < N && currentSim.simIsAlive) {
             if(threadQuotaNotMet()>0){
                 for (int i = 0; i< avilableStreams;i++){
                     if (!calculator[i].isAlive()){// Найти закончившийся тред

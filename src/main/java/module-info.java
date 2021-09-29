@@ -9,6 +9,4 @@ module AtomSimulation {
 
     requires java.xml;
     requires java.scripting;
-
-    exports com.opencsv;
 }

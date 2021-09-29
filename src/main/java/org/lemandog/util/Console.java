@@ -13,7 +13,7 @@ public class Console {
     }
     public static void ready(){
         printLine('@');
-        coolPrintout("Atom simulation v 0.3.3 ");
+        coolPrintout("Atom simulation v 0.3.5 ");
         printLine('@');
     }
 
@@ -26,10 +26,7 @@ public class Console {
         for (int i = 0; i < CON_WIDTH/2 - line.length()/2; i++) {
             System.out.print(" ");
         }
-        System.out.print(line);
-        for (int i = 0; i < CON_WIDTH/2 - line.length()/2; i++) {
-            System.out.print(" ");
-        }
+        System.out.println(line);
     }
     public static void particleOut(int ordinal, int timesHitWall, int timesHitGen, boolean tarIsHit, int stepsPassed){
         System.out.println(String.format("#%0" +amLen+ "d",ordinal) + "; "+"On step: "+String.format("#%0" +dist+ "d",stepsPassed)

@@ -77,6 +77,10 @@ public class EngineDraw {
         scene.setCamera(main);
         // КОНТРОЛЬ КАМЕРЫ
         scene.setOnKeyPressed(keyEvent -> {
+            if(keyEvent.getCode() == KeyCode.ESCAPE){
+                System.out.println("EXITTING");
+                Sim.currentSim.simIsAlive =false;
+            }
             if(keyEvent.getCode() == KeyCode.NUMPAD1 || keyEvent.getCode() == KeyCode.NUMPAD4){
                 if(keyEvent.getCode() == KeyCode.NUMPAD1){main.setTranslateX(main.getTranslateX() + 1);} else {main.setTranslateX(main.getTranslateX() - 1);}
                 System.out.println("CURRENT CAMERA X POS " + main.getTranslateX());
@@ -168,7 +172,7 @@ public class EngineDraw {
         double chamberMaxZ = chamberR.getBoundsInParent().getMaxZ();
         double mixY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*10);//Шаг обратно пропорционален пути который нужно пройти
+        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
 
         for (double i = 0; i < 1; i+=optimalStep) {
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);

@@ -1,6 +1,5 @@
 package org.lemandog.util;
 
-import com.opencsv.CSVWriter;
 import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,9 +50,13 @@ public class Output {
     public static int lastPrintStep = 1;
     static Stage setOutput = new Stage();
     static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
-    static CSVWriter global;
-    static CSVWriter global2;
+    static FileWriter global;
+    static FileWriter global2;
     public static CheckBox pathDrawing;
+
+    static final String LINE_END = "\r\n";
+    static final String SEPARATOR = ";";
+
     public static void ConstructOutputAFrame() {
         VBox compOutput = new VBox();
         Scene setOutputSc = new Scene(compOutput,500,500);
@@ -197,8 +200,8 @@ public class Output {
         }
         if (outputCSV) {
             try {
-                global.flush();
-                System.out.println("GLOBAL STREAM CLOSED");
+                global.close();
+                System.out.println("GLOBAL STREAM ParticleStates CLOSED");
                 global=null;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -206,8 +209,8 @@ public class Output {
         }
         if (outputPicCSV) {
             try {
-                global2.flush();
-                System.out.println("GLOBAL STREAM2 CLOSED");
+                global2.close();
+                System.out.println("GLOBAL STREAM Hits CLOSED");
                 global2=null;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -252,67 +255,65 @@ public class Output {
         maxWidth = target.getWidth();
         maxDepth = target.getDepth();
     }
-    public static void insertValuesToSCV(double[] cord, int passed, int ordinal){
+    synchronized public static void insertValuesToSCV(double[] cord, int passed, int ordinal){
         if (global == null){
-            CSVWriterBuild();
+            try {
+                LocalDateTime main = LocalDateTime.now();
+                File csv = new File(selectedPath.getAbsolutePath()
+                        + "/"+App.simQueue.size()+"ParticleStates"+sdfF.format(main)+".csv");
+                global = new FileWriter(csv);
+                Vector<String> ve = new Vector<>(0);
+                for (int i = 0; i < App.dimensionCount.getValue(); i++) {
+                    ve.add("КООРДИНАТА "+i +SEPARATOR);
+                }
+                ve.add("ПРОШЕДШИЕ ШАГИ "+SEPARATOR);
+                ve.add("НОМЕР ЧАСТИЦЫ ИЗ "+ App.particleAm.getText()+SEPARATOR);
+                ve.add("ТЕМПЕРАТУРА: "+ App.tempAm.getText()+SEPARATOR);
+                for (String s : ve) {
+                    global.write(s);
+                }
+                global.write(LINE_END);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         Vector<String> ve = new Vector<>(0);
         for (double v : cord) {
-            ve.add(String.valueOf(v));
+            ve.add(v + SEPARATOR);
         }
-        ve.add(String.valueOf(passed));
-        ve.add(String.valueOf(ordinal));
+        ve.add(passed + SEPARATOR);
+        ve.add(ordinal + SEPARATOR);
         String[] output = new String[ve.size()]; //Мы не знаем, сколько там измерений
         for (int i = 0; i < ve.size(); i++) {
             output[i] = ve.get(i);
         }
-        global.writeNext(output);
-    }
-
-    public static void CSVWriterBuild() {
         try {
-            LocalDateTime main = LocalDateTime.now();
-            File csv = new File(selectedPath.getAbsolutePath()
-                    + "/"+App.simQueue.size()+"ParticleStates"+sdfF.format(main)+".csv");
-            global = new CSVWriter(new FileWriter(csv),
-                    ';',
-                    CSVWriter.NO_QUOTE_CHARACTER,
-                    CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                    CSVWriter.RFC4180_LINE_END);
-            Vector<String> ve = new Vector<>(0);
-            for (int i = 0; i < App.dimensionCount.getValue(); i++) {
-                ve.add("КООРДИНАТА "+i);
+            for (String s : output) {
+                global.write(s);
             }
-            ve.add("ПРОШЕДШИЕ ШАГИ ");
-            ve.add("НОМЕР ЧАСТИЦЫ ИЗ "+ App.particleAm.getText());
-            ve.add("ТЕМПЕРАТУРА: "+ App.tempAm.getText());
-            String[] output = new String[ve.size()]; //Мы не знаем, сколько там измерений
-            for (int i = 0; i < ve.size(); i++) {
-                output[i] = ve.get(i);
-            }
-            global.writeNext(output);
+            global.write(LINE_END);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void CSVStateReact(double translateX, double translateZ) {
+    synchronized public static void CSVStateReact(double translateX, double translateZ) {
         if (outputPicCSV){
         if (global2 == null){
             LocalDateTime main = LocalDateTime.now();
             File csv = new File( selectedPath.getAbsolutePath()
                     + "/"+App.simQueue.size()+"Hits"+sdfF.format(main)+".csv");
             try {
-                global2 = new CSVWriter(new FileWriter(csv),
-                        ';',
-                        CSVWriter.NO_QUOTE_CHARACTER,
-                        CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-                        CSVWriter.RFC4180_LINE_END);
+                global2 = new FileWriter(csv);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        global2.writeNext(new String[]{String.valueOf(translateX),String.valueOf(translateZ)});
-    }
+            try {
+                global2.write(translateX +SEPARATOR+ translateZ + LINE_END);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
