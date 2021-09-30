@@ -79,15 +79,14 @@ public class Particle{
 
     private double[] generateSpeed(int mode) {
         double[] product = new double[currentSim.maxDimensions]; //XYZ
-        //В общем-то планируется механика переиспарения и добавление сюда жёсткого ограничения может пока вызвать проблемы
         Arrays.fill(product,0);
-        double sv = Math.sqrt((Sim.k*currentSim.T)/Sim.m);
+        double sv = Math.sqrt((Sim.k*currentSim.T)/Sim.m); // длинна вектора
         for (int i = 0; i < currentSim.avilableDimensions; i++) {
-            product[i] = (rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));
+            product[i] = (rand.nextGaussian()*sv);
         }
 
         if(mode == 1 && currentSim.avilableDimensions>2){
-            product[1] = -Math.abs(rand.nextGaussian()*sv) * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
+            product[1] = -Math.abs(rand.nextGaussian()*sv);}// * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
 
         return product;
     }
