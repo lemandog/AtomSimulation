@@ -84,7 +84,13 @@ public class Particle{
         for (int i = 0; i < currentSim.avilableDimensions; i++) {
             product[i] = (rand.nextGaussian()*sv);
         }
-
+        if(currentSim.avilableDimensions>2){
+        while(getPosChance(product)){
+            for (int i = 0; i < currentSim.avilableDimensions; i++) {
+                product[i] = (rand.nextGaussian()*sv);
+            }
+        }
+        }
         if(mode == 1 && currentSim.avilableDimensions>2){
             product[1] = -Math.abs(rand.nextGaussian()*sv);}// * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
 
@@ -195,6 +201,11 @@ public class Particle{
             return !(Math.random() < currentSim.wallBounce);
         }
         return !(Math.random() < currentSim.genBounce);
+    }
+    private boolean getPosChance(double[] product) {
+        double chance = Math.random();
+        double func = Math.cos(Math.PI/2 - Math.atan(product[1]/(Math.sqrt(Math.pow(product[2],2) + Math.pow(product[0],2)))));
+        return chance > func;
     }
 
     public void getCurrSphere() {
