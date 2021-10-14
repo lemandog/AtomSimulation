@@ -80,9 +80,11 @@ public class Sim {
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
         if(Output.outputPic) {
-            Output.xSize = (int) CHA_SIZE[0];
-            Output.zSize = (int) CHA_SIZE[2];
+            Output.DOTSIZE = Output.outputAskPicResolution.getValue();
+            Output.xSize = CHA_SIZE[0]/Output.DOTSIZE;
+            Output.zSize = CHA_SIZE[2]/Output.DOTSIZE;
             Output.palette = new Image("/heatmap" + (int) Output.outputPalette.getValue() + ".png");
+            Output.picState = new int[(int) Output.xSize][(int) Output.zSize];
         }
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
         for (int i = 0; i < avilableStreams; i++) {

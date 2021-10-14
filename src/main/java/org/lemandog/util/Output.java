@@ -1,6 +1,5 @@
 package org.lemandog.util;
 
-import javafx.geometry.Bounds;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -30,8 +29,8 @@ import static org.lemandog.util.SwingFXUtils.fromFXImage;
 public class Output {
     static DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd=MM=yyyy-HH=mm=ss");
     public static Image palette = new Image("heatmap2.png");
-    public static int zSize = 10;
-    public static int xSize = 10;
+    public static double zSize = 10;
+    public static double xSize = 10;
     public static DirectoryChooser directoryChooserOutputPath = new DirectoryChooser();
     public static boolean output = false;
     public static boolean outputPic = false;
@@ -44,10 +43,9 @@ public class Output {
     public static CheckBox outputAskGraph;
     public static Slider outputAskPicResolution;
     public static Slider outputPalette;
-    public static double maxDepth;
-    public static double maxWidth;
     public static int[][] picState;
     public static int lastPrintStep = 1;
+    public static double DOTSIZE;
     static Stage setOutput = new Stage();
     static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
     static FileWriter global;
@@ -130,10 +128,10 @@ public class Output {
         outputAskPicResolution = new Slider();
         outputAskPicResolution.setMaxWidth(setOutputSc.getWidth()/3);
         outputAskPicResolution.setValue(0.5);
-        Label resolutionText = new Label("Разрешение сейчас: " + String.format("%3.0f", outputAskPicResolution.getValue()));
+        Label resolutionText = new Label("Разрешение сейчас: " + String.format("%3.2f", outputAskPicResolution.getValue()));
         resolutionText.setFont(mainFont);
         outputAskPicResolution.setOnMouseReleased((event) -> {
-            resolutionText.setText("Разрешение сейчас: "+ String.format("%3.0f", outputAskPicResolution.getValue())); // Три знака всего, два после запятой
+            resolutionText.setText("Разрешение сейчас: "+ String.format("%3.2f", outputAskPicResolution.getValue())); // Три знака всего, два после запятой
         });
         outputAskPicResolution.setMin(0.01);
         outputAskPicResolution.setMax(1);
@@ -223,38 +221,36 @@ public class Output {
         return randColRead.getColor(sel,0);}
 
     private static Image toImage(int[][] modelRes){
-        WritableImage writeHere = new WritableImage((int) maxWidth,(int) maxDepth);
+        WritableImage writeHere = new WritableImage((int) xSize,(int) zSize);
         PixelWriter outPix = writeHere.getPixelWriter();
 
         int biggest = 0;
-        for (int x = 0; x<writeHere.getWidth();x++){
-            for (int y = 0; y<writeHere.getHeight();y++) {
+        for (int x = 0; x<(int) xSize;x++){
+            for (int y = 0; y<(int) zSize;y++) {
                 if(modelRes[x][y] > biggest){biggest = modelRes[x][y];} //Ищем наибольшее
             }}
 
         biggest = biggest/((int)palette.getWidth()); //делим на количество цветов в палитре, так, что значения в диапазоне 0-9
 
-        for (int x = 0; x<xSize;x++){
-            for (int y = 0; y<zSize;y++) {
+        for (int x = 0; x<(int)xSize;x++){
+            for (int y = 0; y<(int)zSize;y++) {
                 modelRes[x][y] = modelRes[x][y]/(biggest+1); //Привод к нужным для вывода значениям
             }}
 
-        for (int x = 0; x<xSize;x++){
-            for (int y = 0; y<zSize;y++) {
+        for (int x = 0; x<(int)xSize;x++){
+            for (int y = 0; y<(int)zSize;y++) {
                 outPix.setColor(x,y,colSel(modelRes[x][y]));//Вывод из палитры
             }}
         return writeHere;
     }
     public static void picStateReact(double xCord, double zCord){
         if (outputPic){
-            picState[(int) ((maxWidth/2) + xCord)][(int) ((maxDepth/2) + zCord)] += 1;
+            int desiredX = (int) (Math.abs(xCord/DOTSIZE)/2 + (xCord/DOTSIZE));
+            int desiredZ = (int) (Math.abs(zCord/DOTSIZE)/2 + (zCord/DOTSIZE));
+            picState[desiredX][desiredZ]++;
         }
     }
 
-    public static void setTargetSize(Bounds target) {
-        maxWidth = target.getWidth();
-        maxDepth = target.getDepth();
-    }
     synchronized public static void insertValuesToSCV(double[] cord, int passed, int ordinal){
         if (global == null){
             try {

@@ -57,12 +57,7 @@ public class EngineDraw {
 
         targetR = new Box((Sim.currentSim.TAR_SIZE[0]),(Sim.currentSim.TAR_SIZE[1]),(Sim.currentSim.TAR_SIZE[2]));
         targetR.setTranslateY((-Sim.currentSim.CHA_SIZE[1]/2));
-
-        if(Output.outputPic) {
-            Output.setTargetSize(chamberR.getBoundsInParent());
-            Output.picState = new int[(int) Output.maxWidth][(int) Output.maxDepth];
-        }
-        generatorR = new Box((Sim.currentSim.GEN_SIZE[0]),(Sim.currentSim.GEN_SIZE[1]),(Sim.currentSim.GEN_SIZE[2]));
+                generatorR = new Box((Sim.currentSim.GEN_SIZE[0]),(Sim.currentSim.GEN_SIZE[1]),(Sim.currentSim.GEN_SIZE[2]));
         generatorR.setTranslateY((Sim.currentSim.CHA_SIZE[1]/2));
 
         PerspectiveCamera main = new PerspectiveCamera();

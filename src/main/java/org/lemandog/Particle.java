@@ -85,14 +85,14 @@ public class Particle{
             product[i] = (rand.nextGaussian()*sv);
         }
         if(currentSim.avilableDimensions>2){
-        while(getPosChance(product)){
+        while(getPosChance(product) && mode==1){
             for (int i = 0; i < currentSim.avilableDimensions; i++) {
                 product[i] = (rand.nextGaussian()*sv);
             }
         }
         }
         if(mode == 1 && currentSim.avilableDimensions>2){
-            product[1] = -Math.abs(rand.nextGaussian()*sv);}// * Math.cos(Math.PI/2 - Math.atan((rand.nextGaussian()*sv)/(rand.nextGaussian()*sv)));}
+            product[1] = -Math.abs(rand.nextGaussian()*sv);}
 
         return product;
     }
