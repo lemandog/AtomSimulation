@@ -245,9 +245,18 @@ public class Output {
     }
     public static void picStateReact(double xCord, double zCord){
         if (outputPic){
-            int desiredX = (int) (Math.abs(xCord/DOTSIZE)/2 + (xCord/DOTSIZE));
-            int desiredZ = (int) (Math.abs(zCord/DOTSIZE)/2 + (zCord/DOTSIZE));
-            picState[desiredX][desiredZ]++;
+            fromhere:
+            for(double x = 1; x< xSize; x += DOTSIZE){
+                for(double y = 1; y< zSize; y += DOTSIZE){
+                    if( ((1f/DOTSIZE)*(x-1) - xSize/2 <xCord/DOTSIZE && xCord/DOTSIZE<(1f/DOTSIZE)*x - xSize/2)
+                            &&((1f/DOTSIZE)*(y-1) - zSize/2<zCord/DOTSIZE && zCord/DOTSIZE<(1f/DOTSIZE)*y - zSize/2)) {
+                        picState[(int) (x/DOTSIZE)][(int) (y/DOTSIZE)]++;
+                        break fromhere;
+                    }
+
+                }
+            }
+
         }
     }
 

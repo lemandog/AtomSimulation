@@ -111,8 +111,8 @@ public class App extends Application {
         userControlPane.getChildren().add(pressurePow);
         userControlPane.getChildren().add(pressurePowText);
 
-        pressure = new TextField("1");
-        Label pressureText = new Label("Давление - число перед десяткой (Па)");
+        pressure = new TextField("10");
+        Label pressureText = new Label("Давление - число, возводимое в степень (Па)");
         pressureText.setLabelFor(pressurePow);
         pressureText.setFont(mainFont);
         userControlPane.getChildren().add(pressure);

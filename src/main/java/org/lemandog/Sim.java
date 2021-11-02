@@ -12,7 +12,6 @@ public class Sim {
     private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
     static final double m=m_Cr*1.660539040e-27; //масса ХРОМ, кг
     private static final double d = 130*10e-12;//Диаметр хрома (м)
-
     int T;
     double p;
     int N;
@@ -42,8 +41,7 @@ public class Sim {
         T = Integer.parseInt(App.tempAm.getText());
         N = Integer.parseInt(App.particleAm.getText());
         LEN = Integer.parseInt(App.stepsAm.getText());
-        lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
-
+        this.lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
         //Как сказано в Paticle, пользователь может сам ввести количество осей.
         //Конечно, я не знаю кому нужна пятимерная симуляция газа, но гибкость кода - важная часть ООП
         avilableDimensions = (int) App.dimensionCount.getValue();
@@ -84,7 +82,7 @@ public class Sim {
             Output.xSize = CHA_SIZE[0]/Output.DOTSIZE;
             Output.zSize = CHA_SIZE[2]/Output.DOTSIZE;
             Output.palette = new Image("/heatmap" + (int) Output.outputPalette.getValue() + ".png");
-            Output.picState = new int[(int) Output.xSize][(int) Output.zSize];
+            Output.picState = new int[(int) Output.xSize+1][(int) Output.zSize+1];
         }
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
         for (int i = 0; i < avilableStreams; i++) {
