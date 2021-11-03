@@ -1,15 +1,20 @@
 package org.lemandog.util;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.image.Image;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.lemandog.App;
+import org.lemandog.GasTypes;
 import org.lemandog.Sim;
 
 import java.awt.*;
@@ -18,6 +23,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class Util {
+    static GasTypes chosen = GasTypes.CHROME;
     public static Label queueSize = new Label();
     public static void constructAWin() {
         Stage info = new Stage();
@@ -114,5 +120,59 @@ public class Util {
 
     public static void addToQueue(){
         App.simQueue.add(new Sim());
+    }
+
+    public static void constructAWinMatterChooser() {
+        Stage matterCh = new Stage();
+        matterCh.getIcons().add(new Image("/matterChooser.png"));
+        matterCh.setResizable(false);
+        VBox layout = new VBox();
+
+        Label mainLabel = new Label("Вещества (Выбор по нажатию). Выбран сейчас: " + chosen.name());
+        mainLabel.setAlignment(Pos.TOP_CENTER);
+        mainLabel.setFont(App.mainFont2);
+        VBox order = new VBox();
+        layout.getChildren().add(mainLabel);
+
+        for (int i = 0; i < GasTypes.values().length; i++) {
+            HBox matter = new HBox();
+            matter.setPrefHeight(50);
+            final GasTypes fin = GasTypes.values()[i];
+            matter.setOnMouseClicked(actionEvent -> {
+                chosen = fin;
+                mainLabel.setText("Вещества. Выбран сейчас: " + chosen.name());
+            });
+            matter.getChildren().add(new Label(GasTypes.values()[i].name()));
+            matter.getChildren().add(new Label(" А.Е.М. "+GasTypes.values()[i].massRAW));
+            matter.getChildren().add(new Label(" Диаметр(пм) "+GasTypes.values()[i].massRAW));
+            matter.setBackground(new Background(
+                    new BackgroundFill(
+                            new LinearGradient(0, 0, 0, 1, true,
+                                    CycleMethod.NO_CYCLE,
+                                    new Stop(0, GasTypes.values()[i].particleCol),
+                                    new Stop(1, Color.WHITESMOKE)
+                            ), CornerRadii.EMPTY, Insets.EMPTY
+                    ),
+                    new BackgroundFill(
+                            new RadialGradient(
+                                    0, 0, 0.5, 0.5, 0.5, true,
+                                    CycleMethod.NO_CYCLE,
+                                    new Stop(0, GasTypes.values()[i].particleCol),
+                                    new Stop(1, Color.WHITESMOKE)),
+                            CornerRadii.EMPTY, Insets.EMPTY)
+                    ));
+            layout.getChildren().add(matter);
+        }
+
+        layout.getChildren().add(order);
+        Scene mainSc = new Scene(layout,450,350);
+
+        matterCh.setScene(mainSc);
+        matterCh.show();
+
+    }
+
+    public static GasTypes getMat() {
+        return chosen;
     }
 }

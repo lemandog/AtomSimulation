@@ -45,6 +45,7 @@ public class App extends Application {
 
     public static ArrayDeque<Sim> simQueue = new ArrayDeque<>();
     public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
+    public static final Font mainFont2 = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 20); //Подгрузка шрифта
 
     @Override
     public void start(Stage stage){
@@ -105,14 +106,14 @@ public class App extends Application {
         userControlPane.getChildren().add(zFrameLenText);
 
         pressurePow = new TextField("-8");
-        Label pressurePowText = new Label("Давление - степень десятки");
+        Label pressurePowText = new Label("Давление X в Y*10^X (Па)");
         pressurePowText.setLabelFor(pressurePow);
         pressurePowText.setFont(mainFont);
         userControlPane.getChildren().add(pressurePow);
         userControlPane.getChildren().add(pressurePowText);
 
-        pressure = new TextField("10");
-        Label pressureText = new Label("Давление - число, возводимое в степень (Па)");
+        pressure = new TextField("1");
+        Label pressureText = new Label("Давление Y в Y*10^X (Па)");
         pressureText.setLabelFor(pressurePow);
         pressureText.setFont(mainFont);
         userControlPane.getChildren().add(pressure);
@@ -120,9 +121,13 @@ public class App extends Application {
 
         HBox queuePanel = new HBox();
         Button queueWinBuilder = new Button("Очередь симуляции");
+        Button matterChooser = new Button("Вещество в симуляции");
         queueWinBuilder.setFont(mainFont);
+        matterChooser.setFont(mainFont);
         queueWinBuilder.setOnAction(actionEvent -> Util.constructAWinQueue());
+        matterChooser.setOnAction(actionEvent -> Util.constructAWinMatterChooser());
         queuePanel.getChildren().add(queueWinBuilder);
+        queuePanel.getChildren().add(matterChooser);
         userControlPane.getChildren().add(queuePanel);
         threadCount = new Slider();
         threadCount.setMin(1);

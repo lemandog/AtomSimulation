@@ -68,7 +68,7 @@ public class EngineDraw {
         Console.coolPrintout("POS " + main.getTranslateZ() + " FILL MULTI " + multiToFill );
 
         main.setNearClip(0.001);
-        main.setFieldOfView(51.5);
+        main.setFieldOfView(52.7);
         scene.setCamera(main);
         // КОНТРОЛЬ КАМЕРЫ
         scene.setOnKeyPressed(keyEvent -> {
@@ -157,6 +157,7 @@ public class EngineDraw {
 
 
     public static boolean takePointOnChamber(Point3D origin, Point3D target, Particle inUse){
+
         Sphere product = new Sphere();
         //Это более глупый алгоритм нежели чем тот, что используется для нахождения точек пересечения с мишенью и генератором.
         //Однако, так не нужно искать положение стенки в пространстве, что нивелирует выигрыш от "более умного" алгоритма.
@@ -167,11 +168,11 @@ public class EngineDraw {
         double chamberMaxY = chamberR.getBoundsInParent().getMaxY();
         double chamberMinZ = chamberR.getBoundsInParent().getMinZ();
         double chamberMaxZ = chamberR.getBoundsInParent().getMaxZ();
-        double mixY = origin.getY();
+        double minY = origin.getY();
         double maxY = target.getY();
-        double optimalStep = 1/((Math.abs(mixY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
-
+        double optimalStep = 1/((Math.abs(minY)+Math.abs(maxY))*100);//Шаг обратно пропорционален пути который нужно пройти
         for (double i = 0; i < 1; i+=optimalStep) {
+
             product.setTranslateX(origin.getX() + (target.getX() - origin.getX())*i);
             product.setTranslateY(origin.getY() + (target.getY() - origin.getY())*i);
             product.setTranslateZ(origin.getZ() + (target.getZ() - origin.getZ())*i);
@@ -187,6 +188,7 @@ public class EngineDraw {
                         return true;
             }
         }
+
         return false;
     }
     static void drawAPath(Cylinder path){
@@ -221,6 +223,7 @@ public class EngineDraw {
         return false;
     }
     public static boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
+
         Sphere product = new Sphere();
         //ВНИМАНИЕ: Генератор ВЫШЕ нуля по Y (!!!), поэтому нужно не путать условия (как это делал я до сих пор)
         if (origin.getY() <= generatorR.getBoundsInParent().getMaxY() && target.getY() >= generatorR.getBoundsInParent().getMaxY()){ //Проходит через высоту мишени

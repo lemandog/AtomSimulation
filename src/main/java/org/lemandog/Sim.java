@@ -5,13 +5,14 @@ import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
 import org.lemandog.util.Console;
 import org.lemandog.util.Output;
+import org.lemandog.util.Util;
 
 public class Sim {
     static Sim currentSim;
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
-    private static final double m_Cr=51.9961; //масса ХРОМА, а.е.м.
-    static final double m=m_Cr*1.660539040e-27; //масса ХРОМ, кг
-    private static final double d = 130*10e-12;//Диаметр хрома (м)
+    double m;         //кг
+    private final double d; //м
+    public GasTypes thisRunMaterial;
     int T;
     double p;
     int N;
@@ -37,11 +38,17 @@ public class Sim {
     Thread[] calculator;
 
     public Sim(){
-        p = Math.pow(Double.parseDouble(App.pressure.getText()),Double.parseDouble(App.pressurePow.getText()));
-        T = Integer.parseInt(App.tempAm.getText());
+        thisRunMaterial = Util.getMat();
+        Console.coolPrintout("Material is: "+thisRunMaterial.name() +" "+ thisRunMaterial.diameterRAW +" "+ thisRunMaterial.massRAW);
+        d = thisRunMaterial.diameter;
+        m = thisRunMaterial.mass;
+
+        p = Double.parseDouble(App.pressure.getText())*Math.pow(10,Double.parseDouble(App.pressurePow.getText())); //X*10^Y
+        T = Integer.parseInt(App.tempAm.getText()); //K
         N = Integer.parseInt(App.particleAm.getText());
         LEN = Integer.parseInt(App.stepsAm.getText());
-        this.lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
+
+        lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
         //Как сказано в Paticle, пользователь может сам ввести количество осей.
         //Конечно, я не знаю кому нужна пятимерная симуляция газа, но гибкость кода - важная часть ООП
         avilableDimensions = (int) App.dimensionCount.getValue();
@@ -92,6 +99,7 @@ public class Sim {
     }
     public static void genTest() {
     currentSim = new Sim();
+    EngineDraw.reset();
     EngineDraw.eSetup();
         for (int i = 0; i < currentSim.N; i++) {
             currentSim.container[i] = new Particle(i);

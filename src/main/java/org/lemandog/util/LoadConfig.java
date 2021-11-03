@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.lemandog.App;
+import org.lemandog.GasTypes;
 import org.lemandog.Sim;
 
 public class LoadConfig {
@@ -51,7 +52,8 @@ public class LoadConfig {
         layout.getChildren().add(new Label("3DNOT / Не отрисовывать 3Д. (Отключает и задержку!)"));
         layout.getChildren().add(new Label("Очереди:"));
         layout.getChildren().add(new Label("RUNAN - Добавить одну симуляцию. "));
-        layout.getChildren().add(new Label("RUNMO 10 -Добавить ещё 10 нынешних симуляций в очередь. "));
+        layout.getChildren().add(new Label("RUNMO 10 -Добавить ещё 10 симуляций с текущими настройками в очередь. "));
+        layout.getChildren().add(new Label("AURUM / Латинское название вещества из списка по нажатию \"Вещество в симуляции\""));
         layout.getChildren().add(new Label("Не обязательно указывать все команды. Конфигурационный файл"));
         layout.getChildren().add(new Label("может быть как и в одну команду, так и в двадцать."));
         layout.getChildren().add(new Label("Перетащите получившийся файл в бирюзовую панель."));
@@ -99,6 +101,11 @@ public class LoadConfig {
                 if (line.contains("VERGE")){App.bounceGenChance.setValue(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
                 if (line.contains("3DNOT")){Output.output3dCHK.setSelected(false); Output.output3D = false;}
                 if (line.contains("RUNAN")){App.simQueue.add(new Sim());} //double
+                for (int i = 0; i < GasTypes.values().length; i++) {
+                    if(line.contains(GasTypes.values()[i].name())){
+                        Util.chosen = GasTypes.values()[i];
+                    }
+                }
                 if (line.contains("RUNMO")){
                     int threa_ = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));
                     for (int i = 0; i < threa_; i++) {

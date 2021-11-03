@@ -15,7 +15,7 @@ import static org.lemandog.Sim.*;
 
 public class Particle{
     //Цвета состояний
-    Color activeCol = Color.WHITE;
+    Color activeCol;
     Color wallHitCol = Color.ORANGERED;
     Color TarHitCol = Color.LIME;
     Color GenHitCol = Color.VIOLET;
@@ -38,6 +38,7 @@ public class Particle{
     Cylinder paths = new Cylinder();
 
     Particle(int ordinal){ //Конструктор класса, вызывается при создании экземпляра
+        activeCol = currentSim.thisRunMaterial.particleCol;
         this.ordinal = ordinal; //Внутреннее порядковое число частицы. Нужно только для вывода (И, возможно, кривых методов вывода частиц)
         this.rand = new Random();//Генератор случайных чисел нужен для генерации скоростей и координат
 
@@ -55,6 +56,7 @@ public class Particle{
     }
 
     static double calcRandLen() {
+        //TODO: тут lambdaN бесконечен.
         double xMAX = 5*currentSim.lambdaN;
         double lambda= Math.random()*xMAX; //vxR
         double awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(currentSim.lambdaN,3))
@@ -69,6 +71,7 @@ public class Particle{
             awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(currentSim.lambdaN,3))
                     *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/currentSim.lambdaN),2))); //Значение функции в Х
         }
+
         return lambda;
     }
 
@@ -89,7 +92,7 @@ public class Particle{
     private double[] generateSpeed(boolean isFirstStep) {
         double[] product = new double[currentSim.maxDimensions]; //XYZ
         Arrays.fill(product,0);
-        double sv = Math.sqrt((Sim.k*currentSim.T)/Sim.m); // длина вектора
+        double sv = Math.sqrt((Sim.k*currentSim.T)/ currentSim.m); // длина вектора
         for (int i = 0; i < currentSim.avilableDimensions; i++) {
             product[i] = (rand.nextGaussian()*sv);
         }
@@ -108,10 +111,10 @@ public class Particle{
 
     public Thread CreateThread() {
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
+
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
             int stepsPassed = 0;
             while(active && stepsPassed<currentSim.LEN){ //Когда симуляция запущена и частица ещё не прошла шаги
-
                 if (currentSim.waitTimeMS>=0 && Output.output3D){//Ожидание?
                     try {
                         Thread.sleep(currentSim.waitTimeMS);
@@ -122,13 +125,15 @@ public class Particle{
                 //Нынешнее приращение
                 double dS = freeRunLen/Math.sqrt(Math.pow(speeds[0],
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
+
                 //Новые координаты
                 Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-
                 for(int i = 0; i<currentSim.avilableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dS * speeds[i];
                 }
+
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
+
 
                 paths = EngineDraw.createConnection(oldCord,newCord);
                 //длина пробега
