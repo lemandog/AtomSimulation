@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
@@ -124,6 +123,7 @@ public class Util {
 
     public static void constructAWinMatterChooser() {
         Stage matterCh = new Stage();
+        matterCh.setTitle("Вещество в симуляции");
         matterCh.getIcons().add(new Image("/matterChooser.png"));
         matterCh.setResizable(false);
         VBox layout = new VBox();
@@ -144,7 +144,7 @@ public class Util {
             });
             matter.getChildren().add(new Label(GasTypes.values()[i].name()));
             matter.getChildren().add(new Label(" А.Е.М. "+GasTypes.values()[i].massRAW));
-            matter.getChildren().add(new Label(" Диаметр(пм) "+GasTypes.values()[i].massRAW));
+            matter.getChildren().add(new Label(" Диаметр(пм) "+GasTypes.values()[i].diameterRAW));
             matter.setBackground(new Background(
                     new BackgroundFill(
                             new LinearGradient(0, 0, 0, 1, true,
