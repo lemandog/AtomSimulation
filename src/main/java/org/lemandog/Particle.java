@@ -56,7 +56,6 @@ public class Particle{
     }
 
     static double calcRandLen() {
-        //TODO: тут lambdaN бесконечен.
         double xMAX = 5*currentSim.lambdaN;
         double lambda= Math.random()*xMAX; //vxR
         double awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(currentSim.lambdaN,3))
