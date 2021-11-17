@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import javafx.scene.image.Image;
 import org.lemandog.util.Console;
+import org.lemandog.util.DebugTools;
 import org.lemandog.util.Output;
 import org.lemandog.util.Util;
 
@@ -150,6 +151,7 @@ public class Sim {
             Console.coolPrintout("SIMULATION RUN IS OVER!");
             EngineDraw.DrawingThreadFire(container);
         Output.toFile();
+        DebugTools.close();
         simIsAlive = false;
         if (!App.simQueue.isEmpty()){
             currentSim = App.simQueue.pop();

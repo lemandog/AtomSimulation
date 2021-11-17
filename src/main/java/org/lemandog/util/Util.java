@@ -147,15 +147,14 @@ public class Util {
             matter.getChildren().add(new Label(" Диаметр(пм) "+GasTypes.values()[i].diameterRAW));
             matter.setBackground(new Background(
                     new BackgroundFill(
-                            new LinearGradient(0, 0, 0, 1, true,
+                            new LinearGradient(1, 0, 0.4, 1, true,
                                     CycleMethod.NO_CYCLE,
                                     new Stop(0, GasTypes.values()[i].particleCol),
                                     new Stop(1, Color.WHITESMOKE)
-                            ), CornerRadii.EMPTY, Insets.EMPTY
-                    ),
+                            ), CornerRadii.EMPTY, Insets.EMPTY),
                     new BackgroundFill(
                             new RadialGradient(
-                                    0, 0, 0.5, 0.5, 0.5, true,
+                                    0.9, 0.9, 0.5, 0.5, 0.5, true,
                                     CycleMethod.NO_CYCLE,
                                     new Stop(0, GasTypes.values()[i].particleCol),
                                     new Stop(1, Color.WHITESMOKE)),

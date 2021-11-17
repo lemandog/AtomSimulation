@@ -47,7 +47,7 @@ public class Output {
     public static int lastPrintStep = 1;
     public static double DOTSIZE;
     static Stage setOutput = new Stage();
-    static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
+    public static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
     static FileWriter global;
     static FileWriter global2;
     public static CheckBox pathDrawing;

@@ -18,6 +18,7 @@ public class LoadConfig {
     public static void constructConfigInfoFrame(){
         Stage info = new Stage();
         VBox layout = new VBox();
+        info.setResizable(false);
         info.getIcons().add(new Image("/config.png"));
         info.setTitle("Конфигурации");
         Scene infoPane = new Scene(layout);
@@ -103,7 +104,7 @@ public class LoadConfig {
                 if (line.contains("RUNAN")){App.simQueue.add(new Sim());} //double
                 for (int i = 0; i < GasTypes.values().length; i++) {
                     if(line.contains(GasTypes.values()[i].name())){
-                        Util.chosen = GasTypes.values()[i];
+                        Util.chosen = GasTypes.values()[i+1];
                     }
                 }
                 if (line.contains("RUNMO")){

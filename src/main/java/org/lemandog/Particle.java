@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import org.lemandog.util.Console;
+import org.lemandog.util.DebugTools;
 import org.lemandog.util.Output;
 
 import java.util.Arrays;
@@ -21,7 +22,8 @@ public class Particle{
     Color GenHitCol = Color.VIOLET;
 
     int ordinal;
-    double[] coordinates;
+    double dS;
+    double[] coordinates; //XYZ
     double[] speeds;
     double freeRunLen;
     Random rand;
@@ -92,21 +94,28 @@ public class Particle{
         double[] product = new double[currentSim.maxDimensions]; //XYZ
         Arrays.fill(product,0);
         double sv = Math.sqrt((Sim.k*currentSim.T)/ currentSim.m); // длина вектора
+
         for (int i = 0; i < currentSim.avilableDimensions; i++) {
-            product[i] = (rand.nextGaussian()*sv);
+            product[i] = rand.nextGaussian()*sv;
         }
-        if(currentSim.avilableDimensions>2){
-        while(getPosChance(product) && isFirstStep){
+        if(currentSim.avilableDimensions>2 && getPosChance(product) && isFirstStep){
             for (int i = 0; i < currentSim.avilableDimensions; i++) {
-                product[i] = (rand.nextGaussian()*sv);
+                product[i] = rand.nextGaussian()*sv;
             }
         }
+        if(isFirstStep){
+            product[1] = -Math.abs(product[1]);
         }
-        if(isFirstStep && currentSim.avilableDimensions>2){
-            product[1] = -Math.abs(rand.nextGaussian()*sv);}
-
         return product;
     }
+
+    private boolean getPosChance(double[] product) {
+        double chance = Math.random();
+        double func = product[2]/(Math.sqrt(Math.pow(product[1],2) + Math.pow(product[0],2))+ Math.pow(product[2],2));
+        //Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
+        return chance > func;
+    }
+
 
     public Thread CreateThread() {
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
@@ -120,17 +129,19 @@ public class Particle{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }}
+
                 DrawingThreadFire(new Particle[]{this});
                 //Нынешнее приращение
-                double dS = freeRunLen/Math.sqrt(Math.pow(speeds[0],
+                dS = freeRunLen/Math.sqrt(Math.pow(speeds[0],
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
+                //Так как далее dS умножается на соответсвующую скорость по оси, считаю то что выше верным.
 
                 //Новые координаты
                 Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
                 for(int i = 0; i<currentSim.avilableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dS * speeds[i];
                 }
-
+                DebugTools.CSVDebug(speeds);
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
 
 
@@ -203,11 +214,12 @@ public class Particle{
     }
 
     private void toCenter(Point3D oldCord) {
-        Point3D product = currentSim.center.interpolate(oldCord,(Math.random()/2));//Точка между старой координатой и центром в случайной линейной пропорции
+        Point3D product = currentSim.center.interpolate(oldCord,(1 - Math.random()/20));//Точка между старой координатой и центром в случайной линейной пропорции
         coordinates[0] = product.getX();
         coordinates[1] = product.getY();
         coordinates[2] = product.getZ();
     }
+
 
     private boolean bounceChance(String type) {
         if (type.equals("WALL")) {
@@ -215,11 +227,7 @@ public class Particle{
         }
         return !(Math.random() < currentSim.genBounce);
     }
-    private boolean getPosChance(double[] product) {
-        double chance = Math.random();
-        double func = Math.cos(Math.PI/2 - Math.atan(product[1]/(Math.sqrt(Math.pow(product[2],2) + Math.pow(product[0],2)))));
-        return chance > func;
-    }
+
 
     public void getCurrSphere() {
         obj.setMaterial(thisParticleMat);
