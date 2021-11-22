@@ -157,10 +157,12 @@ public class Sim {
             currentSim = App.simQueue.pop();
             try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
                 Console.coolPrintout("Another Sim will start shortly...");
+                java.awt.Toolkit.getDefaultToolkit().beep();
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) {}
             Platform.runLater(() -> currentSim.start()); //Надо обязательно делать это на потоке JavaFX
         }
+        java.awt.Toolkit.getDefaultToolkit().beep();
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);
         mainContr.start();

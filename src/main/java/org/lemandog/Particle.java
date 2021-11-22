@@ -111,7 +111,8 @@ public class Particle{
 
     private boolean getPosChance(double[] product) {
         double chance = Math.random();
-        double func = product[2]/(Math.sqrt(Math.pow(product[1],2) + Math.pow(product[0],2))+ Math.pow(product[2],2));
+        double func = Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
+        //product[2]/(Math.sqrt(Math.pow(product[1],2) + Math.pow(product[0],2))+ Math.pow(product[2],2));
         //Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
         return chance > func;
     }
