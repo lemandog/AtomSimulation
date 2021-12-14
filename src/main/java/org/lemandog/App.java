@@ -36,6 +36,7 @@ public class App extends Application {
     public static TextField particleAm;
     public static TextField stepsAm;
     public static TextField tempAm;
+    public static TextField tempSourceAm;
     public static TextField pressurePow;
     public static TextField pressure;
 
@@ -83,6 +84,13 @@ public class App extends Application {
         tempAmText.setFont(mainFont);
         userControlPane.getChildren().add(tempAm);
         userControlPane.getChildren().add(tempAmText);
+
+        tempSourceAm = new TextField("1200"); //Поле для ввода температуры
+        Label tempAmSourceText = new Label("Температура испарителя (в кельвинах)");
+        tempAmSourceText.setLabelFor(tempSourceAm);
+        tempAmSourceText.setFont(mainFont);
+        userControlPane.getChildren().add(tempSourceAm);
+        userControlPane.getChildren().add(tempAmSourceText);
 
         xFrameLen = new TextField("10");
         Label xFrameLenText = new Label("Размеры камеры по оси X");

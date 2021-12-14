@@ -94,7 +94,7 @@ public class Particle{
         double[] product = new double[currentSim.maxDimensions]; //XYZ
         Arrays.fill(product,0);
         double sv = Math.sqrt((Sim.k*currentSim.T)/ currentSim.m); // длина вектора
-
+        if(isFirstStep){sv = Math.sqrt((Sim.k*currentSim.TSource)/ currentSim.m);} // длина вектора
         for (int i = 0; i < currentSim.avilableDimensions; i++) {
             product[i] = rand.nextGaussian()*sv;
         }
@@ -112,8 +112,6 @@ public class Particle{
     private boolean getPosChance(double[] product) {
         double chance = Math.random();
         double func = Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
-        //product[2]/(Math.sqrt(Math.pow(product[1],2) + Math.pow(product[0],2))+ Math.pow(product[2],2));
-        //Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
         return chance > func;
     }
 
@@ -162,14 +160,10 @@ public class Particle{
 
                 if (tarIsHit){ //Запись столкновений в CSV и или в PNG
                     Output.CSVStateReact(obj.getTranslateX(),obj.getTranslateZ());
-                    Output.picStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     drawAPath(paths); //Отрисовка пути
                 }
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
-                if (Output.outputCSV){ //Запись в расширенный CSV
-                    Output.insertValuesToSCV(coordinates,stepsPassed,ordinal);
-                }
             }
             if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
             Console.particleOut(ordinal, timesHitWall, timesHitGen, tarIsHit, stepsPassed);

@@ -43,8 +43,10 @@ public class LoadConfig {
         layout.getChildren().add(new Label("TEXTW / Текстовый вывод"));
         layout.getChildren().add(new Label("PNGZA / Плотность заселения (PNG)"));
         layout.getChildren().add(new Label("CSVZA / Плотность заселения (CSV)"));
+        layout.getChildren().add(new Label("CSVZE / Плотность заселения (CSV) на подложке"));
         layout.getChildren().add(new Label("CSVOU / Вывод в CSV"));
         layout.getChildren().add(new Label("PALIT 1 / Выбор палитры"));
+        layout.getChildren().add(new Label("RESOL 20 / Делений на метр в выводе (для csv и png)"));
         layout.getChildren().add(new Label("START / Запустить симуляцию (После всех прочих команд!)"));
         layout.getChildren().add(new Label("DIMEN 3 / Количество осей"));
         layout.getChildren().add(new Label("WAITT 5 / Задержка между шагами"));
@@ -78,6 +80,7 @@ public class LoadConfig {
                 if (line.contains("PARTS")){App.particleAm.setText(line.trim().replaceAll("PARTS ",""));} //int
                 if (line.contains("STEPS")){App.stepsAm.setText(line.trim().replaceAll("STEPS ",""));} //int
                 if (line.contains("TEMPE")){App.tempAm.setText(line.trim().replaceAll("TEMPE ",""));} //int
+                if (line.contains("TEMPS")){App.tempSourceAm.setText(line.trim().replaceAll("TEMPS ",""));} //int
                 if (line.contains("CAMSX")){App.xFrameLen.setText(line.trim().replaceAll("CAMSX ",""));} //double
                 if (line.contains("CAMSY")){App.yFrameLen.setText(line.trim().replaceAll("CAMSY ",""));} //double
                 if (line.contains("CAMSZ")){App.zFrameLen.setText(line.trim().replaceAll("CAMSZ ",""));} //double
@@ -94,8 +97,10 @@ public class LoadConfig {
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
                 if (line.contains("CSVZA")){Output.outputPicCSV = true;} //bool
+                if (line.contains("CSVZE")){Output.outputPicCSVPost = true;} //bool
                 if (line.contains("CSVOU")){Output.outputCSV = true;}
                 if (line.contains("PALIT")){Output.outputPalette.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
+                if (line.contains("RESOL")){Output.outputAskPicResolution.setValue(Integer.parseInt(line.trim().replaceAll("RESOL ","")));}
                 if (line.contains("START")){App.startSimButt.fire();} //bool
                 if (line.contains("WAITT")){App.waitTime.setValue(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
                 if (line.contains("VERWA")){App.bounceWallChance.setValue(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double

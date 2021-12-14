@@ -20,10 +20,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Vector;
+import java.util.*;
 
 import static org.lemandog.App.mainFont;
 import static org.lemandog.App.outputMode;
+import static org.lemandog.Sim.currentSim;
 import static org.lemandog.util.SwingFXUtils.fromFXImage;
 
 public class Output {
@@ -35,21 +36,24 @@ public class Output {
     public static boolean output = false;
     public static boolean outputPic = false;
     public static boolean outputPicCSV = false;
+    public static boolean outputPicCSVPost = false;
     public static boolean outputCSV = false;
     public static boolean output3D = true;
     public static CheckBox output3dCHK;
     public static CheckBox outputAskPic;
     public static CheckBox outputAskCSVHits;
+    public static CheckBox outputAskCSVHitsPost;
     public static CheckBox outputAskGraph;
     public static Slider outputAskPicResolution;
     public static Slider outputPalette;
     public static int[][] picState;
+    static Vector<Double> X = new Vector<>();
+    static Vector<Double> Z = new Vector<>();
     public static int lastPrintStep = 1;
     public static double DOTSIZE;
     static Stage setOutput = new Stage();
     public static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
-    static FileWriter global;
-    static FileWriter global2;
+    static FileWriter Hits, enchantedHits;
     public static CheckBox pathDrawing;
 
     static final String LINE_END = "\r\n";
@@ -121,20 +125,26 @@ public class Output {
         outputAskCSVHits.setOnAction(event -> outputPicCSV = !outputPicCSV);
         compOutput.getChildren().add(outputAskCSVHits);
 
+        outputAskCSVHitsPost = new CheckBox();
+        outputAskCSVHitsPost.setText("Вывод плотности заселения в CSV с пост-обработкой?");
+        outputAskCSVHitsPost.setFont(mainFont);
+        outputAskCSVHitsPost.setOnAction(event -> outputPicCSVPost = !outputPicCSVPost);
+        compOutput.getChildren().add(outputAskCSVHitsPost);
+
         Label resolutionWarnText = new Label("Не ставьте большое разрешение для больших подложек!");
         resolutionWarnText.setFont(mainFont);
         compOutput.getChildren().add(resolutionWarnText);
 
         outputAskPicResolution = new Slider();
         outputAskPicResolution.setMaxWidth(setOutputSc.getWidth()/3);
-        outputAskPicResolution.setValue(0.5);
-        Label resolutionText = new Label("Разрешение сейчас: " + String.format("%3.2f", outputAskPicResolution.getValue()));
+        outputAskPicResolution.setValue(5);
+        Label resolutionText = new Label("Разрешение сейчас: " + (int)outputAskPicResolution.getValue());
         resolutionText.setFont(mainFont);
         outputAskPicResolution.setOnMouseReleased((event) -> {
-            resolutionText.setText("Разрешение сейчас: "+ String.format("%3.2f", outputAskPicResolution.getValue())); // Три знака всего, два после запятой
+            resolutionText.setText("Разрешение сейчас: "+ (int)outputAskPicResolution.getValue()); // Три знака всего, два после запятой
         });
-        outputAskPicResolution.setMin(0.01);
-        outputAskPicResolution.setMax(1);
+        outputAskPicResolution.setMin(1);
+        outputAskPicResolution.setMax(100);
 
         compOutput.getChildren().add(resolutionText);
         compOutput.getChildren().add(outputAskPicResolution);
@@ -175,41 +185,76 @@ public class Output {
     }
 
     public static void toFile() {
+        double Xmax = currentSim.TAR_SIZE[0];
+        double Zmax = currentSim.TAR_SIZE[2];
+        int DOTSIZE = (int) outputAskPicResolution.getValue();
+        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)][(int) (Zmax * (double) DOTSIZE)];
+        if (outputPicCSV) {
+            try {
+                for (int i = 0; i < X.size(); i++) {
+                    Hits.write(X.get(i) +SEPARATOR+ Z.get(i) + LINE_END);
+                }
+                Hits.close();
+                System.out.println("GLOBAL STREAM Hits CLOSED");
+                Hits =null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (outputPicCSVPost || outputPic) {
+            for (int[] ints : CORD) {
+                Arrays.fill(ints, 0);
+            }
+            int height = CORD.length;
+            int width = CORD[0].length;
+
+            for (int i = 0; i < X.size(); ++i) {
+
+                for (int x = 0; x < width; ++x) {
+                    for (int y = 0; y < height; ++y) {
+                        if ((double) (1.0F / (float) DOTSIZE * (float) (x - 1)) - Xmax / 2.0D < X.get(i) &&
+                                X.get(i) < (double) (1.0F / (float) DOTSIZE * (float) x) - Xmax / 2.0D &&
+                                (double) (1.0F / (float) DOTSIZE * (float) (y - 1)) - Zmax / 2.0D < Z.get(i) &&
+                                Z.get(i) < (double) (1.0F / (float) DOTSIZE * (float) y) - Zmax / 2.0D) {
+                            CORD[x][y]++;
+                        }
+
+                    }
+                }
+
+            }
+            if(outputPicCSVPost){
+                try {
+                    for (int x = 0; x < width; ++x) {
+                        for (int y = 0; y < height; ++y) {
+                            enchantedHits.write(CORD[x][y] + SEPARATOR);
+                        }
+                        enchantedHits.write(LINE_END);
+                    }
+                    enchantedHits.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("GLOBAL DATA DEALER STREAM CLOSED");
+                enchantedHits = null;
+            }
+        }
         if (outputPic){
-            File outputFile = new File(selectedPath.getAbsolutePath() + "/hitsDetector.png");
+            File outputFile = new File(selectedPath.getAbsolutePath() + "/"+App.simQueue.size()+"hitsDetector.png");
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
-                Image res = toImage(picState); //Это javafx image
+                Image res = toImage(CORD); //Это javafx image
                 BufferedImage tmp = fromFXImage(res, null); //Это awt
                 //Конвертация в awt, потому как оно почему-то возвращает awt image, а не buffered
                 assert tmp != null;
-                java.awt.Image res2 = tmp.getScaledInstance(1200,1200,BufferedImage.SCALE_FAST);
-                //Конвертация обратно в buffered
-                BufferedImage bImage = new BufferedImage(res2.getWidth(null), res2.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+                java.awt.Image resize = tmp.getScaledInstance(tmp.getWidth(null)*10, tmp.getHeight(null)*10,BufferedImage.SCALE_FAST);
+                BufferedImage bImage = new BufferedImage(resize.getWidth(null),resize.getHeight(null), BufferedImage.TYPE_INT_ARGB);
                 Graphics2D bGr = bImage.createGraphics();
-                bGr.drawImage(res2, 0, 0, null);
+                bGr.drawImage(resize, 0, 0, null);
                 bGr.dispose();
                 //Пишем bufferedImage стандартной библиотекой
                 ImageIO.write(bImage, "png", outputFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (outputCSV) {
-            try {
-                global.close();
-                System.out.println("GLOBAL STREAM ParticleStates CLOSED");
-                global=null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (outputPicCSV) {
-            try {
-                global2.close();
-                System.out.println("GLOBAL STREAM Hits CLOSED");
-                global2=null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -220,105 +265,60 @@ public class Output {
         PixelReader randColRead = palette.getPixelReader();
         return randColRead.getColor(sel,0);}
 
-    private static Image toImage(int[][] modelRes){
-        WritableImage writeHere = new WritableImage((int) xSize,(int) zSize);
+    private static Image toImage(int[][] CORD){
+        int height = CORD.length;
+        int width = CORD[0].length;
+        WritableImage writeHere = new WritableImage(width,height);
         PixelWriter outPix = writeHere.getPixelWriter();
 
         int biggest = 0;
-        for (int x = 0; x<(int) xSize;x++){
-            for (int y = 0; y<(int) zSize;y++) {
-                if(modelRes[x][y] > biggest){biggest = modelRes[x][y];} //Ищем наибольшее
+        for (int x = 0; x<width;x++){
+            for (int y = 0; y<height;y++) {
+                if(CORD[x][y] > biggest){biggest = CORD[x][y];} //Ищем наибольшее
             }}
+
 
         biggest = biggest/((int)palette.getWidth()); //делим на количество цветов в палитре, так, что значения в диапазоне 0-9
 
-        for (int x = 0; x<(int)xSize;x++){
-            for (int y = 0; y<(int)zSize;y++) {
-                modelRes[x][y] = modelRes[x][y]/(biggest+1); //Привод к нужным для вывода значениям
+        for (int x = 0; x<width;x++){
+            for (int y = 0; y<height;y++) {
+                CORD[x][y] = CORD[x][y]/(biggest+1); //Привод к нужным для вывода значениям
             }}
 
-        for (int x = 0; x<(int)xSize;x++){
-            for (int y = 0; y<(int)zSize;y++) {
-                outPix.setColor(x,y,colSel(modelRes[x][y]));//Вывод из палитры
-            }}
+        for (int x = 0; x<width;x++){
+            for (int y = 0; y<height;y++) {
+                outPix.setColor(x,y,colSel(CORD[x][y]));//Вывод из палитры
+            }
+        }
         return writeHere;
     }
-    public static void picStateReact(double xCord, double zCord){
-        if (outputPic){
-            fromhere:
-            for(double x = 1; x< xSize; x += DOTSIZE){
-                for(double y = 1; y< zSize; y += DOTSIZE){
-                    if( ((1f/DOTSIZE)*(x-1) - xSize/2 <xCord/DOTSIZE && xCord/DOTSIZE<(1f/DOTSIZE)*x - xSize/2)
-                            &&((1f/DOTSIZE)*(y-1) - zSize/2<zCord/DOTSIZE && zCord/DOTSIZE<(1f/DOTSIZE)*y - zSize/2)) {
-                        picState[(int) (x/DOTSIZE)][(int) (y/DOTSIZE)]++;
-                        break fromhere;
-                    }
-
-                }
-            }
-
-        }
-    }
-
-    synchronized public static void insertValuesToSCV(double[] cord, int passed, int ordinal){
-        if (global == null){
-            try {
-                LocalDateTime main = LocalDateTime.now();
-                File csv = new File(selectedPath.getAbsolutePath()
-                        + "/"+App.simQueue.size()+"ParticleStates"+sdfF.format(main)+".csv");
-                global = new FileWriter(csv);
-                Vector<String> ve = new Vector<>(0);
-                for (int i = 0; i < App.dimensionCount.getValue(); i++) {
-                    ve.add("КООРДИНАТА "+i +SEPARATOR);
-                }
-                ve.add("ПРОШЕДШИЕ ШАГИ "+SEPARATOR);
-                ve.add("НОМЕР ЧАСТИЦЫ ИЗ "+ App.particleAm.getText()+SEPARATOR);
-                ve.add("ТЕМПЕРАТУРА: "+ App.tempAm.getText()+SEPARATOR);
-                for (String s : ve) {
-                    global.write(s);
-                }
-                global.write(LINE_END);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        Vector<String> ve = new Vector<>(0);
-        for (double v : cord) {
-            ve.add(v + SEPARATOR);
-        }
-        ve.add(passed + SEPARATOR);
-        ve.add(ordinal + SEPARATOR);
-        String[] output = new String[ve.size()]; //Мы не знаем, сколько там измерений
-        for (int i = 0; i < ve.size(); i++) {
-            output[i] = ve.get(i);
-        }
-        try {
-            for (String s : output) {
-                global.write(s);
-            }
-            global.write(LINE_END);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    synchronized public static void CSVStateReact(double translateX, double translateZ) {
+    public static void init(){
         if (outputPicCSV){
-        if (global2 == null){
-            LocalDateTime main = LocalDateTime.now();
-            File csv = new File( selectedPath.getAbsolutePath()
-                    + "/"+App.simQueue.size()+"Hits"+sdfF.format(main)+".csv");
-            try {
-                global2 = new FileWriter(csv);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (Hits == null){
+                LocalDateTime main = LocalDateTime.now();
+                File csv = new File( selectedPath.getAbsolutePath()
+                        + "/"+App.simQueue.size()+"Hits"+sdfF.format(main)+".csv");
+                try {
+                    Hits = new FileWriter(csv);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-            try {
-                global2.write(translateX +SEPARATOR+ translateZ + LINE_END);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if(outputPicCSVPost) {
+            if (enchantedHits == null) {
+                File csvOut = new File(selectedPath.getAbsolutePath()
+                        + "/out.csv");
+                try {
+                    enchantedHits = new FileWriter(csvOut);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+    synchronized public static void CSVStateReact(double translateX, double translateZ) {
+        X.add(translateX);
+        Z.add(translateZ);
     }
 }

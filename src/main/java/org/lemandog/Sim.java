@@ -9,17 +9,17 @@ import org.lemandog.util.Output;
 import org.lemandog.util.Util;
 
 public class Sim {
-    static Sim currentSim;
+    public static Sim currentSim;
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
     double m;         //кг
     private final double d; //м
     public GasTypes thisRunMaterial;
-    int T;
+    int T, TSource;
     double p;
     int N;
     int LEN;
     double[] CHA_SIZE; //XYZ
-    double[] TAR_SIZE; //XYZ
+    public double[] TAR_SIZE; //XYZ
     double[] GEN_SIZE; //XYZ
     double lambdaN;
     Point3D center;
@@ -46,6 +46,7 @@ public class Sim {
 
         p = Double.parseDouble(App.pressure.getText())*Math.pow(10,Double.parseDouble(App.pressurePow.getText())); //X*10^Y
         T = Integer.parseInt(App.tempAm.getText()); //K
+        TSource = Integer.parseInt(App.tempSourceAm.getText()); //K
         N = Integer.parseInt(App.particleAm.getText());
         LEN = Integer.parseInt(App.stepsAm.getText());
 
@@ -85,12 +86,10 @@ public class Sim {
         Console.setAm();
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
+        Output.init();
         if(Output.outputPic) {
             Output.DOTSIZE = Output.outputAskPicResolution.getValue();
-            Output.xSize = CHA_SIZE[0]/Output.DOTSIZE;
-            Output.zSize = CHA_SIZE[2]/Output.DOTSIZE;
             Output.palette = new Image("/heatmap" + (int) Output.outputPalette.getValue() + ".png");
-            Output.picState = new int[(int) Output.xSize+1][(int) Output.zSize+1];
         }
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
         for (int i = 0; i < avilableStreams; i++) {
