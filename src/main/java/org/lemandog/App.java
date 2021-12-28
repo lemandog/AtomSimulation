@@ -45,8 +45,8 @@ public class App extends Application {
     public static Button startSimButt;
 
     public static ArrayDeque<Sim> simQueue = new ArrayDeque<>();
-    public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 24); //Подгрузка шрифта
-    public static final Font mainFont2 = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 20); //Подгрузка шрифта
+    public static final Font mainFont = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 20); //Подгрузка шрифта
+    public static final Font mainFont2 = Font.loadFont(Objects.requireNonNull(App.class.getResource("/gost-type-a.ttf")).toExternalForm(), 16); //Подгрузка шрифта
 
     @Override
     public void start(Stage stage){
@@ -61,7 +61,7 @@ public class App extends Application {
 
         userControlWindows.setOnCloseRequest(event -> System.exit(0));
 
-        Scene userControl = new Scene(userControlPane,500,730); //Новое окно с компоновкой
+        Scene userControl = new Scene(userControlPane,450,670); //Новое окно с компоновкой
         userControlWindows.setScene(userControl);
         //Добавляем органы управления
         particleAm = new TextField("500"); //Поле для ввода кол-ва частиц

@@ -28,6 +28,7 @@ public class LoadConfig {
         layout.getChildren().add(new Label("PARTS 500 / Количество частиц"));
         layout.getChildren().add(new Label("STEPS 5000 / Количество максимальное шагов"));
         layout.getChildren().add(new Label("TEMPE 273 / Температура, в кельвинах (>0)"));
+        layout.getChildren().add(new Label("TEMPS 1200 / Температура источника, в кельвинах (>0)"));
         layout.getChildren().add(new Label("CAMSX 5 (Лево/право)/ Размеры камеры по осям. Могут быть дробными."));
         layout.getChildren().add(new Label("CAMSY 5 (Вверх/вниз)"));
         layout.getChildren().add(new Label("CAMSZ 5 (Дальше/ближе)"));
