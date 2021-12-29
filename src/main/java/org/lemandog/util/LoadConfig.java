@@ -110,7 +110,7 @@ public class LoadConfig {
                 if (line.contains("RUNAN")){App.simQueue.add(new Sim());} //double
                 for (int i = 0; i < GasTypes.values().length; i++) {
                     if(line.contains(GasTypes.values()[i].name())){
-                        Util.chosen = GasTypes.values()[i+1];
+                        Util.chosen = GasTypes.values()[i];
                     }
                 }
                 if (line.contains("RUNMO")){
