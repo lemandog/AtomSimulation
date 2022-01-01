@@ -183,7 +183,7 @@ public class Output {
         double Xmax = currentSim.TAR_SIZE[0];
         double Zmax = currentSim.TAR_SIZE[2];
         int DOTSIZE = (int) outputAskPicResolution.getValue();
-        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)][(int) (Zmax * (double) DOTSIZE)];
+        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+1][(int) (Zmax * (double) DOTSIZE)+1];
         if (outputPicCSV) {
             try {
                 for (int i = 0; i < X.size(); i++) {
@@ -216,7 +216,7 @@ public class Output {
 
                     }
                 }
-
+                if (i%X.size() == 0){System.out.println("progress: " + ((double)i/X.size())*100 + " %");}
             }
             if(outputPicCSVPost){
                 try {
