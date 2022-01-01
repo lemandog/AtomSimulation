@@ -90,7 +90,7 @@ public class Sim {
         Console.setAm();
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
-        Output.init();
+
         if(Output.outputPic) {
             Output.DOTSIZE = Output.outputAskPicResolution.getValue();
             Output.palette = new Image("/heatmap" + (int) Output.outputPalette.getValue() + ".png");
@@ -123,6 +123,7 @@ public class Sim {
     public void start() {
         currentSim = new Sim(); //Установка выбраных параметров
         if (!selectedPath.exists()){selectedPath.mkdir();}
+        Output.init();
         currentSim.simIsAlive = true;
         EngineDraw.reset();
         EngineDraw.eSetup();
