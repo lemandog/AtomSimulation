@@ -14,6 +14,8 @@ import org.lemandog.App;
 import org.lemandog.GasTypes;
 import org.lemandog.Sim;
 
+import static org.lemandog.Sim.currentSim;
+
 public class LoadConfig {
     public static void constructConfigInfoFrame(){
         Stage info = new Stage();
@@ -94,7 +96,7 @@ public class LoadConfig {
                 if (line.contains("ZTARS")){App.targetSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZTARS ","")));} //double
                 if (line.contains("XGENE")){App.genSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XGENE ","")));} //double
                 if (line.contains("ZGENE")){App.genSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZGENE ","")));} //double
-                if (line.contains("DIRPA")){Output.selectedPath = (new File((line.trim().replaceAll("DIRPA ",""))));} //str
+                if (line.contains("DIRPA")){Output.choDir.setText(line.trim().replaceAll("DIRPA ",""));} //str
                 if (line.contains("TEXTW")){Output.output = true;} //bool
                 if (line.contains("PNGZA")){Output.outputPic = true;} //bool
                 if (line.contains("CSVZA")){Output.outputPicCSV = true;} //bool

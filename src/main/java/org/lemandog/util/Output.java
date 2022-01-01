@@ -13,6 +13,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.lemandog.App;
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -52,9 +53,9 @@ public class Output {
     public static int lastPrintStep = 1;
     public static double DOTSIZE;
     static Stage setOutput = new Stage();
-    public static File selectedPath = new File(System.getProperty("user.home") + "/Desktop");
     static FileWriter Hits, enchantedHits;
     public static CheckBox pathDrawing;
+    public static Label choDir = new Label();
 
     static final String LINE_END = "\r\n";
     static final String SEPARATOR = ";";
@@ -67,17 +68,11 @@ public class Output {
 
 
         Button dirChoBut = new Button("Выбор директории вывода");
-        Label choDir = new Label();
+
         choDir.setFont(mainFont);
-        choDir.setText(selectedPath.getAbsolutePath());
         dirChoBut.setFont(mainFont);
-        dirChoBut.setOnAction(e -> {
-            selectedPath = directoryChooserOutputPath.showDialog(setOutput);
-            if(selectedPath == null) {
-                selectedPath = new File(System.getProperty("user.home") + "/Desktop");
-            }
-            choDir.setText(selectedPath.getAbsolutePath());
-        });
+        choDir.setText(FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath());
+        dirChoBut.setOnAction(e -> choDir.setText(directoryChooserOutputPath.showDialog(setOutput).getAbsolutePath()));
         compOutput.getChildren().add(dirChoBut);
         compOutput.getChildren().add(choDir);
 
@@ -240,7 +235,7 @@ public class Output {
             }
         }
         if (outputPic){
-            File outputFile = new File(selectedPath.getAbsolutePath() + "/"+App.simQueue.size()+"hitsDetector.png");
+            File outputFile = new File(currentSim.selectedPath.getAbsolutePath() + "/"+App.simQueue.size()+"hitsDetector.png");
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
@@ -296,7 +291,7 @@ public class Output {
         if (outputPicCSV){
             if (Hits == null){
                 LocalDateTime main = LocalDateTime.now();
-                File csv = new File( selectedPath.getAbsolutePath()
+                File csv = new File( currentSim.selectedPath.getAbsolutePath()
                         + "/"+App.simQueue.size()+"Hits"+sdfF.format(main)+".csv");
                 try {
                     Hits = new FileWriter(csv);
@@ -307,7 +302,7 @@ public class Output {
         }
         if(outputPicCSVPost) {
             if (enchantedHits == null) {
-                File csvOut = new File(selectedPath.getAbsolutePath()
+                File csvOut = new File(currentSim.selectedPath.getAbsolutePath()
                         + "/out.csv");
                 try {
                     enchantedHits = new FileWriter(csvOut);

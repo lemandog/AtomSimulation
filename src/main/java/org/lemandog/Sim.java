@@ -8,6 +8,8 @@ import org.lemandog.util.DebugTools;
 import org.lemandog.util.Output;
 import org.lemandog.util.Util;
 
+import java.io.File;
+
 public class Sim {
     public static Sim currentSim;
     static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
@@ -27,6 +29,7 @@ public class Sim {
     Particle[] container; //XYZ
 
     static int avilableStreams = Runtime.getRuntime().availableProcessors();
+    public File selectedPath;
     int avilableDimensions;
     int maxDimensions = 3;
     int nbRunning = 0;
@@ -39,6 +42,7 @@ public class Sim {
     Thread[] calculator;
 
     public Sim(){
+        selectedPath = new File(Output.choDir.getText());
         thisRunMaterial = Util.getMat();
         Console.coolPrintout("Material is: "+thisRunMaterial.name() +" "+ thisRunMaterial.diameterRAW +" "+ thisRunMaterial.massRAW);
         d = thisRunMaterial.diameter;
@@ -118,6 +122,7 @@ public class Sim {
 
     public void start() {
         currentSim = new Sim(); //Установка выбраных параметров
+        if (!selectedPath.exists()){selectedPath.mkdir();}
         currentSim.simIsAlive = true;
         EngineDraw.reset();
         EngineDraw.eSetup();
