@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import static org.lemandog.Sim.currentSim;
 import static org.lemandog.util.Output.*;
 
 public class DebugTools {
@@ -16,7 +17,7 @@ public class DebugTools {
         if (GLOBAL_DEBUG){
             if (global2 == null){
                 LocalDateTime main = LocalDateTime.now();
-                File csv = new File( selectedPath.getAbsolutePath()
+                File csv = new File( currentSim.selectedPath.getAbsolutePath()
                         + "/"+sdfF.format(main)+"1.csv");
                 try {
                     global2 = new FileWriter(csv);

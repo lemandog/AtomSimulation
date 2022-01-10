@@ -116,13 +116,13 @@ public class Particle{
     }
 
 
-    public Thread CreateThread() {
+    public Thread сreateThread() {
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
 
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
             int stepsPassed = 0;
             while(active && stepsPassed<currentSim.LEN){ //Когда симуляция запущена и частица ещё не прошла шаги
-                if (currentSim.waitTimeMS>=0 && Output.output3D){//Ожидание?
+                if (currentSim.waitTimeMS>=0 && currentSim.getDto().isOutput3D()){//Ожидание?
                     try {
                         Thread.sleep(currentSim.waitTimeMS);
                     } catch (InterruptedException e) {
@@ -165,7 +165,7 @@ public class Particle{
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
             }
-            if(stepsPassed>Output.lastPrintStep){Output.lastPrintStep = Math.toIntExact(stepsPassed);}
+            if(stepsPassed>Output.getLastPrintStep()){Output.setLastPrintStep(stepsPassed);}
             Console.particleOut(ordinal, timesHitWall, timesHitGen, tarIsHit, stepsPassed);
             isInUse = false;//И отметить частицу чтобы не отрисовывалась заново.
         });

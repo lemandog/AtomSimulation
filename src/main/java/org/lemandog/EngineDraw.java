@@ -20,6 +20,8 @@ import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
 import java.util.Arrays;
+
+import static org.lemandog.Sim.currentSim;
 /*
 ---------------> X
 |\
@@ -48,23 +50,23 @@ public class EngineDraw {
 
     public static void eSetup() { //Отрисовка камеры
         draw.setResizable(true);
-        Image icon = new Image("/atomSim.png");
+        Image icon = new Image("/icons/atomSim.png");
         draw.getIcons().add(icon);
 
-        multiToFill = scene.getHeight()/(Arrays.stream(Sim.currentSim.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
+        multiToFill = scene.getHeight()/(Arrays.stream(currentSim.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
-        chamberR = new Box((Sim.currentSim.CHA_SIZE[0]),(Sim.currentSim.CHA_SIZE[1]),(Sim.currentSim.CHA_SIZE[2]));
+        chamberR = new Box((currentSim.CHA_SIZE[0]),(currentSim.CHA_SIZE[1]),(currentSim.CHA_SIZE[2]));
 
-        targetR = new Box((Sim.currentSim.TAR_SIZE[0]),(Sim.currentSim.TAR_SIZE[1]),(Sim.currentSim.TAR_SIZE[2]));
-        targetR.setTranslateY((-Sim.currentSim.CHA_SIZE[1]/2));
-                generatorR = new Box((Sim.currentSim.GEN_SIZE[0]),(Sim.currentSim.GEN_SIZE[1]),(Sim.currentSim.GEN_SIZE[2]));
-        generatorR.setTranslateY((Sim.currentSim.CHA_SIZE[1]/2));
+        targetR = new Box((currentSim.TAR_SIZE[0]),(currentSim.TAR_SIZE[1]),(currentSim.TAR_SIZE[2]));
+        targetR.setTranslateY((-currentSim.CHA_SIZE[1]/2));
+                generatorR = new Box((currentSim.GEN_SIZE[0]),(currentSim.GEN_SIZE[1]),(currentSim.GEN_SIZE[2]));
+        generatorR.setTranslateY((currentSim.CHA_SIZE[1]/2));
 
         PerspectiveCamera main = new PerspectiveCamera();
 
         main.setTranslateX(-scene.getHeight()/2); //Чтобы камера в центре имела начало координат
         main.setTranslateY(-scene.getHeight()/2);
-        main.setTranslateZ((Arrays.stream(Sim.currentSim.CHA_SIZE).max().getAsDouble())*multiToFill - Sim.currentSim.CHA_SIZE[2]);
+        main.setTranslateZ((Arrays.stream(currentSim.CHA_SIZE).max().getAsDouble())*multiToFill - currentSim.CHA_SIZE[2]);
         Console.coolPrintout("POS " + main.getTranslateZ() + " FILL MULTI " + multiToFill );
 
         main.setNearClip(0.001);
@@ -74,7 +76,7 @@ public class EngineDraw {
         scene.setOnKeyPressed(keyEvent -> {
             if(keyEvent.getCode() == KeyCode.ESCAPE){
                 System.out.println("EXITTING");
-                Sim.currentSim.simIsAlive =false;
+                currentSim.simIsAlive =false;
             }
             if(keyEvent.getCode() == KeyCode.NUMPAD1 || keyEvent.getCode() == KeyCode.NUMPAD4){
                 if(keyEvent.getCode() == KeyCode.NUMPAD1){main.setTranslateX(main.getTranslateX() + 1);} else {main.setTranslateX(main.getTranslateX() - 1);}
@@ -112,14 +114,14 @@ public class EngineDraw {
         draw.setScene(scene);
         draw.show();
         draw.setOnCloseRequest(windowEvent -> {
-            Sim.currentSim.simIsAlive = false;
+            currentSim.simIsAlive = false;
             draw.hide();
         });
     }
 
 
     public static void DrawingThreadFire(Particle[] containerSet) {
-        if (Output.output3D){
+        if (currentSim.getDto().isOutput3D()){
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
                 if (particle != null) {
@@ -192,7 +194,7 @@ public class EngineDraw {
         return false;
     }
     static void drawAPath(Cylinder path){
-        if(Sim.currentSim.pathsDr){
+        if(currentSim.pathsDr){
             EngineDraw.CylinderThread(path);
         }
     }

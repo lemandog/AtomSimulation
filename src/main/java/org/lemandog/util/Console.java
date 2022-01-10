@@ -4,12 +4,12 @@ import org.lemandog.App;
 public class Console {
     static final int CON_WIDTH = 120;
 
-    static int amLen;
-    static int dist;
+    private static int amLen;
+    private static int dist;
 
-    public static void setAm(){
-        amLen = App.particleAm.getLength();
-        dist = App.stepsAm.getLength();
+    public static void setAm(int particleAm, int stepsAm){
+        amLen = particleAm;
+        dist = stepsAm;
     }
     public static void ready(){
         printLine('@');

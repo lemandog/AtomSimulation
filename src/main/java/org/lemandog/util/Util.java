@@ -1,8 +1,10 @@
 package org.lemandog.util;
 
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -30,7 +32,7 @@ public class Util {
         Scene mainSc = new Scene(layout,550,250);
         info.setResizable(false);
         info.setScene(mainSc);
-        info.getIcons().add(new Image("/database.png"));
+        info.getIcons().add(new Image("/icons/database.png"));
         info.setTitle("О программе");
 
         layout.getChildren().add(new Label("Для контроля вида на камеру используйте NUMPAD"));
@@ -62,41 +64,19 @@ public class Util {
         info.show();
     }
     public static void constructAWinQueue(){
-        Stage queueBuilder = new Stage();
-        queueBuilder.getIcons().add(new Image("/database.png"));
-        queueBuilder.setResizable(false);
-        VBox layout = new VBox();
-
-        Label mainLabel = new Label("Очереди");
-        mainLabel.setAlignment(Pos.TOP_CENTER);
-        mainLabel.setFont(App.mainFont);
-        VBox order = new VBox();
-        layout.getChildren().add(mainLabel);
-
-        Button addToQueue = new Button("Добавить");
-        addToQueue.setFont(App.mainFont);
-        layout.getChildren().add(addToQueue);
-        addToQueue.setOnAction(actionEvent -> {
-            addToQueue();
-            order.getChildren().clear();
-            order.getChildren().addAll(updateQueue());
-        });
-        Button popToQueue = new Button("Удалить последний");
-        popToQueue.setFont(App.mainFont);
-        popToQueue.setOnAction(actionEvent -> {
-            popToQueue();
-            order.getChildren().clear();
-            order.getChildren().addAll(updateQueue());
-        });
-        layout.getChildren().add(popToQueue);
-        layout.getChildren().add(queueSize);
-
-        order.getChildren().addAll(updateQueue());
-        layout.getChildren().add(order);
-        Scene mainSc = new Scene(layout,250,550);
-
-        queueBuilder.setScene(mainSc);
-        queueBuilder.show();
+        try {
+            Stage queueBuilder = new Stage();
+            queueBuilder.setResizable(false);
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("/queueWindow.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            queueBuilder.setScene(scene);
+            queueBuilder.getIcons().add(new Image("/icons/database.png"));
+            queueBuilder.setResizable(false);
+            queueBuilder.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void popToQueue() {
@@ -117,14 +97,10 @@ public class Util {
             return new Label[]{new Label("ПУСТО")};
         }}
 
-    public static void addToQueue(){
-        App.simQueue.add(new Sim());
-    }
-
     public static void constructAWinMatterChooser() {
         Stage matterCh = new Stage();
         matterCh.setTitle("Вещество в симуляции");
-        matterCh.getIcons().add(new Image("/matterChooser.png"));
+        matterCh.getIcons().add(new Image("/icons/matterChooser.png"));
         matterCh.setResizable(false);
         VBox layout = new VBox();
 

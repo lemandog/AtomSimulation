@@ -8,18 +8,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.lemandog.App;
 import org.lemandog.GasTypes;
 import org.lemandog.Sim;
+import org.lemandog.SimDTO;
 
 public class LoadConfig {
     public static void constructConfigInfoFrame(){
         Stage info = new Stage();
         VBox layout = new VBox();
         info.setResizable(false);
-        info.getIcons().add(new Image("/config.png"));
+        info.getIcons().add(new Image("/icons/config.png"));
         info.setTitle("Конфигурации");
         Scene infoPane = new Scene(layout);
         info.setScene(infoPane);
@@ -66,58 +66,59 @@ public class LoadConfig {
     }
     public static void select(File file) {
         if (file.getName().contains(".txt")){
-            App.fileDropText.setTextFill(Color.DARKGREEN);
-            App.fileDropText.setText("Файл принят");
+            Console.printLine('S');
+            Console.coolPrintout("File accepted!");
             load(file);
         } else {
-            App.fileDropText.setTextFill(Color.DARKRED);
-            App.fileDropText.setText("Файл получен, но он не .txt");
+            Console.printLine('F');
+            Console.coolPrintout("Wrong file format - .txt only!");
         }
     }
 
     private static void load(File file) {
         try {
+            SimDTO result = new SimDTO();
             for (String line : Files.readAllLines(file.toPath())){
-                if (line.contains("PARTS")){App.particleAm.setText(line.trim().replaceAll("PARTS ",""));} //int
-                if (line.contains("STEPS")){App.stepsAm.setText(line.trim().replaceAll("STEPS ",""));} //int
-                if (line.contains("TEMPE")){App.tempAm.setText(line.trim().replaceAll("TEMPE ",""));} //int
-                if (line.contains("TEMPS")){App.tempSourceAm.setText(line.trim().replaceAll("TEMPS ",""));} //int
-                if (line.contains("CAMSX")){App.xFrameLen.setText(line.trim().replaceAll("CAMSX ",""));} //double
-                if (line.contains("CAMSY")){App.yFrameLen.setText(line.trim().replaceAll("CAMSY ",""));} //double
-                if (line.contains("CAMSZ")){App.zFrameLen.setText(line.trim().replaceAll("CAMSZ ",""));} //double
-                if (line.contains("PRES^")){App.pressurePow.setText(line.trim().replaceAll("PRES\\^ ",""));} //double
-                if (line.contains("PRES*")){App.pressure.setText(line.trim().replaceAll("PRES\\* ",""));} //double
-                if (line.contains("DRAWP")){Output.pathDrawing.setSelected(true);} //bool
-                if (line.contains("THREA")){App.threadCount.setValue(Integer.parseInt(line.trim().replaceAll("THREA ","")));} //int
-                if (line.contains("DIMEN")){App.dimensionCount.setValue(Integer.parseInt(line.trim().replaceAll("DIMEN ","")));} //int
-                if (line.contains("XTARS")){App.targetSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XTARS ","")));} //double
-                if (line.contains("ZTARS")){App.targetSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZTARS ","")));} //double
-                if (line.contains("XGENE")){App.genSizeX.setValue(Double.parseDouble(line.trim().replaceAll("XGENE ","")));} //double
-                if (line.contains("ZGENE")){App.genSizeZ.setValue(Double.parseDouble(line.trim().replaceAll("ZGENE ","")));} //double
-                if (line.contains("DIRPA")){Output.selectedPath = (new File((line.trim().replaceAll("DIRPA ",""))));} //str
-                if (line.contains("TEXTW")){Output.output = true;} //bool
-                if (line.contains("PNGZA")){Output.outputPic = true;} //bool
-                if (line.contains("CSVZA")){Output.outputPicCSV = true;} //bool
-                if (line.contains("CSVZE")){Output.outputPicCSVPost = true;} //bool
-                if (line.contains("CSVOU")){Output.outputCSV = true;}
-                if (line.contains("PALIT")){Output.outputPalette.setValue(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
-                if (line.contains("RESOL")){Output.outputAskPicResolution.setValue(Integer.parseInt(line.trim().replaceAll("RESOL ","")));}
-                if (line.contains("START")){App.startSimButt.fire();} //bool
-                if (line.contains("WAITT")){App.waitTime.setValue(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
-                if (line.contains("VERWA")){App.bounceWallChance.setValue(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
-                if (line.contains("VERGE")){App.bounceGenChance.setValue(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
-                if (line.contains("3DNOT")){Output.output3dCHK.setSelected(false); Output.output3D = false;}
-                if (line.contains("RUNAN")){App.simQueue.add(new Sim());} //double
+                if (line.contains("PARTS")){result.setParticleAm(Integer.parseInt(line.trim().replaceAll("PARTS ","")));} //int
+                if (line.contains("STEPS")){result.setStepsAm(Integer.parseInt(line.trim().replaceAll("STEPS ","")));} //int
+                if (line.contains("TEMPE")){result.setTempAm(Double.parseDouble(line.trim().replaceAll("TEMPE ","")));} //double
+                if (line.contains("TEMPS")){result.setTempSourceAm(Double.parseDouble(line.trim().replaceAll("TEMPS ","")));} //double
+                if (line.contains("CAMSX")){result.setXFrameLen(Double.parseDouble(line.trim().replaceAll("CAMSX ","")));} //double
+                if (line.contains("CAMSY")){result.setYFrameLen(Double.parseDouble(line.trim().replaceAll("CAMSY ","")));} //double
+                if (line.contains("CAMSZ")){result.setZFrameLen(Double.parseDouble(line.trim().replaceAll("CAMSZ ","")));} //double
+                if (line.contains("PRES^")){result.setPressurePow(Double.parseDouble(line.trim().replaceAll("PRES\\^ ","")));} //double
+                if (line.contains("PRES*")){result.setPressure(Double.parseDouble(line.trim().replaceAll("PRES\\* ","")));} //double
+                if (line.contains("DRAWP")){result.setPathDrawing(true);} //bool
+                if (line.contains("THREA")){result.setThreadCount(Integer.parseInt(line.trim().replaceAll("THREA ","")));} //int
+                if (line.contains("DIMEN")){result.setDimensionCount(Integer.parseInt(line.trim().replaceAll("DIMEN ","")));} //int
+                if (line.contains("XTARS")){result.setTarSizeX(Double.parseDouble(line.trim().replaceAll("XTARS ","")));} //double
+                if (line.contains("ZTARS")){result.setTarSizeZ(Double.parseDouble(line.trim().replaceAll("ZTARS ","")));} //double
+                if (line.contains("XGENE")){result.setGenSizeX(Double.parseDouble(line.trim().replaceAll("XGENE ","")));} //double
+                if (line.contains("ZGENE")){result.setGenSizeZ(Double.parseDouble(line.trim().replaceAll("ZGENE ","")));} //double
+                if (line.contains("DIRPA")){result.setOutputPath(new File(line.trim().replaceAll("DIRPA ","")));} //str
+                if (line.contains("TEXTW")){result.setOutput(true);} //bool
+                if (line.contains("PNGZA")){result.setOutputPic(true);} //bool
+                if (line.contains("CSVZA")){result.setOutputPicCSV(true);} //bool
+                if (line.contains("CSVZE")){result.setOutputPicCSVPost(true);} //bool
+                if (line.contains("CSVOU")){result.setOutputCSV(true);}
+                if (line.contains("PALIT")){result.setPalette(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
+                if (line.contains("RESOL")){result.setResolution(Integer.parseInt(line.trim().replaceAll("RESOL ","")));}
+                if (line.contains("START")){App.startSim(result);} //bool
+                if (line.contains("WAITT")){result.setWaitTime(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
+                if (line.contains("VERWA")){result.setBounceWallChance(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
+                if (line.contains("VERGE")){result.setBounceGenChance(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
+                if (line.contains("3DNOT")){result.setOutput3D(false);}
+                if (line.contains("RUNAN")){App.simQueue.add(new Sim(result));} //double
                 for (int i = 0; i < GasTypes.values().length; i++) {
                     if(line.contains(GasTypes.values()[i].name())){
-                        Util.chosen = GasTypes.values()[i];
+                        result.setGas(GasTypes.values()[i]);
                     }
                 }
                 if (line.contains("RUNMO")){
-                    int threa_ = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));
-                    for (int i = 0; i < threa_; i++) {
-                        App.simQueue.add(new Sim());
-                    }} //double
+                    int more = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));
+                    for (int i = 0; i < more; i++) {
+                        App.simQueue.add(new Sim(result));
+                    }}
             }
     } catch (IOException e) {
             e.printStackTrace();
