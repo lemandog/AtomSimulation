@@ -10,5 +10,5 @@ module AtomSimulation {
     requires java.xml;
     requires java.scripting;
     requires javafx.fxml;
-    requires lombok;
+    requires static lombok;
 }
