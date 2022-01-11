@@ -2,7 +2,6 @@ package org.lemandog.util;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
 import lombok.Getter;
 import lombok.Setter;
 import org.lemandog.App;
@@ -26,7 +25,7 @@ public class Output {
     @Getter
     static int lastPrintStep = 0;
     static DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
-    public static Image palette = new Image("heatmaps/heatmap2.png");
+    public static Image palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
     public static int[][] picState;
     static Vector<Double> X = new Vector<>();
     static Vector<Double> Z = new Vector<>();
@@ -49,7 +48,7 @@ public class Output {
         double Zmax = currentSim.TAR_SIZE[2];
         int DOTSIZE = currentSim.getDto().getResolution();
         int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+2][(int) (Zmax * (double) DOTSIZE)+2];
-        if (currentSim.getDto().isOutputPicCSV()) {
+        if (currentSim.getDto().isOutputRAWCord()) {
             try {
                 for (int i = 0; i < X.size(); i++) {
                     Hits.write(X.get(i) +SEPARATOR+ Z.get(i) + LINE_END);
@@ -61,11 +60,11 @@ public class Output {
                 e.printStackTrace();
             }
         }
-        if ( currentSim.getDto().isOutputPicCSVPost() || currentSim.getDto().isOutputPic()) {
+        if ( currentSim.getDto().isOutputPicCSVPost() || currentSim.getDto().isOutputPic()) { //Код предназначен для и картинки и вывода заселённости
             for (int[] ints : CORD) {
                 Arrays.fill(ints, 0);
             }
-            int height = (int) (Xmax * (double) DOTSIZE)+2;
+            int height = (int) (Xmax * (double) DOTSIZE)+2; //+2 для рамок по краю
             int width = (int) (Zmax * (double) DOTSIZE)+2;
 
             for (int i = 0; i < X.size(); ++i) {
@@ -119,7 +118,7 @@ public class Output {
             }
         }
         }
-    public static Color colSel(int sel){        //0-9
+    public static Color colSel(int sel){        //0-9 цвета в палитре
         PixelReader randColRead = palette.getPixelReader();
         return randColRead.getColor(sel,0);}
 

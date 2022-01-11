@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.lemandog.util.Console;
 import org.lemandog.util.DebugTools;
 import org.lemandog.util.Output;
-import org.lemandog.util.Util;
 
 import java.awt.*;
 import java.io.File;
@@ -50,15 +49,14 @@ public class Sim {
         //DTO - значит data transfer object
         selectedPath = dto.getOutputPath();
         thisRunMaterial = dto.getGas();
-        Console.coolPrintout("Material is: "+thisRunMaterial.name() +" "+ thisRunMaterial.diameterRAW +" "+ thisRunMaterial.massRAW);
         d = thisRunMaterial.diameter;
         m = thisRunMaterial.mass;
 
         p = dto.getPressure()*Math.pow(10, dto.getPressurePow()); //X*10^Y
         T = dto.getTempAm(); //K
         TSource = dto.getTempSourceAm(); //K
-        N = dto.getParticleAm();//Integer.parseInt(App.particleAm.getText());
-        LEN = dto.getStepsAm();//Integer.parseInt(App.stepsAm.getText());
+        N = dto.getParticleAm();
+        LEN = dto.getStepsAm();
 
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
         //Как сказано в Paticle, пользователь может сам ввести количество осей.
@@ -98,8 +96,8 @@ public class Sim {
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
         out = new Output(dto);
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
-        for (int i = 0; i < avilableStreams; i++) {
-            calculator[i] = new Thread();
+        for (Thread calc:calculator) {
+            calc = new Thread();
         }
         container = new Particle[N];
     }
@@ -112,7 +110,7 @@ public class Sim {
             currentSim.container[i] = new Particle(i);
         }
      EngineDraw.DrawingThreadFire(Sim.currentSim.container);
-    currentSim.mainContr = new Thread(); //Иначе будет NullPointerException. То же что и выше
+    currentSim.mainContr = new Thread(); //Иначе будет NullPointerException. То же причины что и выше
     if (dto.outputPic){
             out.generateRandom();
             Output.toFile();

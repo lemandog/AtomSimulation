@@ -8,8 +8,8 @@ public class Console {
     private static int dist;
 
     public static void setAm(int particleAm, int stepsAm){
-        amLen = particleAm;
-        dist = stepsAm;
+        amLen = Integer.toString(particleAm).length();
+        dist = Integer.toString(stepsAm).length();
     }
     public static void ready(){
         printLine('@');

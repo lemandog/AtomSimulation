@@ -140,7 +140,6 @@ public class Particle{
                 for(int i = 0; i<currentSim.avilableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dS * speeds[i];
                 }
-                DebugTools.CSVDebug(speeds);
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
 
 

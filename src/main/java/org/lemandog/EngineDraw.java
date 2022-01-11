@@ -50,7 +50,7 @@ public class EngineDraw {
 
     public static void eSetup() { //Отрисовка камеры
         draw.setResizable(true);
-        Image icon = new Image("/icons/atomSim.png");
+        Image icon = new Image(EngineDraw.class.getResourceAsStream("/icons/atomSim.png"));
         draw.getIcons().add(icon);
 
         multiToFill = scene.getHeight()/(Arrays.stream(currentSim.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора

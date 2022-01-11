@@ -2,6 +2,7 @@ package org.lemandog;
 
 import javafx.scene.image.Image;
 import lombok.*;
+import org.lemandog.util.Output;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -35,10 +36,11 @@ public class SimDTO {
         output = false;
         outputPic = false;
         outputCSV = false;
-        outputPicCSV = false;
+        outputRAWCord = false;
         outputPicCSVPost = false;
-        palette = new Image("/heatmaps/heatmap" + 1 + ".png");
+        palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
         resolution = 100;
+        gas = GasTypes.CHROME;
     }
     @Getter
     @Setter
@@ -84,7 +86,7 @@ public class SimDTO {
     File outputPath;
     @Getter
     @Setter
-    boolean output, outputPic, outputPicCSV, outputPicCSVPost, outputCSV, output3D;
+    boolean output, outputPic, outputRAWCord, outputPicCSVPost, outputCSV, output3D;
     @Getter
     Image palette;
     public void setPalette(int paletteNumber) {

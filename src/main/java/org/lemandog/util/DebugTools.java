@@ -13,7 +13,7 @@ import static org.lemandog.util.Output.*;
 public class DebugTools {
     static final boolean GLOBAL_DEBUG = false;
     public static FileWriter global2;
-    synchronized public static void CSVDebug(double[] data) {
+    synchronized public static void UniversalCSVWriter(double[] data) {
         if (GLOBAL_DEBUG){
             if (global2 == null){
                 LocalDateTime main = LocalDateTime.now();

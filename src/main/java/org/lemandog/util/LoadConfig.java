@@ -64,20 +64,22 @@ public class LoadConfig {
         layout.getChildren().add(new Label("Строки без ключевых слов будут проигнорированы."));
         info.show();
     }
-    public static void select(File file) {
+    public static SimDTO select(File file) {
         if (file.getName().contains(".txt")){
             Console.printLine('S');
             Console.coolPrintout("File accepted!");
-            load(file);
+            return load(file);
         } else {
             Console.printLine('F');
             Console.coolPrintout("Wrong file format - .txt only!");
+            return new SimDTO();
         }
     }
 
-    private static void load(File file) {
+    private static SimDTO load(File file) {
+        SimDTO result = new SimDTO();
         try {
-            SimDTO result = new SimDTO();
+
             for (String line : Files.readAllLines(file.toPath())){
                 if (line.contains("PARTS")){result.setParticleAm(Integer.parseInt(line.trim().replaceAll("PARTS ","")));} //int
                 if (line.contains("STEPS")){result.setStepsAm(Integer.parseInt(line.trim().replaceAll("STEPS ","")));} //int
@@ -98,7 +100,7 @@ public class LoadConfig {
                 if (line.contains("DIRPA")){result.setOutputPath(new File(line.trim().replaceAll("DIRPA ","")));} //str
                 if (line.contains("TEXTW")){result.setOutput(true);} //bool
                 if (line.contains("PNGZA")){result.setOutputPic(true);} //bool
-                if (line.contains("CSVZA")){result.setOutputPicCSV(true);} //bool
+                if (line.contains("CSVZA")){result.setOutputRAWCord(true);} //bool
                 if (line.contains("CSVZE")){result.setOutputPicCSVPost(true);} //bool
                 if (line.contains("CSVOU")){result.setOutputCSV(true);}
                 if (line.contains("PALIT")){result.setPalette(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
@@ -123,5 +125,6 @@ public class LoadConfig {
     } catch (IOException e) {
             e.printStackTrace();
         }
+        return result;
     }
 }
