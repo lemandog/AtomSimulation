@@ -23,7 +23,7 @@ public enum GasTypes {
     public Color particleCol;
 
     GasTypes(double AtomMass, double diameterPicoMeters){
-        mass=AtomMass*1.660539040e-27; //масса ХРОМ, кг
+        mass=AtomMass*1.660539040e-27;
         this.diameter = diameterPicoMeters*10e-12;
         this.particleCol = Color.color(Math.random()*256,Math.random()*256,Math.random()*256);
         this.massRAW = AtomMass;

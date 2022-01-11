@@ -9,10 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.lemandog.App;
-import org.lemandog.GasTypes;
-import org.lemandog.Sim;
-import org.lemandog.SimDTO;
+import org.lemandog.*;
 
 public class LoadConfig {
     public static void constructConfigInfoFrame(){
@@ -105,12 +102,12 @@ public class LoadConfig {
                 if (line.contains("CSVOU")){result.setOutputCSV(true);}
                 if (line.contains("PALIT")){result.setPalette(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("RESOL")){result.setResolution(Integer.parseInt(line.trim().replaceAll("RESOL ","")));}
-                if (line.contains("START")){App.startSim(result);} //bool
+                if (line.contains("START")){MainController.startSim(result);} //bool
                 if (line.contains("WAITT")){result.setWaitTime(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
                 if (line.contains("VERWA")){result.setBounceWallChance(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
                 if (line.contains("VERGE")){result.setBounceGenChance(Double.parseDouble(line.trim().replaceAll("VERGE ","")));} //double
                 if (line.contains("3DNOT")){result.setOutput3D(false);}
-                if (line.contains("RUNAN")){App.simQueue.add(new Sim(result));} //double
+                if (line.contains("RUNAN")){MainController.simQueue.add(new Sim(result));} //double
                 for (int i = 0; i < GasTypes.values().length; i++) {
                     if(line.contains(GasTypes.values()[i].name())){
                         result.setGas(GasTypes.values()[i]);
@@ -119,7 +116,7 @@ public class LoadConfig {
                 if (line.contains("RUNMO")){
                     int more = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));
                     for (int i = 0; i < more; i++) {
-                        App.simQueue.add(new Sim(result));
+                        MainController.simQueue.add(new Sim(result));
                     }}
             }
     } catch (IOException e) {

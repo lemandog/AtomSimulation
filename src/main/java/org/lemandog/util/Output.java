@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.lemandog.App;
+import org.lemandog.MainController;
 import org.lemandog.SimDTO;
 
 import javax.imageio.ImageIO;
@@ -98,7 +99,7 @@ public class Output {
             }
         }
         if (currentSim.getDto().isOutputPic()){
-            File outputFile = new File(currentSim.selectedPath.getAbsolutePath() + "/"+App.simQueue.size()+"hitsDetector.png");
+            File outputFile = new File(currentSim.selectedPath.getAbsolutePath() + "/"+ currentSim.thisRunIndex+"hitsDetector.png");
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
@@ -154,7 +155,7 @@ public class Output {
             if (Hits == null){
                 LocalDateTime main = LocalDateTime.now();
                 File csv = new File( currentSim.selectedPath.getAbsolutePath()
-                        + "/"+App.simQueue.size()+"Hits"+sdfF.format(main)+".csv");
+                        + "/"+currentSim.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
                 try {
                     Hits = new FileWriter(csv);
                 } catch (IOException e) {

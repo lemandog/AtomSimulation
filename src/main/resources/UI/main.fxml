@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="541.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.App">
+<AnchorPane prefHeight="541.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
    <children>
       <GridPane layoutX="14.0" layoutY="20.0" prefHeight="373.0" prefWidth="248.0">
          <columnConstraints>
@@ -110,7 +110,7 @@
       </VBox>
       <Pane layoutX="527.0" layoutY="246.0" onDragEntered="#selectConfig" prefHeight="240.0" prefWidth="281.0" style="-fx-background-color: GREEN;" AnchorPane.bottomAnchor="148.0" AnchorPane.rightAnchor="14.0">
          <children>
-            <Text fill="WHITE" layoutX="16.0" layoutY="115.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Переместите конфигурацию сюда" textAlignment="CENTER" wrappingWidth="248.423828125">
+            <Text fx:id="configReaderStatus" fill="WHITE" layoutX="16.0" layoutY="115.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Переместите конфигурацию сюда" textAlignment="CENTER" wrappingWidth="248.423828125">
                <font>
                   <Font size="20.0" />
                </font>
@@ -135,7 +135,7 @@
                            <children>
                               <TextField fx:id="pathToOutput" prefHeight="25.0" prefWidth="370.0" promptText="Выбранный путь" AnchorPane.rightAnchor="84.0" AnchorPane.topAnchor="0.0" />
                               <Button layoutX="361.0" mnemonicParsing="false" onAction="#selectPath" prefHeight="25.0" prefWidth="80.0" text="Выбор" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                              <Slider fx:id="paletteSelect" blockIncrement="1.0" layoutX="3.0" layoutY="36.0" majorTickUnit="1.0" max="4.0" min="1.0" onDragDone="#viewPalette" prefHeight="38.0" prefWidth="248.0" showTickLabels="true" showTickMarks="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                              <Slider fx:id="paletteSelect" blockIncrement="1.0" layoutX="3.0" layoutY="36.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="1" onMouseReleased="#viewPalette" prefHeight="38.0" prefWidth="248.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                               <ImageView fx:id="paletteView" fitHeight="38.0" fitWidth="202.0" layoutX="257.0" layoutY="36.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                            </children>
                         </AnchorPane>
@@ -149,14 +149,14 @@
                      <children>
                         <HBox>
                            <children>
-                              <TextField fx:id="ServerAddress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="25.0" prefWidth="739.0" promptText="Адрес сервера" />
+                              <TextField fx:id="serverAddress" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="25.0" prefWidth="739.0" promptText="Адрес сервера" />
                               <Button mnemonicParsing="false" onAction="#checkServer" prefHeight="25.0" prefWidth="97.0" text="Проверить" />
                            </children>
                         </HBox>
                         <TextField fx:id="userEmail" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="25.0" prefWidth="739.0" promptText="Ваш email" />
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <WebView fx:id="serverResponce" prefHeight="114.0" prefWidth="333.0" HBox.hgrow="ALWAYS" />
+                              <WebView fx:id="serverResponse" prefHeight="114.0" prefWidth="333.0" HBox.hgrow="ALWAYS" />
                               <CheckBox fx:id="serverCalculate" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Считать на сервере" />
                            </children>
                         </HBox>
@@ -169,7 +169,7 @@
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                      <children>
                         <ChoiceBox fx:id="materialChooser" prefHeight="25.0" prefWidth="217.0" />
-                        <Text fx:id="atomRad" strokeType="OUTSIDE" strokeWidth="0.0" text="АТОМНЫЙ РАДИУС" />
+                        <Text fx:id="atomDiam" strokeType="OUTSIDE" strokeWidth="0.0" text="АТОМНЫЙ РАДИУС" />
                         <Text fx:id="atomMass" strokeType="OUTSIDE" strokeWidth="0.0" text="АТОМНАЯ МАССА" />
                      </children>
                   </HBox>
@@ -179,9 +179,11 @@
                <content>
                   <Pane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="361.0" layoutY="34.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addToQueue" text="+" />
-                        <Button layoutX="416.0" layoutY="34.0" mnemonicParsing="false" onAction="#expungeToQueue" text="-" />
+                        <Button layoutX="351.0" layoutY="34.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addToQueue" text="+" />
+                        <Button layoutX="429.0" layoutY="34.0" mnemonicParsing="false" onAction="#expungeToQueue" text="-" />
                         <Text fx:id="numberInQueue" layoutX="386.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="CENTER" wrappingWidth="30.0" />
+                        <Button layoutX="364.0" layoutY="67.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add10ToQueue" prefHeight="25.0" prefWidth="76.0" text="+10" />
+                        <Button layoutX="338.0" layoutY="2.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#expungeAllQueue" prefHeight="25.0" prefWidth="127.0" text="Стереть очередь" />
                      </children>
                   </Pane>
                </content>

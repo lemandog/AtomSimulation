@@ -44,7 +44,12 @@ public class Sim {
     Thread mainContr;
     Thread[] calculator;
 
+    public static int index = 0;
+    public int thisRunIndex;
+
     public Sim(SimDTO dto){
+        index++;
+        thisRunIndex = index;
         this.dto = dto;
         //DTO - значит data transfer object
         selectedPath = dto.getOutputPath();
@@ -74,13 +79,13 @@ public class Sim {
 
         center = new Point3D(0,0,0);//Центр камеры для механики переизлучения
         //Размер генератора и мишени - сотая камеры, поэтому в очень низких камерах оно может не работать
-        TAR_SIZE[0] = CHA_SIZE[0] * dto.tarSizeX;
+        TAR_SIZE[0] = CHA_SIZE[0] * dto.getTarSizeX();
         TAR_SIZE[1] = CHA_SIZE[1]/100;
-        TAR_SIZE[2] = CHA_SIZE[2] * dto.tarSizeZ;
+        TAR_SIZE[2] = CHA_SIZE[2] * dto.getTarSizeZ();
 
-        GEN_SIZE[0] = CHA_SIZE[0] * dto.genSizeX;
+        GEN_SIZE[0] = CHA_SIZE[0] * dto.getGenSizeX();
         GEN_SIZE[1] = CHA_SIZE[1]/100;
-        GEN_SIZE[2] = CHA_SIZE[2] * dto.genSizeZ;
+        GEN_SIZE[2] = CHA_SIZE[2] * dto.getGenSizeZ();
 
         waitTimeMS = dto.getWaitTime();
         wallBounce = dto.getBounceWallChance();
@@ -96,9 +101,10 @@ public class Sim {
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
         out = new Output(dto);
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
-        for (Thread calc:calculator) {
-            calc = new Thread();
+        for (int i = 0; i < calculator.length; i++) {
+            calculator[i] = new Thread();
         }
+
         container = new Particle[N];
     }
 
@@ -157,8 +163,8 @@ public class Sim {
         Output.toFile();
         DebugTools.close();
         simIsAlive = false;
-        if (!App.simQueue.isEmpty()){
-            currentSim = App.simQueue.pop();
+        if (!MainController.simQueue.isEmpty()){
+            currentSim = MainController.simQueue.pop();
             try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
                 Console.coolPrintout("There is another sim in Queue... Starting");
                 Thread.sleep(1000);

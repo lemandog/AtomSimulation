@@ -39,24 +39,25 @@ public class SimDTO {
         outputRAWCord = false;
         outputPicCSVPost = false;
         palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
+        paletteNumber = 2;
         resolution = 100;
         gas = GasTypes.CHROME;
     }
     @Getter
     @Setter
-    boolean pathDrawing, distCalc;
+    private boolean pathDrawing, distCalc;
     @Getter
     @Setter
-    String serverAddress, userEmail;
+    private String serverAddress, userEmail;
     @Getter
     @Setter
-    double genSizeZ, genSizeX, tarSizeZ, tarSizeX;
+    private double genSizeZ, genSizeX, tarSizeZ, tarSizeX;
     @Getter
     @Setter
-    double bounceWallChance;
+    private double bounceWallChance;
     @Getter
     @Setter
-    double bounceGenChance;
+    private double bounceGenChance;
     @Getter
     @Setter
     int threadCount;
@@ -92,6 +93,12 @@ public class SimDTO {
     public void setPalette(int paletteNumber) {
         this.palette = new Image("/heatmaps/heatmap" + paletteNumber + ".png");
     }
+    public void setPalette(){
+        this.palette = new Image("/heatmaps/heatmap" + this.paletteNumber + ".png");
+    }
+    @Getter
+    @Setter
+    int paletteNumber;
 
     @Getter
     @Setter
