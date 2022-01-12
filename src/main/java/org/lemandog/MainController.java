@@ -17,8 +17,6 @@ import org.lemandog.util.Util;
 import java.io.File;
 import java.util.ArrayDeque;
 
-import static org.lemandog.Sim.currentSim;
-
 public class MainController {
     public Slider targetSizeZ;
     public Slider targetSizeX;
@@ -89,8 +87,7 @@ public class MainController {
             ServerHandler.sendQueueToServer(simQueue);
         }
         else{
-            currentSim = simQueue.pop();
-            currentSim.start();
+            simQueue.pop().start();
         }
     }
     public void readDTO(SimDTO input){   //Чтение DTO в UI
@@ -152,10 +149,26 @@ public class MainController {
         result.setYFrameLen(Double.parseDouble(yFrameLen.getText()));
         result.setZFrameLen(Double.parseDouble(zFrameLen.getText()));
         result.setStepsAm(Integer.parseInt(stepsAm.getText()));
+        result.setParticleAm(Integer.parseInt(particleAm.getText()));
         result.setTempAm(Double.parseDouble(tempAm.getText()));
         result.setTempSourceAm(Double.parseDouble(tempSourceAm.getText()));
         result.setPressure(Double.parseDouble(pressure.getText()));
         result.setPressurePow(Double.parseDouble(pressurePow.getText()));
+
+        result.setOutputRAWCord(RAWCordOutput.isSelected());
+        result.setOutputPicCSVPost(PicCSVOutput.isSelected());
+        result.setOutputPic(PicPNGOutput.isSelected());
+        result.setOutput3D(particlesDraw.isSelected());
+
+        result.setOutputPath(new File(pathToOutput.getText()));
+        result.setPalette((int)paletteSelect.getValue());
+        result.setPaletteNumber((int)paletteSelect.getValue());//Вроде оно должно быть автоматически, но это на случай если не сработает
+
+        result.setServerAddress(serverAddress.getText());
+        result.setUserEmail(userEmail.getText());
+        result.setDistCalc(serverCalculate.isSelected());
+
+        result.setGas(materialChooser.getValue());
         return result;
     }
 

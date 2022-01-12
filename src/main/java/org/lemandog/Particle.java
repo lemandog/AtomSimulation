@@ -5,14 +5,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.*;
 import org.lemandog.util.Console;
-import org.lemandog.util.DebugTools;
 import org.lemandog.util.Output;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import static org.lemandog.EngineDraw.*;
-import static org.lemandog.Sim.*;
 
 public class Particle{
     //Цвета состояний
@@ -38,9 +36,10 @@ public class Particle{
     int timesHitGen = 0;
     PhongMaterial thisParticleMat;
     Cylinder paths = new Cylinder();
-
-    Particle(int ordinal){ //Конструктор класса, вызывается при создании экземпляра
-        activeCol = currentSim.thisRunMaterial.particleCol;
+    Sim parent;
+    Particle(int ordinal, Sim parent){ //Конструктор класса, вызывается при создании экземпляра
+        this.parent = parent;
+        activeCol = parent.thisRunMaterial.particleCol;
         this.ordinal = ordinal; //Внутреннее порядковое число частицы. Нужно только для вывода (И, возможно, кривых методов вывода частиц)
         this.rand = new Random();//Генератор случайных чисел нужен для генерации скоростей и координат
 
@@ -57,20 +56,20 @@ public class Particle{
         thisParticleMat.setDiffuseColor(activeCol);
     }
 
-    static double calcRandLen() {
-        double xMAX = 5*currentSim.lambdaN;
+    double calcRandLen() {
+        double xMAX = 5*parent.lambdaN;
         double lambda= Math.random()*xMAX; //vxR
-        double awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(currentSim.lambdaN,3))
-                *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/currentSim.lambdaN),2))); //Значение функции в Х
+        double awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
+                *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х
 
-        double possibleMax = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(currentSim.lambdaN,3))
-                *Math.pow(currentSim.lambdaN,2) *Math.exp(-Math.pow((lambda/currentSim.lambdaN),2))); //Значение функции в Х максимально возможное
+        double possibleMax = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
+                *Math.pow(parent.lambdaN,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х максимально возможное
         double vyR = Math.random()*possibleMax;
         while(vyR>awaitedNum){
             lambda= Math.random()*xMAX; //vxR
             vyR = Math.random()*possibleMax;
-            awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(currentSim.lambdaN,3))
-                    *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/currentSim.lambdaN),2))); //Значение функции в Х
+            awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
+                    *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х
         }
 
         return lambda;
@@ -79,27 +78,27 @@ public class Particle{
 
     private double[] generateCord() {
         //Мы не знаем, что ударит в голову пользователю. Чтобы даже 100 осей были возможны, в Sim есть проверка на введённое кол-во
-        double[] product = new double[currentSim.maxDimensions]; //XYZ
+        double[] product = new double[parent.maxDimensions]; //XYZ
         Arrays.fill(product,0);
         // Измерений может быть меньше трёх, но дальше есть код жёстко прописанный под 3Д. (Всё что связано с визуализацией, например)
         // Обнуление неиспользуемых измерений заставляет всё работать и не вызывает Array out of bounds & NullPointerException
-        for (int i = 0; i < currentSim.avilableDimensions; i++) {
-            product[i] = (currentSim.GEN_SIZE[i])*Math.random() - currentSim.GEN_SIZE[i]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
+        for (int i = 0; i < parent.avilableDimensions; i++) {
+            product[i] = (parent.GEN_SIZE[i])*Math.random() - parent.GEN_SIZE[i]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
         }
-        product[1] = currentSim.CHA_SIZE[1]/2 - currentSim.GEN_SIZE[1];
+        product[1] = parent.CHA_SIZE[1]/2 - parent.GEN_SIZE[1];
         return product;
     }
 
     private double[] generateSpeed(boolean isFirstStep) {
-        double[] product = new double[currentSim.maxDimensions]; //XYZ
+        double[] product = new double[parent.maxDimensions]; //XYZ
         Arrays.fill(product,0);
-        double sv = Math.sqrt((Sim.k*currentSim.T)/ currentSim.m); // длина вектора
-        if(isFirstStep){sv = Math.sqrt((Sim.k*currentSim.TSource)/ currentSim.m);} // длина вектора
-        for (int i = 0; i < currentSim.avilableDimensions; i++) {
+        double sv = Math.sqrt((Sim.k*parent.T)/ parent.m); // длина вектора
+        if(isFirstStep){sv = Math.sqrt((Sim.k*parent.TSource)/ parent.m);} // длина вектора
+        for (int i = 0; i < parent.avilableDimensions; i++) {
             product[i] = rand.nextGaussian()*sv;
         }
-        if(currentSim.avilableDimensions>2 && getPosChance(product) && isFirstStep){
-            for (int i = 0; i < currentSim.avilableDimensions; i++) {
+        if(parent.avilableDimensions>2 && getPosChance(product) && isFirstStep){
+            for (int i = 0; i < parent.avilableDimensions; i++) {
                 product[i] = rand.nextGaussian()*sv;
             }
         }
@@ -116,20 +115,20 @@ public class Particle{
     }
 
 
-    public Thread сreateThread() {
+    public Thread createThread() {
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
 
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
             int stepsPassed = 0;
-            while(active && stepsPassed<currentSim.LEN){ //Когда симуляция запущена и частица ещё не прошла шаги
-                if (currentSim.waitTimeMS>=0 && currentSim.getDto().isOutput3D()){//Ожидание?
+            while(active && stepsPassed<parent.LEN){ //Когда симуляция запущена и частица ещё не прошла шаги
+                if (parent.waitTimeMS>=0 && parent.getDto().isOutput3D()){//Ожидание?
                     try {
-                        Thread.sleep(currentSim.waitTimeMS);
+                        Thread.sleep(parent.waitTimeMS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }}
 
-                DrawingThreadFire(new Particle[]{this});
+                parent.getDraw().drawingThreadFire(new Particle[]{this});
                 //Нынешнее приращение
                 dS = freeRunLen/Math.sqrt(Math.pow(speeds[0],
                         2) + Math.pow(speeds[1],2) + Math.pow(speeds[2],2));
@@ -137,7 +136,7 @@ public class Particle{
 
                 //Новые координаты
                 Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-                for(int i = 0; i<currentSim.avilableDimensions; i++) {
+                for(int i = 0; i<parent.avilableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dS * speeds[i];
                 }
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
@@ -159,7 +158,7 @@ public class Particle{
 
                 if (tarIsHit){ //Запись столкновений в CSV и или в PNG
                     Output.CSVStateReact(obj.getTranslateX(),obj.getTranslateZ());
-                    drawAPath(paths); //Отрисовка пути
+                    parent.getDraw().drawAPath(paths); //Отрисовка пути
                 }
                 stepsPassed++;
                 paths = null; // Освобождаю память, иначе - более 2000 частиц не запустить
@@ -173,13 +172,13 @@ public class Particle{
     }
 
     private void tarNotMet(Point3D oldCord, Point3D newCord) {
-        if(EngineDraw.takePointOnTarget(oldCord,newCord,this)){
+        if(parent.getDraw().takePointOnTarget(oldCord,newCord,this)){
             this.tarIsHit = true;
             thisParticleMat.setDiffuseColor(TarHitCol);
         }
     }
     private void genNotMet(Point3D oldCord, Point3D newCord) {
-        if(EngineDraw.takePointOnGenerator(oldCord,newCord,this) && !wallIsHit){ //Есть ли пересечение?
+        if(parent.getDraw().takePointOnGenerator(oldCord,newCord,this) && !wallIsHit){ //Есть ли пересечение?
             if (bounceChance("GEN")){ //Испарения не происходит
             this.genIsHit = true;
             this.wallIsHit = true;
@@ -193,7 +192,7 @@ public class Particle{
     }
 
     private void wallCheck(Point3D oldCord, Point3D newCord) {
-        if(EngineDraw.takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
+        if(parent.getDraw().takePointOnChamber(oldCord,newCord,this) && !tarIsHit){
             if (bounceChance("WALL")){
                 if (!genIsHit){
                 this.wallIsHit = true;
@@ -208,7 +207,7 @@ public class Particle{
     }
 
     private void toCenter(Point3D oldCord) {
-        Point3D product = currentSim.center.interpolate(oldCord,(1 - Math.random()/20));//Точка между старой координатой и центром в случайной линейной пропорции
+        Point3D product = parent.center.interpolate(oldCord,(1 - Math.random()/20));//Точка между старой координатой и центром в случайной линейной пропорции
         coordinates[0] = product.getX();
         coordinates[1] = product.getY();
         coordinates[2] = product.getZ();
@@ -217,15 +216,15 @@ public class Particle{
 
     private boolean bounceChance(String type) {
         if (type.equals("WALL")) {
-            return !(Math.random() < currentSim.wallBounce);
+            return !(Math.random() < parent.wallBounce);
         }
-        return !(Math.random() < currentSim.genBounce);
+        return !(Math.random() < parent.genBounce);
     }
 
 
     public void getCurrSphere() {
         obj.setMaterial(thisParticleMat);
-        obj.setRadius(1/multiToFill);
+        obj.setRadius(1/parent.getDraw().multiToFill);
         obj.setTranslateX(coordinates[0]); //Установка координат визуализации атома
         obj.setTranslateY(coordinates[1]);
         obj.setTranslateZ(coordinates[2]);

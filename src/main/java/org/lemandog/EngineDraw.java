@@ -17,11 +17,7 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 import javafx.stage.Stage;
 import org.lemandog.util.Console;
-import org.lemandog.util.Output;
-
 import java.util.Arrays;
-
-import static org.lemandog.Sim.currentSim;
 /*
 ---------------> X
 |\
@@ -33,40 +29,46 @@ Y
 */
 
 public class EngineDraw {
-    static Stage draw = new Stage();
-    static Group root = new Group();
-    static Scene scene = new Scene(root, 600, 600);
-    static double multiToFill;
-    static Box chamberR;
-    static Box targetR;
-    static Box generatorR;
-
-    public static Sphere engine3D(Particle currPos) {
+    Stage draw = new Stage();
+    Group root = new Group();
+    Scene scene = new Scene(root, 600, 600);
+    double multiToFill;
+    Box chamberR;
+    Box targetR;
+    Box generatorR;
+    Sim parent;
+    SimDTO parentDTO;
+    public Sphere engine3D(Particle currPos) {
         currPos.getCurrSphere();
         Sphere toDraw = currPos.obj;
         toDraw.setMaterial(currPos.obj.getMaterial());
         return toDraw;
     }
+    EngineDraw(Sim parent){
+        this.parent = parent;
+        this.parentDTO = parent.getDto();
+        eSetup();
+    }
 
-    public static void eSetup() { //Отрисовка камеры
+    public void eSetup() { //Отрисовка камеры
         draw.setResizable(true);
         Image icon = new Image(EngineDraw.class.getResourceAsStream("/icons/atomSim.png"));
         draw.getIcons().add(icon);
 
-        multiToFill = scene.getHeight()/(Arrays.stream(currentSim.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
+        multiToFill = scene.getHeight()/(Arrays.stream(parent.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
         scene.setFill(Color.BLACK);
-        chamberR = new Box((currentSim.CHA_SIZE[0]),(currentSim.CHA_SIZE[1]),(currentSim.CHA_SIZE[2]));
+        chamberR = new Box((parent.CHA_SIZE[0]),(parent.CHA_SIZE[1]),(parent.CHA_SIZE[2]));
 
-        targetR = new Box((currentSim.TAR_SIZE[0]),(currentSim.TAR_SIZE[1]),(currentSim.TAR_SIZE[2]));
-        targetR.setTranslateY((-currentSim.CHA_SIZE[1]/2));
-                generatorR = new Box((currentSim.GEN_SIZE[0]),(currentSim.GEN_SIZE[1]),(currentSim.GEN_SIZE[2]));
-        generatorR.setTranslateY((currentSim.CHA_SIZE[1]/2));
+        targetR = new Box((parent.TAR_SIZE[0]),(parent.TAR_SIZE[1]),(parent.TAR_SIZE[2]));
+        targetR.setTranslateY((-parent.CHA_SIZE[1]/2));
+                generatorR = new Box((parent.GEN_SIZE[0]),(parent.GEN_SIZE[1]),(parent.GEN_SIZE[2]));
+        generatorR.setTranslateY((parent.CHA_SIZE[1]/2));
 
         PerspectiveCamera main = new PerspectiveCamera();
 
         main.setTranslateX(-scene.getHeight()/2); //Чтобы камера в центре имела начало координат
         main.setTranslateY(-scene.getHeight()/2);
-        main.setTranslateZ((Arrays.stream(currentSim.CHA_SIZE).max().getAsDouble())*multiToFill - currentSim.CHA_SIZE[2]);
+        main.setTranslateZ((Arrays.stream(parent.CHA_SIZE).max().getAsDouble())*multiToFill - parent.CHA_SIZE[2]);
         Console.coolPrintout("POS " + main.getTranslateZ() + " FILL MULTI " + multiToFill );
 
         main.setNearClip(0.001);
@@ -75,8 +77,8 @@ public class EngineDraw {
         // КОНТРОЛЬ КАМЕРЫ
         scene.setOnKeyPressed(keyEvent -> {
             if(keyEvent.getCode() == KeyCode.ESCAPE){
-                System.out.println("EXITTING");
-                currentSim.simIsAlive =false;
+                System.out.println("FORCED STOP");
+                parent.simIsAlive =false;
             }
             if(keyEvent.getCode() == KeyCode.NUMPAD1 || keyEvent.getCode() == KeyCode.NUMPAD4){
                 if(keyEvent.getCode() == KeyCode.NUMPAD1){main.setTranslateX(main.getTranslateX() + 1);} else {main.setTranslateX(main.getTranslateX() - 1);}
@@ -114,29 +116,29 @@ public class EngineDraw {
         draw.setScene(scene);
         draw.show();
         draw.setOnCloseRequest(windowEvent -> {
-            currentSim.simIsAlive = false;
+            parent.simIsAlive = false;
             draw.hide();
         });
     }
 
-
-    public static void DrawingThreadFire(Particle[] containerSet) {
-        if (currentSim.getDto().isOutput3D()){
+//FIXME
+    public void drawingThreadFire(Particle[] containerSet) {
+        if (parentDTO.isOutput3D()){
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
-                if (particle != null) {
-                    EngineDraw.root.getChildren().remove(particle.drawObj);
+                if (particle != null && root != null) {
+                    root.getChildren().remove(particle.drawObj);
                     particle.getCurrSphere();
                     particle.drawObj = engine3D(particle);
-                    EngineDraw.root.getChildren().add(particle.drawObj);
+                    root.getChildren().add(particle.drawObj);
                 }
             }
         });
     }
     }
 
-    public static void CylinderThread(Cylinder path) {
-        Platform.runLater(()-> EngineDraw.root.getChildren().add(path));
+    public void CylinderThread(Cylinder path) {
+        Platform.runLater(()-> root.getChildren().add(path));
     }
 
     public static Cylinder createConnection(Point3D origin, Point3D target) {
@@ -158,7 +160,7 @@ public class EngineDraw {
     }
 
 
-    public static boolean takePointOnChamber(Point3D origin, Point3D target, Particle inUse){
+    public boolean takePointOnChamber(Point3D origin, Point3D target, Particle inUse){
 
         Sphere product = new Sphere();
         //Это более глупый алгоритм нежели чем тот, что используется для нахождения точек пересечения с мишенью и генератором.
@@ -193,13 +195,13 @@ public class EngineDraw {
 
         return false;
     }
-    static void drawAPath(Cylinder path){
-        if(currentSim.pathsDr){
-            EngineDraw.CylinderThread(path);
+    void drawAPath(Cylinder path){
+        if(parent.pathsDr){
+            CylinderThread(path);
         }
     }
 
-    public static boolean takePointOnTarget(Point3D origin, Point3D target, Particle inUse){
+    public boolean takePointOnTarget(Point3D origin, Point3D target, Particle inUse){
         //ВНИМАНИЕ: Мишень НИЖЕ нуля по Y (!!!), поэтому нужно не путать условия (как это делал я до сих пор)
         Sphere product = new Sphere();
         if (origin.getY() >= targetR.getBoundsInParent().getMaxY() && target.getY() <= targetR.getBoundsInParent().getMaxY()){ //Проходит через высоту мишени
@@ -224,8 +226,7 @@ public class EngineDraw {
         }
         return false;
     }
-    public static boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
-
+    public boolean takePointOnGenerator(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
         //ВНИМАНИЕ: Генератор ВЫШЕ нуля по Y (!!!), поэтому нужно не путать условия (как это делал я до сих пор)
         if (origin.getY() <= generatorR.getBoundsInParent().getMaxY() && target.getY() >= generatorR.getBoundsInParent().getMaxY()){ //Проходит через высоту мишени
@@ -251,14 +252,9 @@ public class EngineDraw {
         return false;
     }
 
-
-    public static void reset() {
-        EngineDraw.root.getChildren().clear();
-    }
-
     //Дальше идёт старый код который жалко удалять
 
-    public static boolean takePointOnTargetAlt(Point3D origin, Point3D target, Particle inUse){
+    public boolean takePointOnTargetAlt(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
         //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
         //Всё потому что Bounds.intersect считает неверно.
@@ -290,7 +286,7 @@ public class EngineDraw {
         }
         return false;
     }
-    public static boolean takePointOnGeneratorAlt(Point3D origin, Point3D target, Particle inUse){
+    public boolean takePointOnGeneratorAlt(Point3D origin, Point3D target, Particle inUse){
         Sphere product = new Sphere();
         //Это очень неэффективный и глупый метод, но он работает (в большинстве случаев)
         //Всё потому что Bounds.intersect считает неверно.

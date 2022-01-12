@@ -1,11 +1,13 @@
 package org.lemandog.util;
-import javafx.scene.image.*;
+
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
-import org.lemandog.App;
-import org.lemandog.MainController;
+import org.lemandog.Sim;
 import org.lemandog.SimDTO;
 
 import javax.imageio.ImageIO;
@@ -16,40 +18,61 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-import static org.lemandog.Sim.currentSim;
+import java.util.Arrays;
+import java.util.Vector;
 import static org.lemandog.util.SwingFXUtils.fromFXImage;
 
 public class Output {
     @Setter
     @Getter
     static int lastPrintStep = 0;
-    static DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
-    public static Image palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
-    public static int[][] picState;
+    static final DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
+    public static final Image palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
     static Vector<Double> X = new Vector<>();
     static Vector<Double> Z = new Vector<>();
-    static FileWriter Hits, enchantedHits;
+    FileWriter Hits, enchantedHits;
+    Sim parent;
+    SimDTO parentDTO;
 
     static final String LINE_END = "\r\n";
     static final String SEPARATOR = ";";
 
-    public Output(SimDTO dto) { //Ставим параметры вывода
-
+    public Output(Sim parent) { //Ставим параметры вывода
+        this.parent = parent;
+        parentDTO = parent.getDto();
+        if (!parent.selectedPath.exists()){parent.selectedPath.mkdir();} //Создаём директории, если их нет
+        if (parentDTO.isOutputRAWCord()){
+            if (Hits == null){
+                LocalDateTime main = LocalDateTime.now();
+                File csv = new File( parent.selectedPath.getAbsolutePath()
+                        + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
+                try {
+                    Hits = new FileWriter(csv);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if(parentDTO.isOutputPicCSVPost()) {
+            if (enchantedHits == null) {
+                File csvOut = new File(parent.selectedPath.getAbsolutePath()
+                        + "/out.csv");
+                try {
+                    enchantedHits = new FileWriter(csvOut);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
-    public static void ConstructOutputAFrame() {
 
-
-    }
-
-    public static void toFile() {
-        double Xmax = currentSim.TAR_SIZE[0];
-        double Zmax = currentSim.TAR_SIZE[2];
-        int DOTSIZE = currentSim.getDto().getResolution();
+    public void toFile() {
+        double Xmax = parent.TAR_SIZE[0];
+        double Zmax = parent.TAR_SIZE[2];
+        int DOTSIZE = parentDTO.getResolution();
         int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+2][(int) (Zmax * (double) DOTSIZE)+2];
-        if (currentSim.getDto().isOutputRAWCord()) {
+        if (parentDTO.isOutputRAWCord()) {
             try {
                 for (int i = 0; i < X.size(); i++) {
                     Hits.write(X.get(i) +SEPARATOR+ Z.get(i) + LINE_END);
@@ -61,7 +84,7 @@ public class Output {
                 e.printStackTrace();
             }
         }
-        if ( currentSim.getDto().isOutputPicCSVPost() || currentSim.getDto().isOutputPic()) { //Код предназначен для и картинки и вывода заселённости
+        if (parentDTO.isOutputPicCSVPost() || parentDTO.isOutputPic()) { //Код предназначен для и картинки и вывода заселённости
             for (int[] ints : CORD) {
                 Arrays.fill(ints, 0);
             }
@@ -72,17 +95,17 @@ public class Output {
 
                 for (int x = 0; x < width; ++x) {
                     for (int y = 0; y < height; ++y) {
-                        if ((double) (1.0F / (float) DOTSIZE * (float) (x - 1)) - Xmax / 2.0D <= X.get(i) &&
-                                X.get(i) <= (double) (1.0F / (float) DOTSIZE * (float) x) - Xmax / 2.0D &&
-                                (double) (1.0F / (float) DOTSIZE * (float) (y - 1)) - Zmax / 2.0D <= Z.get(i) &&
-                                Z.get(i) <= (double) (1.0F / (float) DOTSIZE * (float) y) - Zmax / 2.0D) {
+                        if ((double) (1.0F / (float) DOTSIZE * (float) (x - 1)) - Xmax / 2.0D < X.get(i) &&
+                                X.get(i) < (double) (1.0F / (float) DOTSIZE * (float) x) - Xmax / 2.0D &&
+                                (double) (1.0F / (float) DOTSIZE * (float) (y - 1)) - Zmax / 2.0D < Z.get(i) &&
+                                Z.get(i) < (double) (1.0F / (float) DOTSIZE * (float) y) - Zmax / 2.0D) {
                             CORD[x][y]++;
                         }
                     }
                 }
                 if ((double)i%100 == 0){System.out.println("progress: " + ((double)i/X.size())*100 + " %");}
             }
-            if(currentSim.getDto().isOutputPicCSVPost()){
+            if(parentDTO.isOutputPicCSVPost()){
                 try {
                     for (int x = 0; x < width; ++x) {
                         for (int y = 0; y < height; ++y) {
@@ -98,8 +121,8 @@ public class Output {
                 enchantedHits = null;
             }
         }
-        if (currentSim.getDto().isOutputPic()){
-            File outputFile = new File(currentSim.selectedPath.getAbsolutePath() + "/"+ currentSim.thisRunIndex+"hitsDetector.png");
+        if (parentDTO.isOutputPic()){
+            File outputFile = new File(parent.selectedPath.getAbsolutePath() + "/"+ parent.thisRunIndex+"hitsDetector.png");
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
@@ -150,42 +173,8 @@ public class Output {
         }
         return writeHere;
     }
-    public static void init(){
-        if (currentSim.getDto().isOutputCSV()){
-            if (Hits == null){
-                LocalDateTime main = LocalDateTime.now();
-                File csv = new File( currentSim.selectedPath.getAbsolutePath()
-                        + "/"+currentSim.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
-                try {
-                    Hits = new FileWriter(csv);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if(currentSim.getDto().isOutputPicCSVPost()) {
-            if (enchantedHits == null) {
-                File csvOut = new File(currentSim.selectedPath.getAbsolutePath()
-                        + "/out.csv");
-                try {
-                    enchantedHits = new FileWriter(csvOut);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
     synchronized public static void CSVStateReact(double translateX, double translateZ) {
         X.add(translateX);
         Z.add(translateZ);
-    }
-
-    public void generateRandom() {
-        for (int i = 0; i <picState.length; i++) {
-            for (int j = 0; j <picState[i].length; i++){
-                picState[i][j] = (int) (Math.random() * 100);
-            }
-        }
-        toFile();
     }
 }

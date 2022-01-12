@@ -4,20 +4,17 @@ import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import lombok.Getter;
 import org.lemandog.util.Console;
-import org.lemandog.util.DebugTools;
 import org.lemandog.util.Output;
 
 import java.awt.*;
 import java.io.File;
 
 public class Sim {
-    public static Sim currentSim;
-    static double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
+    static final double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
     @Getter
     private final SimDTO dto;
-    private Output out;
+    private final Output out;
     double m;         //кг
-    private final double d; //м
     public GasTypes thisRunMaterial;
     double T, TSource;
     double p;
@@ -43,6 +40,8 @@ public class Sim {
     boolean pathsDr;
     Thread mainContr;
     Thread[] calculator;
+    @Getter
+    EngineDraw draw;
 
     public static int index = 0;
     public int thisRunIndex;
@@ -54,7 +53,8 @@ public class Sim {
         //DTO - значит data transfer object
         selectedPath = dto.getOutputPath();
         thisRunMaterial = dto.getGas();
-        d = thisRunMaterial.diameter;
+        //м
+        double d = thisRunMaterial.diameter;
         m = thisRunMaterial.mass;
 
         p = dto.getPressure()*Math.pow(10, dto.getPressurePow()); //X*10^Y
@@ -99,56 +99,46 @@ public class Sim {
         Console.setAm(dto.particleAm,dto.stepsAm);
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
-        out = new Output(dto);
+        out = new Output(this);
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
-        for (int i = 0; i < calculator.length; i++) {
+        for (int i = 0; i < avilableStreams; i++) {
             calculator[i] = new Thread();
         }
-
         container = new Particle[N];
     }
 
     public void genTest() {
-    currentSim = new Sim(dto);
-    EngineDraw.reset();
-    EngineDraw.eSetup();
-        for (int i = 0; i < currentSim.N; i++) {
-            currentSim.container[i] = new Particle(i);
+        draw = new EngineDraw(this);
+        for (int i = 0; i < N; i++) {
+            container[i] = new Particle(i,this);
         }
-     EngineDraw.DrawingThreadFire(Sim.currentSim.container);
-    currentSim.mainContr = new Thread(); //Иначе будет NullPointerException. То же причины что и выше
-    if (dto.outputPic){
-            out.generateRandom();
-            Output.toFile();
-    }}
+        getDraw().drawingThreadFire(container);
+    mainContr = new Thread(); //Иначе будет NullPointerException. То же причины что и выше
+    }
 
 
 
     public void start() {
-        currentSim = this; //Ставим этот экземпляр текущим
-        if (!selectedPath.exists()){selectedPath.mkdir();} //Создаём директории, если их нет
-        Output.init();
-        currentSim.simIsAlive = true;
-        EngineDraw.reset();
-        EngineDraw.eSetup();
+        draw = new EngineDraw(this);
+        simIsAlive = true;
         for (int i = 0; i < N; i++) {
-            container[i] = new Particle(i);
+            container[i] = new Particle(i,this);
         }
         //Тут условие для быстродействия. Очень большие симуляции занимают много времени для изначальной отрисовки, так что
         //Первый шаг будет отрисован только если пользователь захочет
-        EngineDraw.DrawingThreadFire(Sim.currentSim.container);
+        getDraw().drawingThreadFire(container);
         //Это делает код менее читабельным, но гораздо более быстрым.
         mainContr = new Thread(() ->{
-        while(lastRunning < N && currentSim.simIsAlive) {
+        while(lastRunning < N && simIsAlive) {
             if(threadQuotaNotMet()>0){
                 for (int i = 0; i< avilableStreams;i++){
                     if (!calculator[i].isAlive()){// Найти закончившийся тред
                         try {
                         calculator[i] = null;       // Удалить
-                        calculator[i] = container[lastRunning].сreateThread(); //Создать и запустить новый - на замену старому
+                        calculator[i] = container[lastRunning].createThread(); //Создать и запустить новый - на замену старому
                         calculator[i].start();
                         lastRunning++;
-                        }catch (ArrayIndexOutOfBoundsException e){Console.coolPrintout("THREAD CREATION MISSFIRE");break;}
+                        }catch (ArrayIndexOutOfBoundsException e){Console.coolPrintout("THREAD CREATION MISFIRE");break;}
                     }
                 }
             }
@@ -159,17 +149,15 @@ public class Sim {
             Console.printLine('X');
             Console.coolPrintout("SIMULATION RUN IS OVER!");
             Console.coolPrintout( "Longest travel distance - " + Output.getLastPrintStep() +" jumps");
-            EngineDraw.DrawingThreadFire(container);
-        Output.toFile();
-        DebugTools.close();
+            out.toFile();
         simIsAlive = false;
         if (!MainController.simQueue.isEmpty()){
-            currentSim = MainController.simQueue.pop();
+            Sim next = MainController.simQueue.pop();
             try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
                 Console.coolPrintout("There is another sim in Queue... Starting");
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) {}
-            Platform.runLater(() -> currentSim.start()); //Надо обязательно делать это на потоке JavaFX
+            Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
         }
         Console.coolPrintout("DONE WORKING!");
         Toolkit.getDefaultToolkit().beep();

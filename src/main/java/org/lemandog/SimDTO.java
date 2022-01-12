@@ -12,6 +12,12 @@ public class SimDTO {
     public SimDTO(){
         pathDrawing = false;
         distCalc = false;
+        output=false;
+        outputPic=false;
+        outputRAWCord=false;
+        outputPicCSVPost=false;
+        outputCSV=false;
+        output3D = true;
         serverAddress = "localhost";
         userEmail = "";
         genSizeX = 0.0000000000000001; //Точечный генератор по умолчанию
@@ -91,7 +97,7 @@ public class SimDTO {
     @Getter
     Image palette;
     public void setPalette(int paletteNumber) {
-        this.palette = new Image("/heatmaps/heatmap" + paletteNumber + ".png");
+        this.palette = new Image(SimDTO.class.getResourceAsStream("/heatmaps/heatmap"+paletteNumber+".png"));
     }
     public void setPalette(){
         this.palette = new Image("/heatmaps/heatmap" + this.paletteNumber + ".png");
