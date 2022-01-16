@@ -1,7 +1,10 @@
 package org.lemandog;
 
 import javafx.scene.paint.Color;
-public enum GasTypes {
+
+import java.io.Serializable;
+
+public enum GasTypes implements Serializable {
     ARGENTUM(107.8682,144,Color.GRAY),
     ALUMINIUM(26.9815386,143, Color.LIGHTSTEELBLUE),
     AURUM(196.966569,144, Color.GOLD),

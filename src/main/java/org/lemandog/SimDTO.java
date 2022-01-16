@@ -2,13 +2,13 @@ package org.lemandog;
 
 import javafx.scene.image.Image;
 import lombok.*;
-import org.lemandog.util.Output;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
+import java.io.Serializable;
+
 @AllArgsConstructor
-public class SimDTO {
-    final int port = 5904;
+public class SimDTO implements Serializable {
     public SimDTO(){
         pathDrawing = false;
         distCalc = false;
@@ -44,7 +44,6 @@ public class SimDTO {
         outputCSV = false;
         outputRAWCord = false;
         outputPicCSVPost = false;
-        palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
         paletteNumber = 2;
         resolution = 100;
         gas = GasTypes.CHROME;
@@ -94,13 +93,11 @@ public class SimDTO {
     @Getter
     @Setter
     boolean output, outputPic, outputRAWCord, outputPicCSVPost, outputCSV, output3D;
-    @Getter
-    Image palette;
-    public void setPalette(int paletteNumber) {
-        this.palette = new Image(SimDTO.class.getResourceAsStream("/heatmaps/heatmap"+paletteNumber+".png"));
+    public Image getPalette() {
+        return new Image(SimDTO.class.getResourceAsStream("/heatmaps/heatmap"+paletteNumber+".png"));
     }
-    public void setPalette(){
-        this.palette = new Image("/heatmaps/heatmap" + this.paletteNumber + ".png");
+    public void setPalette(int paletteNumber) {
+        this.paletteNumber = paletteNumber;
     }
     @Getter
     @Setter
@@ -112,4 +109,6 @@ public class SimDTO {
     @Getter
     @Setter
     GasTypes gas;
+
+
 }

@@ -108,7 +108,7 @@
             </Button>
          </children>
       </VBox>
-      <Pane layoutX="527.0" layoutY="246.0" onDragEntered="#selectConfig" prefHeight="240.0" prefWidth="281.0" style="-fx-background-color: GREEN;" AnchorPane.bottomAnchor="148.0" AnchorPane.rightAnchor="14.0">
+      <Pane layoutX="527.0" layoutY="153.0" onDragEntered="#selectConfig" prefHeight="240.0" prefWidth="281.0" style="-fx-background-color: GREEN;" AnchorPane.bottomAnchor="205.0" AnchorPane.rightAnchor="14.0">
          <children>
             <Text fx:id="configReaderStatus" fill="WHITE" layoutX="16.0" layoutY="115.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Переместите конфигурацию сюда" textAlignment="CENTER" wrappingWidth="248.423828125">
                <font>
@@ -117,13 +117,13 @@
             </Text>
          </children>
       </Pane>
-      <TabPane layoutX="10.0" layoutY="405.0" prefHeight="122.0" prefWidth="802.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane layoutX="10.0" layoutY="405.0" prefHeight="193.0" prefWidth="802.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="Визуализация и вывод">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <VBox layoutY="4.0" maxHeight="1.7976931348623157E308" prefHeight="92.0" prefWidth="324.0" spacing="4.0" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="4.0">
+                        <VBox layoutY="4.0" maxHeight="1.7976931348623157E308" prefHeight="80.0" prefWidth="324.0" spacing="4.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="4.0">
                            <children>
                               <CheckBox fx:id="RAWCordOutput" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" mnemonicParsing="false" text="Вывод координат частиц попавших на подложку (CSV)" />
                               <CheckBox fx:id="PicCSVOutput" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" mnemonicParsing="false" text="Заселение подложки (CSV)" />
@@ -131,14 +131,16 @@
                               <CheckBox fx:id="particlesDraw" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" mnemonicParsing="false" text="Отрисовывать частицы в реальном времени" />
                            </children>
                         </VBox>
-                        <AnchorPane layoutX="335.0" layoutY="11.0" prefHeight="78.0" prefWidth="454.0">
+                        <AnchorPane layoutX="335.0" layoutY="11.0" prefHeight="80.0" prefWidth="454.0">
                            <children>
                               <TextField fx:id="pathToOutput" prefHeight="25.0" prefWidth="370.0" promptText="Выбранный путь" AnchorPane.rightAnchor="84.0" AnchorPane.topAnchor="0.0" />
                               <Button layoutX="361.0" mnemonicParsing="false" onAction="#selectPath" prefHeight="25.0" prefWidth="80.0" text="Выбор" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                              <Slider fx:id="paletteSelect" blockIncrement="1.0" layoutX="3.0" layoutY="36.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="1" onMouseReleased="#viewPalette" prefHeight="38.0" prefWidth="248.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-                              <ImageView fx:id="paletteView" fitHeight="38.0" fitWidth="202.0" layoutX="257.0" layoutY="36.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                              <Slider fx:id="paletteSelect" blockIncrement="1.0" layoutY="40.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="1" onMouseReleased="#viewPalette" prefHeight="25.0" prefWidth="248.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" />
+                              <ImageView fx:id="paletteView" fitHeight="38.0" fitWidth="202.0" layoutX="252.0" layoutY="31.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="0.0" />
                            </children>
                         </AnchorPane>
+                        <Slider fx:id="resolveSelect" blockIncrement="0.0" layoutY="112.0" majorTickUnit="20.0" max="1000.0" min="1.0" minorTickCount="1" onMouseReleased="#resolveSelectDrag" prefHeight="38.0" prefWidth="802.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="50.0" />
+                        <Text fx:id="resolutionText" layoutX="349.0" layoutY="102.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Разрешение съёма" />
                      </children>
                   </AnchorPane>
             </content>
@@ -158,6 +160,7 @@
                            <children>
                               <WebView fx:id="serverResponse" prefHeight="114.0" prefWidth="333.0" HBox.hgrow="ALWAYS" />
                               <CheckBox fx:id="serverCalculate" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Считать на сервере" />
+                              <Button mnemonicParsing="false" onAction="#runServer" prefHeight="38.0" prefWidth="112.0" text="Запустить сервер" />
                            </children>
                         </HBox>
                      </children>

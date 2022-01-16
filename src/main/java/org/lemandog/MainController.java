@@ -11,6 +11,8 @@ import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.lemandog.Server.ServerHandler;
+import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.LoadConfig;
 import org.lemandog.util.Util;
 
@@ -61,15 +63,18 @@ public class MainController {
 
     public WebView configView;
     public Text configReaderStatus;
+    public Slider resolveSelect;
+    public Text resolutionText;
 
 
     public void initialize(){
-        readDTO(new SimDTO());
+        resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
+        writeDTO(new SimDTO());
     }
     public void selectConfig(DragEvent dragEvent) {
         Dragboard db = dragEvent.getDragboard();
         if (db.hasFiles()) {
-            readDTO(LoadConfig.select(db.getFiles().get(0)));
+            writeDTO(LoadConfig.select(db.getFiles().get(0)));
             configReaderStatus.setText("Файл принят");
         }
         dragEvent.consume();
@@ -77,20 +82,21 @@ public class MainController {
 
     public void startSim() {
         //Прочесть ввод из окна
-        SimDTO run = writeDTO();
+        SimDTO run = readDTO();
         startSim(run);
     }
 
     public static void startSim(SimDTO run){
-        if (simQueue.isEmpty()){simQueue.add(new Sim(run));} // Если Пользователь не использует очередь,
+        if (simQueue.isEmpty()) {
+            simQueue.add(new Sim(run));
+        } // Если Пользователь не использует очередь, сделаем очередь из 1 элемента
         if (run.isDistCalc()){
-            ServerHandler.sendQueueToServer(simQueue);
-        }
-        else{
+            ServerHandler.sendQueueToServer(simQueue,run.getServerAddress());
+        } else {
             simQueue.pop().start();
         }
     }
-    public void readDTO(SimDTO input){   //Чтение DTO в UI
+    public void writeDTO(SimDTO input){   //Чтение DTO в UI
         genSizeZ.setValue(input.getGenSizeZ());
         genSizeX.setValue(input.getGenSizeX());
         targetSizeZ.setValue(input.getTarSizeZ());
@@ -117,6 +123,7 @@ public class MainController {
         pathToOutput.setText(input.outputPath.getAbsolutePath());
         paletteSelect.setValue(input.getPaletteNumber());
         paletteView.setImage(input.getPalette());
+        resolveSelect.setValue(input.getResolution());
 
 
         serverAddress.setText(input.getServerAddress());
@@ -134,47 +141,54 @@ public class MainController {
         configView.getEngine().loadContent(Util.getContent());
 
     }
-    public SimDTO writeDTO() { //Запись в DTO
-        SimDTO result = new SimDTO();
-        result.setGenSizeZ(genSizeZ.getValue());
-        result.setGenSizeX(genSizeX.getValue());
-        result.setTarSizeZ(targetSizeZ.getValue());
-        result.setTarSizeX(targetSizeX.getValue());
-        result.setBounceWallChance(bounceWallChance.getValue());
-        result.setBounceGenChance(bounceGenChance.getValue());
-        result.setThreadCount(Integer.parseInt(threadCount.getText()));
-        result.setWaitTime(Integer.parseInt(waitTime.getText()));
-        result.setDimensionCount(Integer.parseInt(dimensionCount.getText()));
-        result.setXFrameLen(Double.parseDouble(xFrameLen.getText()));
-        result.setYFrameLen(Double.parseDouble(yFrameLen.getText()));
-        result.setZFrameLen(Double.parseDouble(zFrameLen.getText()));
-        result.setStepsAm(Integer.parseInt(stepsAm.getText()));
-        result.setParticleAm(Integer.parseInt(particleAm.getText()));
-        result.setTempAm(Double.parseDouble(tempAm.getText()));
-        result.setTempSourceAm(Double.parseDouble(tempSourceAm.getText()));
-        result.setPressure(Double.parseDouble(pressure.getText()));
-        result.setPressurePow(Double.parseDouble(pressurePow.getText()));
+    public SimDTO readDTO() { //Запись в DTO
+        try {
+            SimDTO result = new SimDTO();
+            result.setGenSizeZ(genSizeZ.getValue());
+            result.setGenSizeX(genSizeX.getValue());
+            result.setTarSizeZ(targetSizeZ.getValue());
+            result.setTarSizeX(targetSizeX.getValue());
+            result.setBounceWallChance(bounceWallChance.getValue());
+            result.setBounceGenChance(bounceGenChance.getValue());
+            result.setThreadCount(Integer.parseInt(threadCount.getText()));
+            result.setWaitTime(Integer.parseInt(waitTime.getText()));
+            result.setDimensionCount(Integer.parseInt(dimensionCount.getText()));
+            result.setXFrameLen(Double.parseDouble(xFrameLen.getText()));
+            result.setYFrameLen(Double.parseDouble(yFrameLen.getText()));
+            result.setZFrameLen(Double.parseDouble(zFrameLen.getText()));
+            result.setStepsAm(Integer.parseInt(stepsAm.getText()));
+            result.setParticleAm(Integer.parseInt(particleAm.getText()));
+            result.setTempAm(Double.parseDouble(tempAm.getText()));
+            result.setTempSourceAm(Double.parseDouble(tempSourceAm.getText()));
+            result.setPressure(Double.parseDouble(pressure.getText()));
+            result.setPressurePow(Double.parseDouble(pressurePow.getText()));
 
-        result.setOutputRAWCord(RAWCordOutput.isSelected());
-        result.setOutputPicCSVPost(PicCSVOutput.isSelected());
-        result.setOutputPic(PicPNGOutput.isSelected());
-        result.setOutput3D(particlesDraw.isSelected());
+            result.setOutputRAWCord(RAWCordOutput.isSelected());
+            result.setOutputPicCSVPost(PicCSVOutput.isSelected());
+            result.setOutputPic(PicPNGOutput.isSelected());
+            result.setOutput3D(particlesDraw.isSelected());
+            result.setResolution((int) resolveSelect.getValue());
 
-        result.setOutputPath(new File(pathToOutput.getText()));
-        result.setPalette((int)paletteSelect.getValue());
-        result.setPaletteNumber((int)paletteSelect.getValue());//Вроде оно должно быть автоматически, но это на случай если не сработает
+            result.setOutputPath(new File(pathToOutput.getText()));
+            result.setPalette((int) paletteSelect.getValue());
+            result.setPaletteNumber((int) paletteSelect.getValue());//Вроде оно должно быть автоматически, но это на случай если не сработает
 
-        result.setServerAddress(serverAddress.getText());
-        result.setUserEmail(userEmail.getText());
-        result.setDistCalc(serverCalculate.isSelected());
+            result.setServerAddress(serverAddress.getText());
+            result.setUserEmail(userEmail.getText());
+            result.setDistCalc(serverCalculate.isSelected());
 
-        result.setGas(materialChooser.getValue());
-        return result;
+            result.setGas(materialChooser.getValue());
+            return result;
+        }catch (NumberFormatException e ){
+            System.out.println("MISMATCHED INPUT");
+            System.out.println("НЕВЕРНЫЕ ЗНАЧЕНИЯ");
+        }
+        return null;
     }
 
     public void genTest(ActionEvent actionEvent) {
-        new Sim(writeDTO()).genTest();
-
+        SimDTO result = readDTO();
+        if (result != null){new Sim(readDTO()).genTest();}
     }
 
     public void selectPath() {
@@ -191,13 +205,13 @@ public class MainController {
         numberInQueue.setText(String.valueOf(simQueue.size()));
     }
     public void addToQueue() {
-        simQueue.add(new Sim(writeDTO()));
+        simQueue.add(new Sim(readDTO()));
         numberInQueue.setText(String.valueOf(simQueue.size()));
     }
 
     public void add10ToQueue() {
         for (int i = 0; i < 10; i++) {
-            simQueue.add(new Sim(writeDTO()));
+            simQueue.add(new Sim(readDTO()));
         }
         numberInQueue.setText(String.valueOf(simQueue.size()));
     }
@@ -212,9 +226,15 @@ public class MainController {
     }
 
     public void checkServer() {
-
+        serverResponse.getEngine().loadContent(ServerHandler.askServerForOutput(serverAddress.getText()));
     }
 
 
+    public void runServer() {
+        ServerRunner.main();
+    }
 
+    public void resolveSelectDrag() {
+        resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
+    }
 }

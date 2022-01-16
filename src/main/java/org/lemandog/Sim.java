@@ -3,13 +3,18 @@ package org.lemandog;
 import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import lombok.Getter;
+import org.lemandog.Server.Messenger;
+import org.lemandog.Server.ServerHandler;
+import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
 import java.awt.*;
 import java.io.File;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-public class Sim {
+public class Sim implements Serializable {
     static final double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
     @Getter
     private final SimDTO dto;
@@ -113,7 +118,7 @@ public class Sim {
             container[i] = new Particle(i,this);
         }
         getDraw().drawingThreadFire(container);
-    mainContr = new Thread(); //Иначе будет NullPointerException. То же причины что и выше
+        mainContr = new Thread(); //Иначе будет NullPointerException. То же причины что и выше
     }
 
 
@@ -149,6 +154,7 @@ public class Sim {
             Console.printLine('X');
             Console.coolPrintout("SIMULATION RUN IS OVER!");
             Console.coolPrintout( "Longest travel distance - " + Output.getLastPrintStep() +" jumps");
+            if(getDto().isDistCalc()){ServerRunner.addLine(this);}
             out.toFile();
         simIsAlive = false;
         if (!MainController.simQueue.isEmpty()){
@@ -158,11 +164,16 @@ public class Sim {
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) {}
             Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
+        }else {
+            Console.coolPrintout("DONE WORKING!");
+            if (getDto().isDistCalc()) {
+                ServerRunner.addLine("DONE WORKING AT " + LocalDateTime.now());
+                Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString(), ServerRunner.getAttachments());
+            }
+            Toolkit.getDefaultToolkit().beep();
+            Toolkit.getDefaultToolkit().beep();
+            Toolkit.getDefaultToolkit().beep();
         }
-        Console.coolPrintout("DONE WORKING!");
-        Toolkit.getDefaultToolkit().beep();
-        Toolkit.getDefaultToolkit().beep();
-        Toolkit.getDefaultToolkit().beep();
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);
         mainContr.start();

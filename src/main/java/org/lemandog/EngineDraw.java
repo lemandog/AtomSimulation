@@ -29,7 +29,7 @@ Y
 */
 
 public class EngineDraw {
-    Stage draw = new Stage();
+    static Stage draw = new Stage();
     Group root = new Group();
     Scene scene = new Scene(root, 600, 600);
     double multiToFill;
@@ -121,12 +121,11 @@ public class EngineDraw {
         });
     }
 
-//FIXME
     public void drawingThreadFire(Particle[] containerSet) {
         if (parentDTO.isOutput3D()){
         Platform.runLater(()-> {
             for (Particle particle : containerSet) {
-                if (particle != null && root != null) {
+                if (particle != null && particle.isInUse) {
                     root.getChildren().remove(particle.drawObj);
                     particle.getCurrSphere();
                     particle.drawObj = engine3D(particle);

@@ -7,10 +7,12 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import lombok.Getter;
 import lombok.Setter;
+import org.lemandog.Server.ServerRunner;
 import org.lemandog.Sim;
 import org.lemandog.SimDTO;
 
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -33,21 +35,27 @@ public class Output {
     FileWriter Hits, enchantedHits;
     Sim parent;
     SimDTO parentDTO;
-
+    File csvHitsReport,csvFullOut;
     static final String LINE_END = "\r\n";
     static final String SEPARATOR = ";";
 
     public Output(Sim parent) { //Ставим параметры вывода
         this.parent = parent;
         parentDTO = parent.getDto();
-        if (!parent.selectedPath.exists()){parent.selectedPath.mkdir();} //Создаём директории, если их нет
+        if (parentDTO.isDistCalc()){
+            parentDTO.setOutputPath(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath() + "/AS/"));
+            System.out.println(parentDTO.getOutputPath().getAbsolutePath());
+            parentDTO.getOutputPath().deleteOnExit();
+            ServerRunner.setFilesPath(parentDTO.getOutputPath());
+        }
+        if (!parentDTO.getOutputPath().exists()){parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
         if (parentDTO.isOutputRAWCord()){
             if (Hits == null){
                 LocalDateTime main = LocalDateTime.now();
-                File csv = new File( parent.selectedPath.getAbsolutePath()
+                csvHitsReport = new File( parentDTO.getOutputPath().getAbsolutePath()
                         + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
                 try {
-                    Hits = new FileWriter(csv);
+                    Hits = new FileWriter(csvHitsReport);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -55,10 +63,10 @@ public class Output {
         }
         if(parentDTO.isOutputPicCSVPost()) {
             if (enchantedHits == null) {
-                File csvOut = new File(parent.selectedPath.getAbsolutePath()
-                        + "/out.csv");
+                csvFullOut = new File(parentDTO.getOutputPath().getAbsolutePath()
+                        + "/"+parent.thisRunIndex+"out.csv");
                 try {
-                    enchantedHits = new FileWriter(csvOut);
+                    enchantedHits = new FileWriter(csvFullOut);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -68,8 +76,8 @@ public class Output {
 
 
     public void toFile() {
-        double Xmax = parent.TAR_SIZE[0];
-        double Zmax = parent.TAR_SIZE[2];
+        double Xmax = this.parent.TAR_SIZE[0];
+        double Zmax = this.parent.TAR_SIZE[2];
         int DOTSIZE = parentDTO.getResolution();
         int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+2][(int) (Zmax * (double) DOTSIZE)+2];
         if (parentDTO.isOutputRAWCord()) {
@@ -77,6 +85,7 @@ public class Output {
                 for (int i = 0; i < X.size(); i++) {
                     Hits.write(X.get(i) +SEPARATOR+ Z.get(i) + LINE_END);
                 }
+                Hits.flush();
                 Hits.close();
                 System.out.println("GLOBAL STREAM Hits CLOSED");
                 Hits =null;
@@ -113,6 +122,7 @@ public class Output {
                         }
                         enchantedHits.write(LINE_END);
                     }
+                    enchantedHits.flush();
                     enchantedHits.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -122,7 +132,7 @@ public class Output {
             }
         }
         if (parentDTO.isOutputPic()){
-            File outputFile = new File(parent.selectedPath.getAbsolutePath() + "/"+ parent.thisRunIndex+"hitsDetector.png");
+            File outputFile = new File(parentDTO.getOutputPath().getAbsolutePath() + "/"+ parent.thisRunIndex+"hitsDetector.png");
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
@@ -142,11 +152,11 @@ public class Output {
             }
         }
         }
-    public static Color colSel(int sel){        //0-9 цвета в палитре
+    static Color colSel(int sel){        //0-9 цвета в палитре
         PixelReader randColRead = palette.getPixelReader();
         return randColRead.getColor(sel,0);}
 
-    private static Image toImage(int[][] CORD){
+    private Image toImage(int[][] CORD){
         int height = CORD.length;
         int width = CORD[0].length;
         WritableImage writeHere = new WritableImage(width,height);

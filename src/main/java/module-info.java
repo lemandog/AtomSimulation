@@ -6,10 +6,12 @@ module AtomSimulation {
     requires java.sql;
     exports org.lemandog;
     exports org.lemandog.util;
+    exports org.lemandog.Server;
 
     requires java.xml;
     requires java.scripting;
     requires javafx.fxml;
     requires javafx.web;
     requires static lombok;
+    requires java.mail;
 }
