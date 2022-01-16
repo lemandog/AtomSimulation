@@ -63,9 +63,9 @@ public class Messenger {
             message.setSubject("Results of your simulation with timestamp: " + LocalDateTime.now() +  " - READY");
 
             // Now set the actual message
-            message.setText(messageText);
             MimeMultipart content = new MimeMultipart();
             MimeBodyPart attachmentPart = new MimeBodyPart();
+            attachmentPart.setText(messageText);
             attachmentPart.attachFile(attachments);
             content.addBodyPart(attachmentPart);
             message.setContent(content);

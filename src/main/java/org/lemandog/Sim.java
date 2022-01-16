@@ -169,6 +169,7 @@ public class Sim implements Serializable {
             if (getDto().isDistCalc()) {
                 ServerRunner.addLine("DONE WORKING AT " + LocalDateTime.now());
                 Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString(), ServerRunner.getAttachments());
+                ServerRunner.getFilesPath().delete();
             }
             Toolkit.getDefaultToolkit().beep();
             Toolkit.getDefaultToolkit().beep();

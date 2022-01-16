@@ -114,7 +114,7 @@ public class EngineDraw {
 
         draw.setTitle("Отрисовка");
         draw.setScene(scene);
-        draw.show();
+        if (parentDTO.output3D){draw.show();}
         draw.setOnCloseRequest(windowEvent -> {
             parent.simIsAlive = false;
             draw.hide();

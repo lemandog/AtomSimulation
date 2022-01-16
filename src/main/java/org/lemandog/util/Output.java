@@ -43,10 +43,10 @@ public class Output {
         this.parent = parent;
         parentDTO = parent.getDto();
         if (parentDTO.isDistCalc()){
-            parentDTO.setOutputPath(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath() + "/AS/"));
+            parentDTO.setOutputPath(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath() + "/AS"));
+            ServerRunner.setFilesPath(parentDTO.getOutputPath());
             System.out.println(parentDTO.getOutputPath().getAbsolutePath());
             parentDTO.getOutputPath().deleteOnExit();
-            ServerRunner.setFilesPath(parentDTO.getOutputPath());
         }
         if (!parentDTO.getOutputPath().exists()){parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
         if (parentDTO.isOutputRAWCord()){
@@ -64,7 +64,7 @@ public class Output {
         if(parentDTO.isOutputPicCSVPost()) {
             if (enchantedHits == null) {
                 csvFullOut = new File(parentDTO.getOutputPath().getAbsolutePath()
-                        + "/"+parent.thisRunIndex+"out.csv");
+                        + "/out.csv");
                 try {
                     enchantedHits = new FileWriter(csvFullOut);
                 } catch (IOException e) {

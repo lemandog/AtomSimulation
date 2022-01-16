@@ -18,6 +18,7 @@ public class ServerHandler {
         }
 
         Socket clientSocket1 = new Socket(serverAddress, 5904);
+        clientSocket1.setSoTimeout(2000);
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket1.getOutputStream()));
 
         out.writeObject(dtoList);
@@ -32,6 +33,7 @@ public class ServerHandler {
         String line = " Нет ответа ";
         try {
             Socket clientSocket2 = new Socket(serverAddress, 5905);
+            clientSocket2.setSoTimeout(2000);
             ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket2.getOutputStream()));
             ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(clientSocket2.getInputStream()));
             line = in.readUTF();

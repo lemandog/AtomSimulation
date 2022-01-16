@@ -8,19 +8,17 @@ import org.lemandog.Sim;
 import org.lemandog.SimDTO;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ServerRunner {
-        public static ArrayDeque<Sim> simQueue = new ArrayDeque<>();
         static ServerSocket server;
         static ServerSocket serverStatus;
+        static LocalDateTime startup = LocalDateTime.now();
         @Getter
         @Setter
         static String email;
@@ -34,10 +32,12 @@ public class ServerRunner {
             Thread serverStatusReport = new Thread(()->{
                 try {
                     serverStatus = new ServerSocket(5905);
-                    Socket clientSocketState = serverStatus.accept();
-                    ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocketState.getOutputStream()));
-                    out.writeUTF(statusReport());
-                    out.flush();
+                    while (true) {
+                        Socket clientSocketState = serverStatus.accept();
+                        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocketState.getOutputStream()));
+                        out.writeUTF(statusReport());
+                        out.flush();
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -46,17 +46,17 @@ public class ServerRunner {
             Thread serverRunner = new Thread(()->{
                 try {
                     server = new ServerSocket(5904);
-                    Socket clientSocket = server.accept();
-                    ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
-                    ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
-                    ArrayDeque<SimDTO> accepted = (ArrayDeque<SimDTO>) in.readObject();
-                        if ( accepted != null){
+                    while (true) {
+                        Socket clientSocket = server.accept();
+                        ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
+                        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
+                        ArrayDeque<SimDTO> accepted = (ArrayDeque<SimDTO>) in.readObject();
+                        if (accepted != null) {
                             String answer;
-                            if (accepted.element().getUserEmail().isBlank()){
+                            if (accepted.element().getUserEmail().isBlank()) {
                                 answer = "NO EMAIL IS GIVEN! SIM NOT STARTED";
                                 accepted = new ArrayDeque<>();
-                            }
-                            else{
+                            } else {
                                 answer = "ACCEPTED QUEUE OF SIM OF SIZE " + accepted.size() + " FROM " + accepted.element().getUserEmail();
                                 setEmail(accepted.element().getUserEmail());
                                 setReport(new StringBuilder());
@@ -66,10 +66,13 @@ public class ServerRunner {
                             out.flush();
                         }
 
-                    for (SimDTO sim : accepted){
-                        MainController.simQueue.add(new Sim(sim));
+                        for (SimDTO sim : accepted) {
+                            MainController.simQueue.add(new Sim(sim));
+                        }
+                        Platform.runLater(() -> {
+                            MainController.simQueue.pop().start();
+                        });
                     }
-                    Platform.runLater(()->{MainController.simQueue.pop().start();});
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -80,12 +83,20 @@ public class ServerRunner {
         }
 
         private static String statusReport() {
-            return "ATOM SIM SERVER REPORTING:"+ "\n" +
-                    "OPERATING ON " + Runtime.getRuntime().maxMemory() / 1048576 + "MB OF RAM \n" +
-                    "WITH " + simQueue.size() + " SIM IN QUEUE" +
-                    "IS READY: " + !server.isClosed();
-
+            StringBuilder ipv4 = new StringBuilder();
+            try {
+                ipv4.append(InetAddress.getLocalHost().getHostAddress());
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+            return "<p>ATOMSIM Server reporting:</p>"+
+                   "<p>Operating on "+Runtime.getRuntime().maxMemory() / 1048576 +"  of RAM</p>"+
+                   "<p>With "+MainController.simQueue.size()+" simulations in queue</p>"+
+                    "<p>Ready:"+!server.isClosed()+"</p>"+
+                    "<p>Uptime: "+ LocalDateTime.ofEpochSecond(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - startup.toEpochSecond(ZoneOffset.UTC),0,ZoneOffset.UTC)+ "</p>"+
+                    "<p>"+ipv4+"</p>";
         }
+
 
     public static void addLine(Sim run){
         report.append(run.thisRunIndex + " OVER,  " + " TIMESTAMP: " + LocalDateTime.now() + "\n");
@@ -95,6 +106,7 @@ public class ServerRunner {
     }
     public static File getAttachments() {
         File report = new File("report.zip");
+        report.deleteOnExit();
         try {
             FileOutputStream fos = new FileOutputStream(report);
             ZipOutputStream zipOut = new ZipOutputStream(fos);
