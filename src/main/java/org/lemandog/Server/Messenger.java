@@ -6,11 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Properties;
 
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -61,13 +57,16 @@ public class Messenger {
 
             // Set Subject: header field
             message.setSubject("Results of your simulation with timestamp: " + LocalDateTime.now() +  " - READY");
-
             // Now set the actual message
             MimeMultipart content = new MimeMultipart();
             MimeBodyPart attachmentPart = new MimeBodyPart();
+            BodyPart textPart = new MimeBodyPart();
+            textPart.setText(messageText);
+
             attachmentPart.setText(messageText);
             attachmentPart.attachFile(attachments);
             content.addBodyPart(attachmentPart);
+            content.addBodyPart(textPart);
             message.setContent(content);
 
             System.out.println("sending...");

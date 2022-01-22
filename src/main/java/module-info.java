@@ -14,4 +14,5 @@ module AtomSimulation {
     requires javafx.web;
     requires static lombok;
     requires java.mail;
+    requires org.apache.commons.io;
 }

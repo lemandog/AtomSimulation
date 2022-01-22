@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.lemandog.MainController;
 import org.lemandog.Sim;
 import org.lemandog.SimDTO;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.net.*;
@@ -125,6 +126,7 @@ public class ServerRunner {
         zipOut.close();
         fos.flush();
         fos.close();
+        FileUtils.deleteDirectory(filesPath);
     } catch (IOException e) {
         e.printStackTrace();
     }

@@ -42,18 +42,33 @@ public class Output {
     public Output(Sim parent) { //Ставим параметры вывода
         this.parent = parent;
         parentDTO = parent.getDto();
+    }
+
+
+    public void toFile() {
+        double Xmax = this.parent.TAR_SIZE[0];
+        double Zmax = this.parent.TAR_SIZE[2];
+        int DOTSIZE = parentDTO.getResolution();
+        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+2][(int) (Zmax * (double) DOTSIZE)+2];
         if (parentDTO.isDistCalc()){
             parentDTO.setOutputPath(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath() + "/AS"));
             ServerRunner.setFilesPath(parentDTO.getOutputPath());
             System.out.println(parentDTO.getOutputPath().getAbsolutePath());
             parentDTO.getOutputPath().deleteOnExit();
         }
-        if (!parentDTO.getOutputPath().exists()){parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
+        if (!parentDTO.getOutputPath().exists()){
+            parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
         if (parentDTO.isOutputRAWCord()){
             if (Hits == null){
                 LocalDateTime main = LocalDateTime.now();
-                csvHitsReport = new File( parentDTO.getOutputPath().getAbsolutePath()
-                        + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
+                if(parentDTO.isDistCalc()){
+                    csvHitsReport = new File(ServerRunner.getFilesPath()
+                            + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
+                } else{
+                    csvHitsReport = new File( parentDTO.getOutputPath().getAbsolutePath()
+                            + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
+                }
+
                 try {
                     Hits = new FileWriter(csvHitsReport);
                 } catch (IOException e) {
@@ -63,8 +78,13 @@ public class Output {
         }
         if(parentDTO.isOutputPicCSVPost()) {
             if (enchantedHits == null) {
-                csvFullOut = new File(parentDTO.getOutputPath().getAbsolutePath()
-                        + "/out.csv");
+                if(parentDTO.isDistCalc()){
+                    csvFullOut = new File(ServerRunner.getFilesPath()
+                            + "/out.csv");
+                } else {
+                    csvFullOut = new File(parentDTO.getOutputPath().getAbsolutePath()
+                            + "/out.csv");
+                }
                 try {
                     enchantedHits = new FileWriter(csvFullOut);
                 } catch (IOException e) {
@@ -72,14 +92,7 @@ public class Output {
                 }
             }
         }
-    }
 
-
-    public void toFile() {
-        double Xmax = this.parent.TAR_SIZE[0];
-        double Zmax = this.parent.TAR_SIZE[2];
-        int DOTSIZE = parentDTO.getResolution();
-        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+2][(int) (Zmax * (double) DOTSIZE)+2];
         if (parentDTO.isOutputRAWCord()) {
             try {
                 for (int i = 0; i < X.size(); i++) {
@@ -132,7 +145,12 @@ public class Output {
             }
         }
         if (parentDTO.isOutputPic()){
-            File outputFile = new File(parentDTO.getOutputPath().getAbsolutePath() + "/"+ parent.thisRunIndex+"hitsDetector.png");
+            File outputFile;
+            if(parentDTO.isDistCalc()){
+                outputFile = new File(ServerRunner.getFilesPath()+ "/"+ parent.thisRunIndex+"hitsDetector.png");
+            } else {
+                outputFile = new File(parentDTO.getOutputPath().getAbsolutePath() + "/"+ parent.thisRunIndex+"hitsDetector.png");
+            }
             try {
                 //Тут чёрт ногу сломит, но происходит конвертация из типа в тип из-за несовместимых библиотек.
                 // А потом ещё раз, потому что мне нужно увеличить картинку
