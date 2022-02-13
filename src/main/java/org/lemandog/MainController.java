@@ -144,9 +144,6 @@ public class MainController {
         serverCalculate.setSelected(input.isDistCalc());
 
         materialChooser.setValue(input.getGas());
-        atomDiam.setText(input.getGas().diameterRAW + " пм");
-        atomMass.setText(input.getGas().massRAW + " аем");
-
         numberInQueue.setText(String.valueOf(simQueue.size()));
     }
     public SimDTO readDTO() { //Запись в DTO
