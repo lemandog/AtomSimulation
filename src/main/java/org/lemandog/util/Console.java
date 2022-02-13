@@ -1,7 +1,18 @@
 package org.lemandog.util;
 
-import org.lemandog.App;
+import javafx.application.Application;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+
 public class Console {
+    @Getter
+    static String ver;
     static final int CON_WIDTH = 120;
 
     private static int amLen;
@@ -11,9 +22,23 @@ public class Console {
         amLen = Integer.toString(particleAm).length();
         dist = Integer.toString(stepsAm).length();
     }
+    @SneakyThrows
     public static void ready(){
+        MavenXpp3Reader reader = new MavenXpp3Reader();
+        Model model;
+        if ((new File("/pom.xml")).exists())
+            model = reader.read(new FileReader("/pom.xml"));
+        else
+            model = reader.read(
+                    new InputStreamReader(
+                            Application.class.getResourceAsStream(
+                                    "/META-INF/maven/org.lemandog/AtomSim/pom.xml"
+                            )
+                    )
+            );
+        ver = model.getVersion();
         printLine('@');
-        coolPrintout("Atom simulation v 0.4.4 ");
+        coolPrintout("Atom simulation v "+ver+" ");
         printLine('@');
         if (Runtime.getRuntime().maxMemory()/1048576 <= 4086) {
             coolPrintout("Currently, your machine only has " + Runtime.getRuntime().maxMemory() / 1048576 + "Mbytes of free RAM available to this instance of JVM (which is standard or below)");

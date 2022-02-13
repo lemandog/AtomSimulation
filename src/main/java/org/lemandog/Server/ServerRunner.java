@@ -7,6 +7,7 @@ import org.lemandog.MainController;
 import org.lemandog.Sim;
 import org.lemandog.SimDTO;
 import org.apache.commons.io.FileUtils;
+import org.lemandog.util.Console;
 
 import java.io.*;
 import java.net.*;
@@ -90,7 +91,7 @@ public class ServerRunner {
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
-            return "<p>ATOMSIM Server reporting:</p>"+
+            return "<p>ATOMSIM "+ Console.getVer()+" Server reporting:</p>"+
                    "<p>Operating on "+Runtime.getRuntime().maxMemory() / 1048576 +"  of RAM</p>"+
                    "<p>With "+MainController.simQueue.size()+" simulations in queue</p>"+
                     "<p>Ready:"+!server.isClosed()+"</p>"+

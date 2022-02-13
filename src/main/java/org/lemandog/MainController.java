@@ -1,6 +1,7 @@
 package org.lemandog;
 
-import javafx.event.ActionEvent;
+import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -18,6 +19,7 @@ import org.lemandog.util.Util;
 
 import java.io.*;
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 public class MainController {
     public Slider targetSizeZ;
@@ -72,6 +74,12 @@ public class MainController {
         resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
         configView.getEngine().loadContent(Util.getContent());
         commandPane.setContent(LoadConfig.constructConfigInfoFrame());
+        materialChooser.setItems(FXCollections.observableArrayList(GasTypes.values()));
+        materialChooser.getSelectionModel().selectedIndexProperty().addListener((ChangeListener<? super Number>) (observableValue, gasTypes, t1) -> {
+            GasTypes type = materialChooser.getValue();
+            atomDiam.setText(type.diameterRAW + " пм");
+            atomMass.setText(type.massRAW + " аем");
+        });
         writeDTO(new SimDTO());
     }
     public void selectConfig(DragEvent dragEvent) {
@@ -186,7 +194,7 @@ public class MainController {
         return null;
     }
 
-    public void genTest(ActionEvent actionEvent) {
+    public void genTest() {
         SimDTO result = readDTO();
         if (result != null){new Sim(readDTO()).genTest();}
     }
@@ -200,7 +208,7 @@ public class MainController {
         pathToOutput.setText(path.getAbsolutePath());
     }
 
-    public void expungeToQueue() {
+    public void expungeQueue() {
         if (!simQueue.isEmpty()){simQueue.pop();}
         numberInQueue.setText(String.valueOf(simQueue.size()));
     }
@@ -222,7 +230,7 @@ public class MainController {
     }
 
     public void viewPalette() {
-        paletteView.setImage(new Image(MainController.class.getResourceAsStream("/heatmaps/heatmap"+(int)paletteSelect.getValue()+".png")));
+        paletteView.setImage(new Image(Objects.requireNonNull(MainController.class.getResourceAsStream("/heatmaps/heatmap" + (int) paletteSelect.getValue() + ".png"))));
     }
 
     public void checkServer() {

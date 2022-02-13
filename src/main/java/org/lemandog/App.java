@@ -24,7 +24,7 @@ public class App extends Application {
         userControlWindows.setScene(scene);
         Image icon = new Image(App.class.getResourceAsStream("/icons/atomSim.png"));
         userControlWindows.getIcons().add(icon);
-        userControlWindows.setTitle("Контроль");
+        userControlWindows.setTitle("Контроль " + Console.getVer());
         userControlWindows.setOnCloseRequest(event -> System.exit(0));
         userControlWindows.show();
         } catch (IOException e) {

@@ -15,4 +15,6 @@ module AtomSimulation {
     requires static lombok;
     requires java.mail;
     requires org.apache.commons.io;
+    requires maven.model;
+    requires plexus.utils;
 }
