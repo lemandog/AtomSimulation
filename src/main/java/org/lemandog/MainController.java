@@ -16,7 +16,7 @@ import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.LoadConfig;
 import org.lemandog.util.Util;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayDeque;
 
 public class MainController {
@@ -65,10 +65,13 @@ public class MainController {
     public Text configReaderStatus;
     public Slider resolveSelect;
     public Text resolutionText;
+    public ScrollPane commandPane;
 
 
     public void initialize(){
         resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
+        configView.getEngine().loadContent(Util.getContent());
+        commandPane.setContent(LoadConfig.constructConfigInfoFrame());
         writeDTO(new SimDTO());
     }
     public void selectConfig(DragEvent dragEvent) {
@@ -137,9 +140,6 @@ public class MainController {
         atomMass.setText(input.getGas().massRAW + " аем");
 
         numberInQueue.setText(String.valueOf(simQueue.size()));
-
-        configView.getEngine().loadContent(Util.getContent());
-
     }
     public SimDTO readDTO() { //Запись в DTO
         try {
@@ -236,5 +236,21 @@ public class MainController {
 
     public void resolveSelectDrag() {
         resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
+    }
+
+    public void saveConfig() {
+        try {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File config = new File(directoryChooser.showDialog(new Stage()).getAbsolutePath() + "/config.AS");
+        config.createNewFile();
+        System.out.println(config.getAbsolutePath());
+        FileOutputStream fout = new FileOutputStream(config);
+        ObjectOutputStream oos = new ObjectOutputStream(fout);
+        oos.writeObject(readDTO());
+        oos.flush();
+        fout.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

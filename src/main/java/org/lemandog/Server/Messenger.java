@@ -14,12 +14,8 @@ import javax.mail.internet.MimeMultipart;
 
 public class Messenger {
     public static void send(String recipient, String messageText, File attachments) {
-        // Recipient's email ID needs to be mentioned.
-
-        // Sender's email ID needs to be mentioned
         String from = "atomsim@internet.ru";
-
-        // Assuming you are sending email from through gmails smtp
+        //smtp
         String host = "smtp.mail.ru";
 
         // Get system properties

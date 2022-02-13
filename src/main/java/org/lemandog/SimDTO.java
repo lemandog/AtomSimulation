@@ -10,34 +10,22 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class SimDTO implements Serializable {
     public SimDTO(){
-        pathDrawing = false;
-        distCalc = false;
-        output=false;
-        outputPic=false;
-        outputRAWCord=false;
-        outputPicCSVPost=false;
-        outputCSV=false;
-        output3D = true;
-        serverAddress = "localhost";
-        userEmail = "";
-        genSizeX = 0.0000000000000001; //Точечный генератор по умолчанию
-        genSizeZ = 0.0000000000000001;
-        tarSizeX = 1;
-        tarSizeZ = 1;
-        bounceGenChance = 1;
-        bounceWallChance = 0.3;
-        threadCount = Runtime.getRuntime().availableProcessors();
-        waitTime = 0;
-        dimensionCount = 3;
-        xFrameLen = 1;
-        yFrameLen = 1;
-        zFrameLen = 1;
         particleAm = 5000;
         stepsAm = 5000;
         tempAm = 300;
         tempSourceAm = 1500;
+        gas = GasTypes.CHROME;
+        xFrameLen = 1;
+        yFrameLen = 1;
+        zFrameLen = 1;
         pressurePow = -8;
         pressure = 1;
+        pathDrawing = false;
+        threadCount = Runtime.getRuntime().availableProcessors();
+        tarSizeX = 1;
+        tarSizeZ = 1;
+        genSizeX = 0.0000000000000001; //Точечный генератор по умолчанию
+        genSizeZ = 0.0000000000000001;
         outputPath = FileSystemView.getFileSystemView().getHomeDirectory();
         output = false;
         outputPic = false;
@@ -46,7 +34,14 @@ public class SimDTO implements Serializable {
         outputPicCSVPost = false;
         paletteNumber = 2;
         resolution = 100;
-        gas = GasTypes.CHROME;
+        dimensionCount = 3;
+        waitTime = 0;
+        bounceWallChance = 0.3;
+        bounceGenChance = 1;
+        output3D = true;
+        distCalc = false;
+        serverAddress = "localhost";
+        userEmail = "";
     }
     @Getter
     @Setter
