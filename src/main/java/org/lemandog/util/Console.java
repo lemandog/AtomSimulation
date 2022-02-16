@@ -43,6 +43,7 @@ public class Console {
         if (Runtime.getRuntime().maxMemory()/1048576 <= 4086) {
             coolPrintout("Currently, your machine only has " + Runtime.getRuntime().maxMemory() / 1048576 + "Mbytes of free RAM available to this instance of JVM (which is standard or below)");
             coolPrintout("You could use -Xmx<sizeInMb>m command after  \"java\" command OR in JLINK_VM_OPTIONS to allocate more memory");
+            coolPrintout("For example, java -Xmx12G -jar AtomSim.jar will allocate 12GB memory to program");
         }
 
     }

@@ -246,14 +246,17 @@ public class MainController {
     public void saveConfig() {
         try {
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        File config = new File(directoryChooser.showDialog(new Stage()).getAbsolutePath() + "/config.AS");
-        config.createNewFile();
-        System.out.println(config.getAbsolutePath());
-        FileOutputStream fout = new FileOutputStream(config);
-        ObjectOutputStream oos = new ObjectOutputStream(fout);
-        oos.writeObject(readDTO());
-        oos.flush();
-        fout.flush();
+        File configPath = directoryChooser.showDialog(new Stage());
+        if (configPath != null){ // Если диалог не просто закрыли
+            File config = new File(configPath.getAbsolutePath() + "/config.AS");
+            config.createNewFile();
+            System.out.println(config.getAbsolutePath());
+            FileOutputStream fout = new FileOutputStream(config);
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(readDTO());
+            oos.flush();
+            fout.flush();
+        }
         } catch (IOException e) {
             e.printStackTrace();
         }
