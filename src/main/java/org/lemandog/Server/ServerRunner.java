@@ -82,6 +82,7 @@ public class ServerRunner {
             });
             serverRunner.start();
             System.out.println("SERVER STARTED!");
+            System.out.print(statusReport());
         }
 
         private static String statusReport() {
