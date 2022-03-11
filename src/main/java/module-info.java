@@ -17,4 +17,5 @@ module AtomSimulation {
     requires org.apache.commons.io;
     requires maven.model;
     requires plexus.utils;
+    requires zip4j;
 }

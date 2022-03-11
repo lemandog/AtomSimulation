@@ -3,6 +3,11 @@ package org.lemandog.Server;
 import javafx.application.Platform;
 import lombok.Getter;
 import lombok.Setter;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.CompressionMethod;
 import org.lemandog.MainController;
 import org.lemandog.Sim;
 import org.lemandog.SimDTO;
@@ -14,8 +19,8 @@ import java.net.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayDeque;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ServerRunner {
         static ServerSocket server;
@@ -54,6 +59,9 @@ public class ServerRunner {
                         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
                         ArrayDeque<SimDTO> accepted = (ArrayDeque<SimDTO>) in.readObject();
                         if (accepted != null) {
+                            accepted.forEach((e)->{
+                                e.setOutput3D(false); //На сервере отрисовка не нужна
+                            });
                             String answer;
                             if (accepted.element().getUserEmail().isBlank()) {
                                 answer = "NO EMAIL IS GIVEN! SIM NOT STARTED";
@@ -107,31 +115,38 @@ public class ServerRunner {
     public static void addLine(String line){
         report.append(line + "\n");
     }
-    public static File getAttachments() {
-        File report = new File("report.zip");
-        report.deleteOnExit();
+
+    public static File[] getAttachments() {
+        File dir = new File("/report");
+        dir.delete();
+        dir.mkdir();
+        ZipFile zipFile = new ZipFile("/report/report.zip");
+        ArrayList<File> files = new ArrayList<File>();
+        Collections.addAll(files, filesPath.listFiles());
+        ZipParameters parameters = new ZipParameters();
+        parameters.setCompressionMethod(CompressionMethod.DEFLATE);
+        parameters.setCompressionLevel(CompressionLevel.MAXIMUM);
         try {
-            FileOutputStream fos = new FileOutputStream(report);
-            ZipOutputStream zipOut = new ZipOutputStream(fos);
-        for (File one : filesPath.listFiles()) {
-            FileInputStream fis = new FileInputStream(one);
-            ZipEntry zipEntry = new ZipEntry(one.getName());
-            zipOut.putNextEntry(zipEntry);
-            byte[] bytes = new byte[1024];
-            int length;
-            while((length = fis.read(bytes)) >= 0) {
-                zipOut.write(bytes, 0, length);
-            }
-            fis.close();
+            zipFile.createSplitZipFile(files, parameters, true, 22214400);
+            zipFile.getSplitZipFiles();
+        } catch (ZipException e) {
+            e.printStackTrace();
         }
-        zipOut.flush();
-        zipOut.close();
-        fos.flush();
-        fos.close();
-        FileUtils.deleteDirectory(filesPath);
-    } catch (IOException e) {
-        e.printStackTrace();
+        try {
+            FileUtils.deleteDirectory(filesPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File[] result = null;
+        try {
+            result = new File[zipFile.getSplitZipFiles().size()];
+            for (int i=0;i<zipFile.getSplitZipFiles().size();i++){
+                result[i] = zipFile.getSplitZipFiles().get(i);
+            }
+        } catch (ZipException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
-        return report;
-    }
+
 }

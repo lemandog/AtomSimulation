@@ -8,7 +8,11 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 
 public class ServerHandler {
-
+    public static void sendSimToServer(Sim run) {
+        ArrayDeque<Sim> thisOne = new ArrayDeque<>(0);
+        thisOne.add(run);
+        sendQueueToServer(thisOne, run.getDto().getServerAddress());
+    }
     public static void sendQueueToServer(ArrayDeque<Sim> simQueue, String serverAddress) {
         try{
         //strip SimDTO from Queue

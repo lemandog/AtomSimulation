@@ -10,8 +10,6 @@ import org.lemandog.util.Output;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.lemandog.EngineDraw.*;
-
 public class Particle{
     //Цвета состояний
     Color activeCol;
@@ -37,6 +35,7 @@ public class Particle{
     PhongMaterial thisParticleMat;
     Cylinder paths = new Cylinder();
     Sim parent;
+
     Particle(int ordinal, Sim parent){ //Конструктор класса, вызывается при создании экземпляра
         this.parent = parent;
         activeCol = parent.thisRunMaterial.particleCol;
@@ -82,7 +81,7 @@ public class Particle{
         Arrays.fill(product,0);
         // Измерений может быть меньше трёх, но дальше есть код жёстко прописанный под 3Д. (Всё что связано с визуализацией, например)
         // Обнуление неиспользуемых измерений заставляет всё работать и не вызывает Array out of bounds & NullPointerException
-        for (int i = 0; i < parent.avilableDimensions; i++) {
+        for (int i = 0; i < parent.availableDimensions; i++) {
             product[i] = (parent.GEN_SIZE[i])*Math.random() - parent.GEN_SIZE[i]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
         }
         product[1] = parent.CHA_SIZE[1]/2 - parent.GEN_SIZE[1];
@@ -93,12 +92,12 @@ public class Particle{
         double[] product = new double[parent.maxDimensions]; //XYZ
         Arrays.fill(product,0);
         double sv = Math.sqrt((Sim.k*parent.T)/ parent.m); // длина вектора
-        if(isFirstStep){sv = Math.sqrt((Sim.k*parent.TSource)/ parent.m);} // длина вектора
-        for (int i = 0; i < parent.avilableDimensions; i++) {
+        if(isFirstStep){sv = Math.sqrt((Sim.k*parent.TSource)/ parent.m);} // длина вектора от температуры источника
+        for (int i = 0; i < parent.availableDimensions; i++) {
             product[i] = rand.nextGaussian()*sv;
         }
-        if(parent.avilableDimensions>2 && getPosChance(product) && isFirstStep){
-            for (int i = 0; i < parent.avilableDimensions; i++) {
+        if(parent.availableDimensions >2 && getPosChance(product) && isFirstStep){
+            for (int i = 0; i < parent.availableDimensions; i++) {
                 product[i] = rand.nextGaussian()*sv;
             }
         }
@@ -110,14 +109,16 @@ public class Particle{
 
     private boolean getPosChance(double[] product) {
         double chance = Math.random();
-        double func = Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
+        double func = Math.cos(product[1]/Math.sqrt((Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2)))));
+        //
+        //Старый генератор. Оставлю на всякий пожарный
+        //Math.abs(Math.cos(Math.PI / 2 - Math.atan(product[1] / (Math.sqrt(Math.pow(product[2], 2) + Math.pow(product[0], 2))))));
         return chance > func;
     }
 
 
     public Thread createThread() {
         Thread product = new Thread(() -> { //Лямбда-выражение с содержимым потока
-
             isInUse = true; //Флажок, показывающий рендеру какой атом мы считаем
             int stepsPassed = 0;
             while(active && stepsPassed<parent.LEN){ //Когда симуляция запущена и частица ещё не прошла шаги
@@ -136,7 +137,7 @@ public class Particle{
 
                 //Новые координаты
                 Point3D oldCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);
-                for(int i = 0; i<parent.avilableDimensions; i++) {
+                for(int i = 0; i<parent.availableDimensions; i++) {
                     coordinates[i] = coordinates[i] + dS * speeds[i];
                 }
                 Point3D newCord = new Point3D(coordinates[0],coordinates[1],coordinates[2]);

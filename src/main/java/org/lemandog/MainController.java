@@ -98,15 +98,16 @@ public class MainController {
     }
 
     public static void startSim(SimDTO run){
-        if (simQueue.isEmpty()) {
-            simQueue.add(new Sim(run));
-        } // Если Пользователь не использует очередь, сделаем очередь из 1 элемента
-        if (run.isDistCalc()){
-            ServerHandler.sendQueueToServer(simQueue,run.getServerAddress());
-        } else {
-            simQueue.pop().start();
-        }
+            if (run.isDistCalc()){
+                ServerHandler.sendSimToServer(new Sim(run));
+            } else {
+                if (simQueue.isEmpty()) {
+                    simQueue.add(new Sim(run));
+                }
+                simQueue.pop().start();
+            }
     }
+
     public void writeDTO(SimDTO input){   //Чтение DTO в UI
         genSizeZ.setValue(input.getGenSizeZ());
         genSizeX.setValue(input.getGenSizeX());

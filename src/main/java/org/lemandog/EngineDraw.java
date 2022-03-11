@@ -61,7 +61,7 @@ public class EngineDraw {
 
         targetR = new Box((parent.TAR_SIZE[0]),(parent.TAR_SIZE[1]),(parent.TAR_SIZE[2]));
         targetR.setTranslateY((-parent.CHA_SIZE[1]/2));
-                generatorR = new Box((parent.GEN_SIZE[0]),(parent.GEN_SIZE[1]),(parent.GEN_SIZE[2]));
+        generatorR = new Box((parent.GEN_SIZE[0]),(parent.GEN_SIZE[1]),(parent.GEN_SIZE[2]));
         generatorR.setTranslateY((parent.CHA_SIZE[1]/2));
 
         PerspectiveCamera main = new PerspectiveCamera();

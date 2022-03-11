@@ -1,6 +1,8 @@
 package org.lemandog.Server;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Properties;
@@ -13,9 +15,8 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 public class Messenger {
-    public static void send(String recipient, String messageText, File attachments) {
+    public static void send(String recipient, String messageText, File attachments, String header) {
         String from = "atomsim@internet.ru";
-        //smtp
         String host = "smtp.mail.ru";
 
         // Get system properties
@@ -31,9 +32,21 @@ public class Messenger {
         Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
 
             protected PasswordAuthentication getPasswordAuthentication() {
-
-                return new PasswordAuthentication("atomsim@internet.ru", "hZmWWfD7uLv8E3GPMrPb");
-
+                String userName = null;
+                String password = null;
+                try (BufferedReader br = new BufferedReader(new FileReader("emailCred.txt"))) {
+                    userName = br.readLine();
+                    password = br.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println("Please, put emailCred.txt near running jar with address and key on separate line - more info in INFO table");
+                    try {
+                        new File("emailCred.txt").createNewFile();
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                return new PasswordAuthentication(userName, password);
             }
 
         });
@@ -52,7 +65,7 @@ public class Messenger {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 
             // Set Subject: header field
-            message.setSubject("Results of your simulation with timestamp: " + LocalDateTime.now() +  " - READY");
+            message.setSubject(header+"- Results of your simulation are ready");
             // Now set the actual message
             MimeMultipart content = new MimeMultipart();
             MimeBodyPart attachmentPart = new MimeBodyPart();

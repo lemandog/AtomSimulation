@@ -6,12 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.lemandog.Server.ServerHandler;
-import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.Console;
-
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Objects;
 
 public class App extends Application {
 
@@ -25,7 +22,7 @@ public class App extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root);
         userControlWindows.setScene(scene);
-        Image icon = new Image(App.class.getResourceAsStream("/icons/atomSim.png"));
+        Image icon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/atomSim.png")));
         userControlWindows.getIcons().add(icon);
         userControlWindows.setTitle("Контроль " + Console.getVer());
         userControlWindows.setOnCloseRequest(event -> System.exit(0));

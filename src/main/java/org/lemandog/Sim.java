@@ -3,8 +3,8 @@ package org.lemandog;
 import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import lombok.Getter;
+import org.apache.commons.io.FileUtils;
 import org.lemandog.Server.Messenger;
-import org.lemandog.Server.ServerHandler;
 import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.Console;
 import org.lemandog.util.Output;
@@ -13,6 +13,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import static org.lemandog.MainController.simQueue;
 
 public class Sim implements Serializable {
     static final double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
@@ -33,9 +35,9 @@ public class Sim implements Serializable {
     int lastRunning;
     Particle[] container; //XYZ
 
-    static int avilableStreams = Runtime.getRuntime().availableProcessors();
+    static int availableStreams = Runtime.getRuntime().availableProcessors();
     public File selectedPath;
-    int avilableDimensions;
+    int availableDimensions;
     int maxDimensions = 3;
     int nbRunning = 0;
     int waitTimeMS;
@@ -71,8 +73,8 @@ public class Sim implements Serializable {
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
         //Как сказано в Paticle, пользователь может сам ввести количество осей.
         //Конечно, я не знаю кому нужна пятимерная симуляция газа, но гибкость кода - важная часть ООП
-        avilableDimensions = dto.getDimensionCount();
-        if (avilableDimensions>3){maxDimensions=avilableDimensions;}
+        availableDimensions = dto.getDimensionCount();
+        if (availableDimensions >3){maxDimensions= availableDimensions;}
 
         GEN_SIZE = new double[maxDimensions]; //XYZ
         TAR_SIZE = new double[maxDimensions]; //XYZ
@@ -97,16 +99,16 @@ public class Sim implements Serializable {
         genBounce = dto.getBounceGenChance();
 
         lastRunning = 0;
-        avilableStreams = dto.getThreadCount();
+        availableStreams = dto.getThreadCount();
 
-        calculator = new Thread[avilableStreams];
+        calculator = new Thread[availableStreams];
         pathsDr = dto.isPathDrawing();
         Console.setAm(dto.particleAm,dto.stepsAm);
         //Получается так, что это невероятно огромные массивы, так что инициализировать их будем только если стоит галка.
         //Да, теперь нельзя сохранять результаты прошедшей симуляции после запуска, но Java heap space не будет ругаться.
         out = new Output(this);
         //Тут компилятор ругается, но зря. Это сделано для того чтобы не словить NullPointer далее. Они все будут заменены при запуске.
-        for (int i = 0; i < avilableStreams; i++) {
+        for (int i = 0; i < availableStreams; i++) {
             calculator[i] = new Thread();
         }
         container = new Particle[N];
@@ -136,7 +138,7 @@ public class Sim implements Serializable {
         mainContr = new Thread(() ->{
         while(lastRunning < N && simIsAlive) {
             if(threadQuotaNotMet()>0){
-                for (int i = 0; i< avilableStreams;i++){
+                for (int i = 0; i< availableStreams; i++){
                     if (!calculator[i].isAlive()){// Найти закончившийся тред
                         try {
                         calculator[i] = null;       // Удалить
@@ -157,10 +159,10 @@ public class Sim implements Serializable {
             if(getDto().isDistCalc()){ServerRunner.addLine(this);}
             out.toFile();
         simIsAlive = false;
-        if (!MainController.simQueue.isEmpty()){
-            Sim next = MainController.simQueue.pop();
+        if (!simQueue.isEmpty()){
+            Sim next = simQueue.pop();
             try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
-                Console.coolPrintout("There is another sim in Queue... Starting");
+                Console.coolPrintout("There are "+simQueue.size()+" more sims in Queue... Starting");
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) {}
             Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
@@ -168,7 +170,12 @@ public class Sim implements Serializable {
             Console.coolPrintout("DONE WORKING!");
             if (getDto().isDistCalc()) {
                 ServerRunner.addLine("DONE WORKING AT " + LocalDateTime.now());
-                Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString(), ServerRunner.getAttachments());
+                File[] attachment = ServerRunner.getAttachments();
+                int i = 1;
+                for (File att : attachment){
+                    Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString(), att, "(Part" + i + " of " + attachment.length + ") ");
+                    i++;
+                }
                 ServerRunner.getFilesPath().delete();
             }
             Toolkit.getDefaultToolkit().beep();
@@ -184,7 +191,7 @@ public class Sim implements Serializable {
         int thereAreDeadThreads = 0;
         nbRunning = 0;
         try{
-        for (int i = 0; i< avilableStreams;i++) {
+        for (int i = 0; i< availableStreams; i++) {
             if (!calculator[i].isAlive()) {
                 thereAreDeadThreads++;// Есть не живые треды
             } else {
