@@ -97,12 +97,14 @@ public class MainController {
     public void startSim() {
         //Прочесть ввод из окна
         SimDTO run = readDTO();
-        startSim(run);
+        startSim(run, run.getServerAddress());
     }
 
-    public static void startSim(SimDTO run){
+    public static void startSim(SimDTO run, String address){
             if (run.isDistCalc()){
-                ServerHandler.sendSimToServer(new Sim(run));
+                ArrayDeque<SimDTO> toSend = currentStream;
+                currentStream = new ArrayDeque<>();
+                ServerHandler.sendQueueToServer(toSend,address);
             } else {
                 if (currentStream.isEmpty()) {
                     currentStream.add(run);

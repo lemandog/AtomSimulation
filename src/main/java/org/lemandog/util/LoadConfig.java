@@ -110,7 +110,7 @@ public class LoadConfig {
                 if (line.contains("CSVOU")){result.setOutputCSV(true);}
                 if (line.contains("PALIT")){result.setPalette(Integer.parseInt(line.trim().replaceAll("PALIT ","")));} //int
                 if (line.contains("RESOL")){result.setResolution(Integer.parseInt(line.trim().replaceAll("RESOL ","")));}
-                if (line.contains("START")){MainController.startSim(result);} //bool
+                if (line.contains("START")){MainController.startSim(result,result.getServerAddress());} //bool
                 if (line.contains("DIMEN")){result.setDimensionCount(Integer.parseInt(line.trim().replaceAll("DIMEN ","")));} //int
                 if (line.contains("WAITT")){result.setWaitTime(Integer.parseInt(line.trim().replaceAll("WAITT ","")));} //int
                 if (line.contains("VERWA")){result.setBounceWallChance(Double.parseDouble(line.trim().replaceAll("VERWA ","")));} //double
@@ -119,11 +119,11 @@ public class LoadConfig {
                 if (line.contains("DISTC")){result.setDistCalc(true);}
                 if (line.contains("ADDRE")){result.setServerAddress(line.trim().replaceAll("ADDRE ",""));}
                 if (line.contains("EMAIL")){result.setUserEmail(line.trim().replaceAll("EMAIL ",""));}
-                if (line.contains("RUNAN")){MainController.simQueue.add(new Sim(result));} //double
+                if (line.contains("RUNAN")){MainController.currentStream.add(result);} //double
                 if (line.contains("RUNMO")){
                     int more = Integer.parseInt(line.trim().replaceAll("RUNMO ", ""));
                     for (int i = 0; i < more; i++) {
-                        MainController.simQueue.add(new Sim(result));
+                        MainController.currentStream.add(result);
                     }}
             }
     } catch (IOException e) {

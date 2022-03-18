@@ -156,7 +156,7 @@ public class Sim implements Serializable {
             Console.printLine('X');
             Console.coolPrintout("SIMULATION RUN IS OVER!");
             Console.coolPrintout( "Longest travel distance - " + Output.getLastPrintStep() +" jumps");
-            if(getDto().isDistCalc()){ServerRunner.addLine(this);}
+            if(getDto().isDistCalc()){ServerRunner.addLine(getDto());}
             out.toFile();
         simIsAlive = false;
         if (!currentStream.isEmpty()){
@@ -169,11 +169,11 @@ public class Sim implements Serializable {
         }else {
             Console.coolPrintout("DONE WORKING!");
             if (getDto().isDistCalc()) {
-                ServerRunner.addLine("DONE WORKING AT " + LocalDateTime.now());
+                getDto().report.append("DONE WORKING AT " + LocalDateTime.now());
                 File[] attachment = ServerRunner.getAttachments();
                 int i = 1;
                 for (File att : attachment){
-                    Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString() + getDto().toString(), att, "(Part" + i + " of " + attachment.length + ") ");
+                    Messenger.send(getDto().getUserEmail(), getDto().report.toString(), att, "(Part" + i + " of " + attachment.length + ") ");
                     i++;
                 }
                 ServerRunner.getFilesPath().delete();

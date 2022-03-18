@@ -42,6 +42,7 @@ public class SimDTO implements Serializable {
         distCalc = false;
         serverAddress = "localhost";
         userEmail = "";
+
     }
     @Getter
     @Setter
@@ -104,6 +105,7 @@ public class SimDTO implements Serializable {
     @Getter
     @Setter
     GasTypes gas;
+    public StringBuilder report = new StringBuilder();
 
     @Override
     public String toString(){

@@ -24,17 +24,12 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import static org.lemandog.MainController.currentStream;
+import static org.lemandog.MainController.simQueue;
 
 public class ServerRunner {
         static ServerSocket server;
         static ServerSocket serverStatus;
         static LocalDateTime startup = LocalDateTime.now();
-        @Getter
-        @Setter
-        static String email;
-        @Getter
-        @Setter
-        static StringBuilder report = new StringBuilder();
         @Getter
         @Setter
         static File filesPath;
@@ -65,6 +60,7 @@ public class ServerRunner {
                         if (accepted != null) {
                             StringBuilder answer = new StringBuilder();
                             for (SimDTO sim : accepted) {
+                                System.out.println("INCOMING SIMS - " + accepted.size());
                                 sim.setOutput3D(false); //На сервере отрисовка не нужна
                                 ArrayDeque<SimDTO> currentUserList;
                                 if (!sim.getUserEmail().isBlank()){
@@ -75,22 +71,22 @@ public class ServerRunner {
                                     }
                                     currentUserList.add(sim);
                                     set.put(sim.getUserEmail(),currentUserList);
-                                    answer.append("\n ACCEPTED SIM FROM " + accepted.element().getUserEmail() + "\n CURRENT SIZE - " + currentUserList + "\n");
-                                } else{
-                                    answer.append("\n NO EMAIL IS GIVEN! SIM NOT CREATED \n ");
-                                }
-                                setEmail(accepted.element().getUserEmail());
-                                setReport(new StringBuilder());
-
+                                    answer.append("\n ACCEPTED SIM FROM " + accepted.element().getUserEmail() + "\n CURRENT SIZE - " + currentUserList.size() + "\n");
+                                } else{answer.append("\n NO EMAIL IS GIVEN! SIM NOT CREATED \n ");}
+                            }
+                            MainController.simQueue.putAll(set);
+                            answer.append("RESULT: \n");
+                            for (String key : simQueue.keySet()){
+                                answer.append(simQueue.get(key).size() + " SIMS FOR " + key);
                             }
                                 out.writeUTF(answer.toString());
                                 System.out.println(answer);
                                 out.flush();
                         }
-                        MainController.simQueue.putAll(set);
                         if (currentStream.isEmpty()){
                         Platform.runLater(() -> {
                             String key = (String) MainController.simQueue.keySet().toArray()[0];
+                            System.out.println(key);
                             currentStream = MainController.simQueue.get(key);
                             new Sim(currentStream.pop()).start();
                         });
@@ -122,11 +118,9 @@ public class ServerRunner {
         }
 
 
-    public static void addLine(Sim run){
-        report.append(run.thisRunIndex + " OVER,  " + " TIMESTAMP: " + LocalDateTime.now() + "\n");
-    }
-    public static void addLine(String line){
-        report.append(line + "\n");
+    public static void addLine(SimDTO run){
+        run.report.append("RUN OVER,  " + " TIMESTAMP: " + LocalDateTime.now() + "\n");
+        run.report.append(run + "\n");
     }
 
     public static File[] getAttachments() {

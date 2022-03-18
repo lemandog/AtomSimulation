@@ -8,24 +8,18 @@ import java.net.Socket;
 import java.util.ArrayDeque;
 
 public class ServerHandler {
-    public static void sendSimToServer(Sim run) {
-        ArrayDeque<Sim> thisOne = new ArrayDeque<>(0);
+    public static void sendSimToServer(SimDTO run) {
+        ArrayDeque<SimDTO> thisOne = new ArrayDeque<>(0);
         thisOne.add(run);
-        sendQueueToServer(thisOne, run.getDto().getServerAddress());
+        sendQueueToServer(thisOne, run.getServerAddress());
     }
-    public static void sendQueueToServer(ArrayDeque<Sim> simQueue, String serverAddress) {
+    public static void sendQueueToServer(ArrayDeque<SimDTO> simDTOQueue, String serverAddress) {
         try{
-        //strip SimDTO from Queue
-            ArrayDeque<SimDTO> dtoList = new ArrayDeque<>();
-        for (Sim ex : simQueue){
-            dtoList.add(ex.getDto());
-        }
-
         Socket clientSocket1 = new Socket(serverAddress, 5904);
         clientSocket1.setSoTimeout(2000);
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket1.getOutputStream()));
 
-        out.writeObject(dtoList);
+        out.writeObject(simDTOQueue);
         out.flush();
         clientSocket1.close();
     } catch (IOException e) {
