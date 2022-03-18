@@ -173,7 +173,7 @@ public class Sim implements Serializable {
                 File[] attachment = ServerRunner.getAttachments();
                 int i = 1;
                 for (File att : attachment){
-                    Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString(), att, "(Part" + i + " of " + attachment.length + ") ");
+                    Messenger.send(ServerRunner.getEmail(), ServerRunner.getReport().toString() + getDto().toString(), att, "(Part" + i + " of " + attachment.length + ") ");
                     i++;
                 }
                 ServerRunner.getFilesPath().delete();

@@ -105,5 +105,49 @@ public class SimDTO implements Serializable {
     @Setter
     GasTypes gas;
 
+    @Override
+    public String toString(){
+        return
+        "PARTS " + particleAm + "\n" +
+        "STEPS " + stepsAm + "\n" +
+        "TEMPE " + tempAm + "\n" +
+        "TEMPS " + tempSourceAm + "\n" +
+        gas + "\n" +
+        "CAMSX " + xFrameLen + "\n" +
+        "CAMSY " + yFrameLen + "\n" +
+        "CAMSZ " + zFrameLen + "\n" +
+        "PRES^ " + pressurePow + "\n" +
+        "PRES* " + pressure + "\n" +
+        "DRAWP " + pathDrawing + "\n" +
+        "THREA " + threadCount + "\n" +
+        "XTARS " + tarSizeX + "\n" +
+        "ZTARS " + tarSizeZ + "\n" +
+        "XGENE " + genSizeX + "\n" +
+        "ZGENE " + genSizeZ + "\n" +
+        "DIRPA " + outputPath.getAbsolutePath() + "\n" +
+        "TEXTW " + output + "\n" +
+        "PNGZA " + outputPic + "\n" +
+        "CSVZA " + outputRAWCord + "\n" +
+        "CSVZE " + outputPicCSVPost + "\n" +
+        "CSVOU " + outputCSV + "\n" +
+        "PALIT " + paletteNumber + "\n" +
+        "RESOL " + resolution + "\n" +
+        "DIMEN " + dimensionCount + "\n" +
+        "WAITT " + waitTime + "\n" +
+        "VERWA " + bounceWallChance + "\n" +
+        "VERGE " + bounceGenChance + "\n" +
+        "3DNOT " + output3D + "\n" +
+        "DISTC " + distCalc + "\n" +
+        "ADDRE " + serverAddress + "\n" +
+        "EMAIL " + serverAddress + "\n";
+    }
+    @Override
+    public int hashCode(){
+        return (int) (230*1.6*particleAm + 1.8*stepsAm + 5.3*tempAm
+                + 2.2*tempSourceAm + xFrameLen*1.4 + yFrameLen*1.3 + zFrameLen*1.2
+                + pressurePow*pressure + threadCount*2 + tarSizeX*1.1 + tarSizeZ*1.2
+                + genSizeX * 2.1 + genSizeZ * 2.2 + paletteNumber + resolution
+                + dimensionCount + waitTime + bounceGenChance*bounceWallChance);
+    }
 
 }
