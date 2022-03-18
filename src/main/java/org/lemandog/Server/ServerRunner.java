@@ -21,6 +21,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class ServerRunner {
         static ServerSocket server;
@@ -75,12 +76,21 @@ public class ServerRunner {
                             System.out.println(answer);
                             out.flush();
                         }
-
+                        HashMap<String, ArrayDeque<SimDTO>> set = new HashMap();
                         for (SimDTO sim : accepted) {
-                            MainController.simQueue.add(new Sim(sim));
+                            ArrayDeque<SimDTO> currentUserList;
+                            if(set.containsKey(sim.getUserEmail())){
+                                currentUserList = set.get(sim.getUserEmail());
+                            }else{
+                                currentUserList = new ArrayDeque<>(0);
+                            }
+                            currentUserList.add(sim);
+                            set.put(sim.getUserEmail(),currentUserList);
                         }
+                        MainController.simQueue.putAll(set);
                         Platform.runLater(() -> {
-                            MainController.simQueue.pop().start();
+                            String key = (String) MainController.simQueue.keySet().toArray()[0];
+                            MainController.simQueue.get(key);
                         });
                     }
                 } catch (IOException | ClassNotFoundException e) {

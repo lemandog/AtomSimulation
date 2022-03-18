@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import static org.lemandog.MainController.simQueue;
+import static org.lemandog.MainController.*;
 
 public class Sim implements Serializable {
     static final double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
@@ -159,10 +159,10 @@ public class Sim implements Serializable {
             if(getDto().isDistCalc()){ServerRunner.addLine(this);}
             out.toFile();
         simIsAlive = false;
-        if (!simQueue.isEmpty()){
-            Sim next = simQueue.pop();
+        if (!currentStream.isEmpty()){
+            Sim next = new Sim(currentStream.pop());
             try { //Просто ждём пока закончит считать. Изящнее сделать не получилось
-                Console.coolPrintout("There are "+simQueue.size()+" more sims in Queue... Starting");
+                Console.coolPrintout("There are "+currentStream.size()+" more sims in current stream Queue... Starting");
                 Thread.sleep(1000);
             } catch (InterruptedException ignore) {}
             Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
@@ -181,6 +181,15 @@ public class Sim implements Serializable {
             Toolkit.getDefaultToolkit().beep();
             Toolkit.getDefaultToolkit().beep();
             Toolkit.getDefaultToolkit().beep();
+            if (!simQueue.isEmpty()) {
+                Console.coolPrintout("ANOTHER STREAM IN GLOBAL QUEUE...");
+                simQueue.remove(currentStreamKey);
+                currentStreamKey = (String) simQueue.keySet().toArray()[0];
+                currentStream = simQueue.get(currentStreamKey);
+                Sim next = new Sim(currentStream.pop());
+                Console.coolPrintout("Picked up stream of " + currentStream.size() + " sims, Starting..");
+                Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
+            }
         }
     });
         mainContr.setPriority(Thread.MAX_PRIORITY);

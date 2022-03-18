@@ -19,6 +19,7 @@ import org.lemandog.util.Util;
 
 import java.io.*;
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class MainController {
@@ -42,7 +43,9 @@ public class MainController {
     public TextField pressure;
     public static Scene scene;
 
-    public static ArrayDeque<Sim> simQueue = new ArrayDeque<>();
+    public static HashMap<String, ArrayDeque<SimDTO>> simQueue = new HashMap();
+    public static String currentStreamKey;
+    public static ArrayDeque<SimDTO> currentStream = new ArrayDeque<>();
 
     public CheckBox RAWCordOutput;
     public CheckBox PicCSVOutput;
@@ -101,10 +104,10 @@ public class MainController {
             if (run.isDistCalc()){
                 ServerHandler.sendSimToServer(new Sim(run));
             } else {
-                if (simQueue.isEmpty()) {
-                    simQueue.add(new Sim(run));
+                if (currentStream.isEmpty()) {
+                    currentStream.add(run);
                 }
-                simQueue.pop().start();
+                new Sim(currentStream.pop()).start();
             }
     }
 
@@ -207,23 +210,23 @@ public class MainController {
     }
 
     public void expungeQueue() {
-        if (!simQueue.isEmpty()){simQueue.pop();}
-        numberInQueue.setText(String.valueOf(simQueue.size()));
+        if (!currentStream.isEmpty()){currentStream.pop();}
+        numberInQueue.setText(String.valueOf(currentStream.size()));
     }
     public void addToQueue() {
-        simQueue.add(new Sim(readDTO()));
-        numberInQueue.setText(String.valueOf(simQueue.size()));
+        currentStream.add(readDTO());
+        numberInQueue.setText(String.valueOf(currentStream.size()));
     }
 
     public void add10ToQueue() {
         for (int i = 0; i < 10; i++) {
-            simQueue.add(new Sim(readDTO()));
+            currentStream.add(readDTO());
         }
-        numberInQueue.setText(String.valueOf(simQueue.size()));
+        numberInQueue.setText(String.valueOf(currentStream.size()));
     }
 
     public void expungeAllQueue() {
-        simQueue.clear();
+        currentStream.clear();
         numberInQueue.setText(String.valueOf(0));
     }
 
