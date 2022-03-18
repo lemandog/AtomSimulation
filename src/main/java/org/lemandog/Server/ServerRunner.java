@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static org.lemandog.MainController.currentStream;
+
 public class ServerRunner {
         static ServerSocket server;
         static ServerSocket serverStatus;
@@ -59,44 +61,44 @@ public class ServerRunner {
                         ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(clientSocket.getInputStream()));
                         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
                         ArrayDeque<SimDTO> accepted = (ArrayDeque<SimDTO>) in.readObject();
+                        HashMap<String, ArrayDeque<SimDTO>> set = new HashMap();
                         if (accepted != null) {
-                            accepted.forEach((e)->{
-                                e.setOutput3D(false); //На сервере отрисовка не нужна
-                            });
-                            String answer;
-                            if (accepted.element().getUserEmail().isBlank()) {
-                                answer = "NO EMAIL IS GIVEN! SIM NOT STARTED";
-                                accepted = new ArrayDeque<>();
-                            } else {
-                                answer = "ACCEPTED QUEUE OF SIM OF SIZE " + accepted.size() + " FROM " + accepted.element().getUserEmail();
+                            StringBuilder answer = new StringBuilder();
+                            for (SimDTO sim : accepted) {
+                                sim.setOutput3D(false); //На сервере отрисовка не нужна
+                                ArrayDeque<SimDTO> currentUserList;
+                                if (!sim.getUserEmail().isBlank()){
+                                    if(set.containsKey(sim.getUserEmail())){
+                                        currentUserList = set.get(sim.getUserEmail());
+                                    }else{
+                                        currentUserList = new ArrayDeque<>(0);
+                                    }
+                                    currentUserList.add(sim);
+                                    set.put(sim.getUserEmail(),currentUserList);
+                                    answer.append("\n ACCEPTED SIM FROM " + accepted.element().getUserEmail() + "\n CURRENT SIZE - " + currentUserList + "\n");
+                                } else{
+                                    answer.append("\n NO EMAIL IS GIVEN! SIM NOT CREATED \n ");
+                                }
                                 setEmail(accepted.element().getUserEmail());
                                 setReport(new StringBuilder());
+
                             }
-                            out.writeUTF(answer);
-                            System.out.println(answer);
-                            out.flush();
-                        }
-                        HashMap<String, ArrayDeque<SimDTO>> set = new HashMap();
-                        for (SimDTO sim : accepted) {
-                            ArrayDeque<SimDTO> currentUserList;
-                            if(set.containsKey(sim.getUserEmail())){
-                                currentUserList = set.get(sim.getUserEmail());
-                            }else{
-                                currentUserList = new ArrayDeque<>(0);
-                            }
-                            currentUserList.add(sim);
-                            set.put(sim.getUserEmail(),currentUserList);
+                                out.writeUTF(answer.toString());
+                                System.out.println(answer);
+                                out.flush();
                         }
                         MainController.simQueue.putAll(set);
+                        if (currentStream.isEmpty()){
                         Platform.runLater(() -> {
                             String key = (String) MainController.simQueue.keySet().toArray()[0];
-                            MainController.simQueue.get(key);
+                            currentStream = MainController.simQueue.get(key);
+                            new Sim(currentStream.pop()).start();
                         });
+                        }
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-
             });
             serverRunner.start();
             System.out.println("SERVER STARTED!");
@@ -112,10 +114,11 @@ public class ServerRunner {
             }
             return "<p>ATOMSIM "+ Console.getVer()+" Server reporting:</p>"+
                    "<p>Operating on "+Runtime.getRuntime().maxMemory() / 1048576 +"  of RAM</p>"+
-                   "<p>With "+MainController.simQueue.size()+" simulations in queue</p>"+
-                    "<p>Ready:"+!server.isClosed()+"</p>"+
-                    "<p>Uptime: "+ LocalDateTime.ofEpochSecond(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - startup.toEpochSecond(ZoneOffset.UTC),0,ZoneOffset.UTC)+ "</p>"+
-                    "<p>"+ipv4+"</p>";
+                   "<p>With "+ currentStream.size()+" simulations in current stream</p>"+
+                   "<p>With "+MainController.simQueue.size()+" streams in queue</p>"+
+                   "<p>Ready:"+!server.isClosed()+"</p>"+
+                   "<p>Uptime: "+ LocalDateTime.ofEpochSecond(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - startup.toEpochSecond(ZoneOffset.UTC),0,ZoneOffset.UTC)+ "</p>"+
+                   "<p>"+ipv4+"</p>";
         }
 
 
