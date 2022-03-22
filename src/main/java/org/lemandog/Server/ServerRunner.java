@@ -59,8 +59,8 @@ public class ServerRunner {
                         HashMap<String, ArrayDeque<SimDTO>> set = new HashMap();
                         if (accepted != null) {
                             StringBuilder answer = new StringBuilder();
+                            System.out.println("INCOMING SIMS - " + accepted.size());
                             for (SimDTO sim : accepted) {
-                                System.out.println("INCOMING SIMS - " + accepted.size());
                                 sim.setOutput3D(false); //На сервере отрисовка не нужна
                                 ArrayDeque<SimDTO> currentUserList;
                                 if (!sim.getUserEmail().isBlank()){
@@ -71,7 +71,7 @@ public class ServerRunner {
                                     }
                                     currentUserList.add(sim);
                                     set.put(sim.getUserEmail(),currentUserList);
-                                    answer.append("\n ACCEPTED SIM FROM " + accepted.element().getUserEmail() + "\n CURRENT SIZE - " + currentUserList.size() + "\n");
+                                    answer.append("\n ACCEPTED SIM FROM " + sim.getUserEmail() + "\n CURRENT SIZE - " + currentUserList.size() + "\n");
                                 } else{answer.append("\n NO EMAIL IS GIVEN! SIM NOT CREATED \n ");}
                             }
                             MainController.simQueue.putAll(set);
@@ -125,7 +125,11 @@ public class ServerRunner {
 
     public static File[] getAttachments() {
         File dir = new File("/report");
-        dir.delete();
+        try {
+            FileUtils.deleteDirectory(dir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         dir.mkdir();
         ZipFile zipFile = new ZipFile("/report/report.zip");
         ArrayList<File> files = new ArrayList<File>();
@@ -133,24 +137,15 @@ public class ServerRunner {
         ZipParameters parameters = new ZipParameters();
         parameters.setCompressionMethod(CompressionMethod.DEFLATE);
         parameters.setCompressionLevel(CompressionLevel.MAXIMUM);
-        try {
-            zipFile.createSplitZipFile(files, parameters, true, 22214400);
-            zipFile.getSplitZipFiles();
-        } catch (ZipException e) {
-            e.printStackTrace();
-        }
-        try {
-            FileUtils.deleteDirectory(filesPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         File[] result = null;
         try {
+            zipFile.createSplitZipFile(files, parameters, true, 22214400);
+            FileUtils.deleteDirectory(filesPath);
             result = new File[zipFile.getSplitZipFiles().size()];
             for (int i=0;i<zipFile.getSplitZipFiles().size();i++){
                 result[i] = zipFile.getSplitZipFiles().get(i);
             }
-        } catch (ZipException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return result;

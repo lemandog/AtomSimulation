@@ -13,8 +13,12 @@ import java.awt.*;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import static org.lemandog.MainController.*;
+import static org.lemandog.util.Output.resetCords;
 
 public class Sim implements Serializable {
     static final double k=1.3806485279e-23;//постоянная Больцмана, Дж/К
@@ -173,7 +177,7 @@ public class Sim implements Serializable {
                 File[] attachment = ServerRunner.getAttachments();
                 int i = 1;
                 for (File att : attachment){
-                    Messenger.send(getDto().getUserEmail(), getDto().report.toString(), att, "(Part" + i + " of " + attachment.length + ") ");
+                    Messenger.send(getDto().getUserEmail(), getDto().report.toString(), att, "(Part " + i + " of " + attachment.length + ") ");
                     i++;
                 }
                 ServerRunner.getFilesPath().delete();
@@ -182,13 +186,28 @@ public class Sim implements Serializable {
             Toolkit.getDefaultToolkit().beep();
             Toolkit.getDefaultToolkit().beep();
             if (!simQueue.isEmpty()) {
-                Console.coolPrintout("ANOTHER STREAM IN GLOBAL QUEUE...");
-                simQueue.remove(currentStreamKey);
                 currentStreamKey = (String) simQueue.keySet().toArray()[0];
-                currentStream = simQueue.get(currentStreamKey);
-                Sim next = new Sim(currentStream.pop());
-                Console.coolPrintout("Picked up stream of " + currentStream.size() + " sims, Starting..");
-                Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
+                System.out.println(currentStreamKey + " DONE");
+                Console.coolPrintout("ANOTHER STREAM IN GLOBAL QUEUE...");
+                HashMap<String, ArrayDeque<SimDTO>> newSimQueue= new HashMap<>();
+                for (String key : simQueue.keySet()){
+                    System.out.println("ITERATING OVER " + key);
+                    if (key != currentStreamKey){
+                        System.out.println(key + " ADDED TO NEW MAP");
+                        newSimQueue.put(key,simQueue.get(key));
+                    }
+                }
+                simQueue = newSimQueue;
+                System.out.println(Arrays.toString(simQueue.keySet().toArray()));
+                resetCords();
+                if (!simQueue.keySet().isEmpty()) {
+                    currentStreamKey = (String) simQueue.keySet().toArray()[0];
+                    System.out.println(currentStreamKey + " TAKEN");
+                    currentStream = simQueue.get(currentStreamKey);
+                    Sim next = new Sim(currentStream.pop());
+                    Console.coolPrintout("Picked up stream of " + currentStream.size() + " sims, Starting..");
+                    Platform.runLater(next::start); //Надо обязательно делать это на потоке JavaFX
+                }
             }
         }
     });

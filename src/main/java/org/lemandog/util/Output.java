@@ -43,7 +43,10 @@ public class Output {
         this.parent = parent;
         parentDTO = parent.getDto();
     }
-
+    public static void resetCords(){
+        X = new Vector<>();
+        Z = new Vector<>();
+    }
 
     public void toFile() {
         double Xmax = this.parent.TAR_SIZE[0];
@@ -56,8 +59,7 @@ public class Output {
             System.out.println(parentDTO.getOutputPath().getAbsolutePath());
             parentDTO.getOutputPath().deleteOnExit();
         }
-        if (!parentDTO.getOutputPath().exists()){
-            parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
+        if (!parentDTO.getOutputPath().exists()){parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
         if (parentDTO.isOutputRAWCord()){
             if (Hits == null){
                 LocalDateTime main = LocalDateTime.now();
@@ -124,6 +126,7 @@ public class Output {
                             CORD[x][y]++;
                         }
                     }
+
                 }
                 if ((double)i%100 == 0){System.out.println("progress: " + ((double)i/X.size())*100 + " %");}
             }
