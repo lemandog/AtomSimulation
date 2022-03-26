@@ -34,7 +34,7 @@ public class Sim implements Serializable {
     double[] CHA_SIZE; //XYZ
     public double[] TAR_SIZE; //XYZ
     double[] GEN_SIZE; //XYZ
-    double lambdaN;
+    double lambdaN, lambdaNSource;
     Point3D center;
     int lastRunning;
     Particle[] container; //XYZ
@@ -75,6 +75,8 @@ public class Sim implements Serializable {
         LEN = dto.getStepsAm();
 
         lambdaN = (k*T/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
+        lambdaNSource = (k*TSource/(Math.sqrt(2)*p*Math.PI*Math.pow(d,2)));
+        System.out.println("AMBIENT:"+lambdaN +" SOURCE:"+lambdaNSource);
         //Как сказано в Paticle, пользователь может сам ввести количество осей.
         //Конечно, я не знаю кому нужна пятимерная симуляция газа, но гибкость кода - важная часть ООП
         availableDimensions = dto.getDimensionCount();
@@ -120,6 +122,7 @@ public class Sim implements Serializable {
 
     public void genTest() {
         draw = new EngineDraw(this);
+        System.out.println(this.lambdaN);
         for (int i = 0; i < N; i++) {
             container[i] = new Particle(i,this);
         }

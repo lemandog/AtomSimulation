@@ -44,7 +44,7 @@ public class Particle{
 
         coordinates = generateCord();
         this.speeds = generateSpeed(true);
-        this.freeRunLen = calcRandLen();
+        this.freeRunLen = calcRandLen(true);
         obj = new Sphere();     //Реальная сфера в масштабе 1 к 1
         drawObj = new Sphere(); //Скалированый obj для отрисовки
         this.isInUse = false;
@@ -55,8 +55,10 @@ public class Particle{
         thisParticleMat.setDiffuseColor(activeCol);
     }
 
-    double calcRandLen() {
-        double xMAX = 5*parent.lambdaN;
+    double calcRandLen(boolean isFirstStep) {
+        double xMAX;
+        if(isFirstStep){xMAX = 5*parent.lambdaNSource;} else{xMAX = 5*parent.lambdaN;}
+
         double lambda= Math.random()*xMAX; //vxR
         double awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
                 *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х
@@ -70,7 +72,6 @@ public class Particle{
             awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
                     *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х
         }
-
         return lambda;
     }
 
@@ -146,7 +147,7 @@ public class Particle{
 
                 paths = EngineDraw.createConnection(oldCord,newCord);
                 //длина пробега
-                freeRunLen = calcRandLen();
+                freeRunLen = calcRandLen(false);
                 //скорости
                 speeds = generateSpeed(false);
 
@@ -159,6 +160,7 @@ public class Particle{
                 active = !wallIsHit && !tarIsHit;
 
                 if (tarIsHit){ //Запись столкновений в CSV и или в PNG
+                    getCurrSphere();
                     Output.CSVStateReact(obj.getTranslateX(),obj.getTranslateZ());
                     parent.getDraw().drawAPath(paths); //Отрисовка пути
                 }

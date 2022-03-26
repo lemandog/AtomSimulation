@@ -114,22 +114,18 @@ public class Output {
             }
             int height = (int) (Xmax * (double) DOTSIZE)+2; //+2 для рамок по краю
             int width = (int) (Zmax * (double) DOTSIZE)+2;
-
+            double step = 1.0D/DOTSIZE;
             for (int i = 0; i < X.size(); ++i) {
-
-                for (int x = 0; x < width; ++x) {
-                    for (int y = 0; y < height; ++y) {
-                        if ((double) (1.0F / (float) DOTSIZE * (float) (x - 1)) - Xmax / 2.0D < X.get(i) &&
-                                X.get(i) < (double) (1.0F / (float) DOTSIZE * (float) x) - Xmax / 2.0D &&
-                                (double) (1.0F / (float) DOTSIZE * (float) (y - 1)) - Zmax / 2.0D < Z.get(i) &&
-                                Z.get(i) < (double) (1.0F / (float) DOTSIZE * (float) y) - Zmax / 2.0D) {
-                            CORD[x][y]++;
-                        }
+                try {
+                    int finCordX = (int) (((X.get(i)) / step) + (Xmax * DOTSIZE / 2));
+                    int finCordZ = (int) (((Z.get(i)) / step) + (Zmax * DOTSIZE / 2));
+                    System.out.println("XORIG:" + X.get(i) + "ZORIG:" + Z.get(i) + " X:" + finCordX + " Z:" + finCordZ + " STEP:" + step);
+                    CORD[finCordX][finCordZ]++;
+                }catch (ArrayIndexOutOfBoundsException e){
+                    Console.coolPrintout("!! PARTICLE IS OUT OF BOUNDS - IGNORING!!");
+                }
                     }
 
-                }
-                if ((double)i%100 == 0){System.out.println("progress: " + ((double)i/X.size())*100 + " %");}
-            }
             if(parentDTO.isOutputPicCSVPost()){
                 try {
                     for (int x = 0; x < width; ++x) {
