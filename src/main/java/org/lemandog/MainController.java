@@ -2,19 +2,24 @@ package org.lemandog;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.lemandog.Server.ServerHandler;
 import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.LoadConfig;
+import org.lemandog.util.Output;
 import org.lemandog.util.Util;
 
 import java.io.*;
@@ -69,12 +74,12 @@ public class MainController {
     public WebView configView;
     public Text configReaderStatus;
     public Slider resolveSelect;
-    public Text resolutionText;
     public ScrollPane commandPane;
+    public TextField resolutionField;
 
 
     public void initialize(){
-        resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
+        resolutionField.setText(String.valueOf(resolveSelect.getValue()));
         configView.getEngine().loadContent(Util.getContent());
         commandPane.setContent(LoadConfig.constructConfigInfoFrame());
         materialChooser.setItems(FXCollections.observableArrayList(GasTypes.values()));
@@ -220,13 +225,6 @@ public class MainController {
         numberInQueue.setText(String.valueOf(currentStream.size()));
     }
 
-    public void add10ToQueue() {
-        for (int i = 0; i < 10; i++) {
-            currentStream.add(readDTO());
-        }
-        numberInQueue.setText(String.valueOf(currentStream.size()));
-    }
-
     public void expungeAllQueue() {
         currentStream.clear();
         numberInQueue.setText(String.valueOf(0));
@@ -246,7 +244,7 @@ public class MainController {
     }
 
     public void resolveSelectDrag() {
-        resolutionText.setText("Разрешение съёма: " + (int)resolveSelect.getValue());
+        resolutionField.setText(String.valueOf(resolveSelect.getValue()));
     }
 
     public void saveConfig() {
@@ -265,6 +263,39 @@ public class MainController {
         }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void add10ToQueue() {
+        for (int i = 0; i < 10; i++) {
+            currentStream.add(readDTO());
+        }
+        numberInQueue.setText(String.valueOf(currentStream.size()));
+    }
+    public void add100ToQueue() {
+        for (int i = 0; i < 100; i++) {
+            currentStream.add(readDTO());
+        }
+        numberInQueue.setText(String.valueOf(currentStream.size()));
+    }
+
+    public void reloadQueueCounter() {
+        numberInQueue.setText(String.valueOf(currentStream.size()));
+    }
+
+    public void SetResolution(KeyEvent keyEvent) {
+        if (keyEvent.getCode() == KeyCode.ENTER){
+            resolveSelect.setValue(Integer.parseInt(resolutionField.getText()));
+        }
+    }
+
+    public void readAFileOutput() {
+        FileChooser pathfinder = new FileChooser();
+        File path = pathfinder.showOpenDialog(new Stage());
+        if (path != null){
+            new Output(new Sim(readDTO())).loadFromFile(path);
+        } else{
+            System.out.println("NO FILE SELECTED!");
         }
     }
 }

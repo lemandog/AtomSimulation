@@ -15,12 +15,11 @@ import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.Vector;
 import static org.lemandog.util.SwingFXUtils.fromFXImage;
 
@@ -30,8 +29,8 @@ public class Output {
     static int lastPrintStep = 0;
     static final DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
     public static final Image palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
-    static Vector<Double> X = new Vector<>();
-    static Vector<Double> Z = new Vector<>();
+    static public Vector<Double> X = new Vector<>();
+    static public Vector<Double> Z = new Vector<>();
     FileWriter Hits, enchantedHits;
     Sim parent;
     SimDTO parentDTO;
@@ -47,12 +46,25 @@ public class Output {
         X = new Vector<>();
         Z = new Vector<>();
     }
-
-    public void toFile() {
+    public void loadFromFile(File target){
+        resetCords();
+        try {
+            Scanner sc=new Scanner(target);
+            while (sc.hasNext()){
+                String[] parts = sc.next().split(SEPARATOR);
+                X.add(Double.valueOf(parts[0]));
+                Z.add(Double.valueOf(parts[1]));
+            }
+            this.toFile(X,Z);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void toFile(Vector<Double> X, Vector<Double> Z) {
         double Xmax = this.parent.TAR_SIZE[0];
         double Zmax = this.parent.TAR_SIZE[2];
         int DOTSIZE = parentDTO.getResolution();
-        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)+2][(int) (Zmax * (double) DOTSIZE)+2];
+        int[][] CORD = new int[(int) (Xmax * (double) DOTSIZE)][(int) (Zmax * (double) DOTSIZE)];
         if (parentDTO.isDistCalc()){
             parentDTO.setOutputPath(new File(FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath() + "/AS"));
             ServerRunner.setFilesPath(parentDTO.getOutputPath());
@@ -60,72 +72,25 @@ public class Output {
             parentDTO.getOutputPath().deleteOnExit();
         }
         if (!parentDTO.getOutputPath().exists()){parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
-        if (parentDTO.isOutputRAWCord()){
-            if (Hits == null){
-                LocalDateTime main = LocalDateTime.now();
-                if(parentDTO.isDistCalc()){
-                    csvHitsReport = new File(ServerRunner.getFilesPath()
-                            + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
-                } else{
-                    csvHitsReport = new File( parentDTO.getOutputPath().getAbsolutePath()
-                            + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
-                }
-
-                try {
-                    Hits = new FileWriter(csvHitsReport);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if(parentDTO.isOutputPicCSVPost()) {
-            if (enchantedHits == null) {
-                if(parentDTO.isDistCalc()){
-                    csvFullOut = new File(ServerRunner.getFilesPath()
-                            + "/out.csv");
-                } else {
-                    csvFullOut = new File(parentDTO.getOutputPath().getAbsolutePath()
-                            + "/out.csv");
-                }
-                try {
-                    enchantedHits = new FileWriter(csvFullOut);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        if (parentDTO.isOutputRAWCord()) {
-            try {
-                for (int i = 0; i < X.size(); i++) {
-                    Hits.write(X.get(i) +SEPARATOR+ Z.get(i) + LINE_END);
-                }
-                Hits.flush();
-                Hits.close();
-                System.out.println("GLOBAL STREAM Hits CLOSED");
-                Hits =null;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        outputRawCord();
+        outputPicCSVPost();
         if (parentDTO.isOutputPicCSVPost() || parentDTO.isOutputPic()) { //Код предназначен для и картинки и вывода заселённости
             for (int[] ints : CORD) {
                 Arrays.fill(ints, 0);
             }
-            int height = (int) (Xmax * (double) DOTSIZE)+2; //+2 для рамок по краю
-            int width = (int) (Zmax * (double) DOTSIZE)+2;
+            int height = (int) (Xmax * (double) DOTSIZE); //+2 для рамок по краю
+            int width = (int) (Zmax * (double) DOTSIZE);
             double step = 1.0D/DOTSIZE;
             for (int i = 0; i < X.size(); ++i) {
                 try {
                     int finCordX = (int) (((X.get(i)) / step) + (Xmax * DOTSIZE / 2));
                     int finCordZ = (int) (((Z.get(i)) / step) + (Zmax * DOTSIZE / 2));
-                    System.out.println("XORIG:" + X.get(i) + "ZORIG:" + Z.get(i) + " X:" + finCordX + " Z:" + finCordZ + " STEP:" + step);
                     CORD[finCordX][finCordZ]++;
                 }catch (ArrayIndexOutOfBoundsException e){
                     Console.coolPrintout("!! PARTICLE IS OUT OF BOUNDS - IGNORING!!");
                 }
                     }
-
+            Console.coolPrintout("X-Z decomposition finished, particles calculated:"+ X.size());
             if(parentDTO.isOutputPicCSVPost()){
                 try {
                     for (int x = 0; x < width; ++x) {
@@ -139,7 +104,8 @@ public class Output {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                System.out.println("GLOBAL DATA DEALER STREAM CLOSED");
+                Console.printLine('@');
+                Console.coolPrintout("GLOBAL DATA DEALER STREAM CLOSED");
                 enchantedHits = null;
             }
         }
@@ -169,6 +135,55 @@ public class Output {
             }
         }
         }
+
+    private void outputPicCSVPost() {
+        if (enchantedHits == null) { //Попытка создать файл
+            if(parentDTO.isDistCalc()){
+                csvFullOut = new File(ServerRunner.getFilesPath()
+                        + "/"+parent.thisRunIndex+"out.csv");
+            } else {
+                csvFullOut = new File(parentDTO.getOutputPath().getAbsolutePath()
+                        + "/"+parent.thisRunIndex+"out.csv");
+            }
+            try {
+                enchantedHits = new FileWriter(csvFullOut);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void outputRawCord() {
+        if (Hits == null){ //Попытка создать файл
+            LocalDateTime main = LocalDateTime.now();
+            if(parentDTO.isDistCalc()){
+                csvHitsReport = new File(ServerRunner.getFilesPath()
+                        + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
+            } else{
+                csvHitsReport = new File( parentDTO.getOutputPath().getAbsolutePath()
+                        + "/"+parent.thisRunIndex+"Hits"+sdfF.format(main)+".csv");
+            }
+
+            try {
+                Hits = new FileWriter(csvHitsReport);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try { //Запись за шаг
+            for (int i = 0; i < X.size(); i++) {
+                Hits.write(X.get(i) +SEPARATOR+ Z.get(i) + LINE_END);
+            }
+            Hits.flush();
+            Hits.close();
+            Console.coolPrintout("GLOBAL STREAM RAW CORD CLOSED");
+            Hits =null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     static Color colSel(int sel){        //0-9 цвета в палитре
         PixelReader randColRead = palette.getPixelReader();
         return randColRead.getColor(sel,0);}

@@ -3,7 +3,6 @@ package org.lemandog;
 import javafx.application.Platform;
 import javafx.geometry.Point3D;
 import lombok.Getter;
-import org.apache.commons.io.FileUtils;
 import org.lemandog.Server.Messenger;
 import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.Console;
@@ -122,7 +121,6 @@ public class Sim implements Serializable {
 
     public void genTest() {
         draw = new EngineDraw(this);
-        System.out.println(this.lambdaN);
         for (int i = 0; i < N; i++) {
             container[i] = new Particle(i,this);
         }
@@ -164,7 +162,7 @@ public class Sim implements Serializable {
             Console.coolPrintout("SIMULATION RUN IS OVER!");
             Console.coolPrintout( "Longest travel distance - " + Output.getLastPrintStep() +" jumps");
             if(getDto().isDistCalc()){ServerRunner.addLine(getDto());}
-            out.toFile();
+            out.toFile(Output.X,Output.Z);
         simIsAlive = false;
         if (!currentStream.isEmpty()){
             Sim next = new Sim(currentStream.pop());

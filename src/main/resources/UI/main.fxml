@@ -144,7 +144,8 @@
                            </children>
                         </AnchorPane>
                         <Slider fx:id="resolveSelect" blockIncrement="0.0" layoutY="112.0" majorTickUnit="20.0" max="1000.0" min="1.0" minorTickCount="1" onMouseReleased="#resolveSelectDrag" prefHeight="38.0" prefWidth="802.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="50.0" />
-                        <Text fx:id="resolutionText" layoutX="349.0" layoutY="102.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Разрешение съёма" />
+                        <TextField fx:id="resolutionField" layoutX="338.0" layoutY="91.0" onKeyPressed="#SetResolution" prefHeight="25.0" prefWidth="127.0" promptText="Разрешение съёма" />
+                        <Text layoutX="227.0" layoutY="108.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Резрешение съёма:" />
                      </children>
                   </AnchorPane>
             </content>
@@ -186,11 +187,13 @@
                <content>
                   <Pane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="351.0" layoutY="34.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addToQueue" text="+" />
-                        <Button layoutX="429.0" layoutY="34.0" mnemonicParsing="false" onAction="#expungeQueue" text="-" />
-                        <Text fx:id="numberInQueue" layoutX="386.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="CENTER" wrappingWidth="30.0" />
-                        <Button layoutX="364.0" layoutY="67.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add10ToQueue" prefHeight="25.0" prefWidth="76.0" text="+10" />
-                        <Button layoutX="338.0" layoutY="2.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#expungeAllQueue" prefHeight="25.0" prefWidth="127.0" text="Стереть очередь" />
+                        <Button layoutX="351.0" layoutY="49.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addToQueue" text="+" />
+                        <Button layoutX="429.0" layoutY="49.0" mnemonicParsing="false" onAction="#expungeQueue" text="-" />
+                        <Text fx:id="numberInQueue" layoutX="386.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="CENTER" wrappingWidth="30.0" />
+                        <Button layoutX="300.0" layoutY="85.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add10ToQueue" prefHeight="25.0" prefWidth="76.0" text="+10" />
+                        <Button layoutX="301.0" layoutY="17.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#expungeAllQueue" prefHeight="25.0" prefWidth="201.0" text="Стереть очередь" />
+                        <Button layoutX="427.0" layoutY="85.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add100ToQueue" prefHeight="25.0" prefWidth="76.0" text="+100" />
+                        <Button layoutX="301.0" layoutY="123.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#reloadQueueCounter" prefHeight="25.0" prefWidth="200.0" text="Обновить счётчик" />
                      </children>
                   </Pane>
                </content>
@@ -215,6 +218,20 @@
                         </Accordion>
                      </children>
                   </Pane>
+               </content>
+            </Tab>
+            <Tab text="Дополнительные инструменты">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <VBox alignment="CENTER" layoutX="15.0" layoutY="5.0" prefHeight="154.0" prefWidth="767.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="5.0">
+                           <children>
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#readAFileOutput" prefHeight="25.0" prefWidth="756.0" text="Обработка Hits фаила" />
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Настройки будут те же, что и в &quot;Визуализация и вывод&quot; и размерах камеры по осям" textAlignment="CENTER" wrappingWidth="771.13671875" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
                </content>
             </Tab>
         </tabs>
