@@ -27,7 +27,7 @@ public class Output {
     @Setter
     @Getter
     static int lastPrintStep = 0;
-    static final DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm");
+    static final DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd MM yyyy HH mm");
     public static final Image palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
     static public Vector<Double> X = new Vector<>();
     static public Vector<Double> Z = new Vector<>();
@@ -72,8 +72,8 @@ public class Output {
             parentDTO.getOutputPath().deleteOnExit();
         }
         if (!parentDTO.getOutputPath().exists()){parentDTO.getOutputPath().mkdir();} //Создаём директории, если их нет
-        outputRawCord();
-        outputPicCSVPost();
+        if (parentDTO.isOutputRAWCord()){outputRawCord();}
+        if (parentDTO.isOutputPicCSVPost()){outputPicCSVPost();}
         if (parentDTO.isOutputPicCSVPost() || parentDTO.isOutputPic()) { //Код предназначен для и картинки и вывода заселённости
             for (int[] ints : CORD) {
                 Arrays.fill(ints, 0);
@@ -87,7 +87,7 @@ public class Output {
                     int finCordZ = (int) (((Z.get(i)) / step) + (Zmax * DOTSIZE / 2));
                     CORD[finCordX][finCordZ]++;
                 }catch (ArrayIndexOutOfBoundsException e){
-                    Console.coolPrintout("!! PARTICLE IS OUT OF BOUNDS - IGNORING!!");
+                    Console.coolPrintout("!! PARTICLE IS OUT OF BOUNDS - IGNORING !!");
                 }
                     }
             Console.coolPrintout("X-Z decomposition finished, particles calculated:"+ X.size());

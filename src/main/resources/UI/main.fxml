@@ -22,7 +22,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="541.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
+<AnchorPane prefHeight="598.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
    <children>
       <GridPane layoutX="14.0" layoutY="20.0" prefHeight="373.0" prefWidth="248.0">
          <columnConstraints>
@@ -90,12 +90,12 @@
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Размер генератора по Z" GridPane.rowIndex="6" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Размер подложки по X" GridPane.rowIndex="7" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Размер подложки по Z" GridPane.rowIndex="8" />
-            <Slider fx:id="targetSizeZ" blockIncrement="0.05" majorTickUnit="0.1" max="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="0.8" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-            <Slider fx:id="targetSizeX" blockIncrement="0.05" majorTickUnit="0.1" max="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="0.8" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-            <Slider fx:id="genSizeZ" blockIncrement="0.05" majorTickUnit="0.1" max="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="0.8" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-            <Slider fx:id="genSizeX" blockIncrement="0.05" majorTickUnit="0.1" max="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="0.8" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-            <Slider fx:id="bounceGenChance" blockIncrement="0.05" majorTickUnit="0.1" max="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="0.8" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <Slider fx:id="bounceWallChance" blockIncrement="0.05" majorTickUnit="0.1" max="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" value="0.5" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="bounceWallChance" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="bounceGenChance" text="1" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="genSizeX" text="0.000000000001" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="genSizeZ" text="0.000000000001" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextField fx:id="targetSizeX" text="1" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <TextField fx:id="targetSizeZ" text="1" GridPane.columnIndex="1" GridPane.rowIndex="8" />
          </children>
       </GridPane>
       <VBox alignment="CENTER" layoutX="305.0" layoutY="24.0" prefHeight="122.0" prefWidth="281.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="24.0">

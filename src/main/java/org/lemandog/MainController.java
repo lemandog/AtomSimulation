@@ -2,7 +2,6 @@ package org.lemandog;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -28,12 +27,12 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class MainController {
-    public Slider targetSizeZ;
-    public Slider targetSizeX;
-    public Slider genSizeZ;
-    public Slider genSizeX;
-    public Slider bounceWallChance;
-    public Slider bounceGenChance;
+    public TextField targetSizeZ;
+    public TextField targetSizeX;
+    public TextField genSizeZ;
+    public TextField genSizeX;
+    public TextField bounceWallChance;
+    public TextField bounceGenChance;
     public TextField threadCount;
     public TextField waitTime;
     public TextField dimensionCount;
@@ -119,12 +118,12 @@ public class MainController {
     }
 
     public void writeDTO(SimDTO input){   //Чтение DTO в UI
-        genSizeZ.setValue(input.getGenSizeZ());
-        genSizeX.setValue(input.getGenSizeX());
-        targetSizeZ.setValue(input.getTarSizeZ());
-        targetSizeX.setValue(input.getTarSizeX());
-        bounceWallChance.setValue(input.getBounceWallChance());
-        bounceGenChance.setValue(input.getBounceGenChance());
+        genSizeZ.setText(String.valueOf(input.getGenSizeZ()));
+        genSizeX.setText(String.valueOf(input.getGenSizeX()));
+        targetSizeZ.setText(String.valueOf(input.getTarSizeZ()));
+        targetSizeX.setText(String.valueOf(input.getTarSizeX()));
+        bounceWallChance.setText(String.valueOf(input.getBounceWallChance()));
+        bounceGenChance.setText(String.valueOf(input.getBounceGenChance()));
         threadCount.setText(String.valueOf(input.getThreadCount()));
         waitTime.setText(String.valueOf(input.getWaitTime()));
         dimensionCount.setText(String.valueOf(input.getDimensionCount()));
@@ -160,12 +159,12 @@ public class MainController {
     public SimDTO readDTO() { //Запись в DTO
         try {
             SimDTO result = new SimDTO();
-            result.setGenSizeZ(genSizeZ.getValue());
-            result.setGenSizeX(genSizeX.getValue());
-            result.setTarSizeZ(targetSizeZ.getValue());
-            result.setTarSizeX(targetSizeX.getValue());
-            result.setBounceWallChance(bounceWallChance.getValue());
-            result.setBounceGenChance(bounceGenChance.getValue());
+            result.setGenSizeZ(Double.parseDouble(genSizeZ.getText()));
+            result.setGenSizeX(Double.parseDouble(genSizeX.getText()));
+            result.setTarSizeZ(Double.parseDouble(targetSizeZ.getText()));
+            result.setTarSizeX(Double.parseDouble(targetSizeX.getText()));
+            result.setBounceWallChance(Double.parseDouble(bounceWallChance.getText()));
+            result.setBounceGenChance(Double.parseDouble(bounceGenChance.getText()));
             result.setThreadCount(Integer.parseInt(threadCount.getText()));
             result.setWaitTime(Integer.parseInt(waitTime.getText()));
             result.setDimensionCount(Integer.parseInt(dimensionCount.getText()));
