@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import lombok.*;
 
 import javax.swing.filechooser.FileSystemView;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
 
@@ -46,10 +47,13 @@ public class SimDTO implements Serializable {
     }
     @Getter
     @Setter
-    private boolean pathDrawing, distCalc;
+    private boolean pathDrawing, distCalc, plainCharacteristic;
     @Getter
     @Setter
     private String serverAddress, userEmail;
+    @Getter
+    @Setter
+    private double[][] genImage;
     @Getter
     @Setter
     private double genSizeZ, genSizeX, tarSizeZ, tarSizeX;

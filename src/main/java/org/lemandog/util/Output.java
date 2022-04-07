@@ -28,7 +28,6 @@ public class Output {
     @Getter
     static int lastPrintStep = 0;
     static final DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd MM yyyy HH mm");
-    public static final Image palette = new Image(Output.class.getResourceAsStream("/heatmaps/heatmap2.png"));
     static public Vector<Double> X = new Vector<>();
     static public Vector<Double> Z = new Vector<>();
     FileWriter Hits, enchantedHits;
@@ -184,8 +183,8 @@ public class Output {
         }
     }
 
-    static Color colSel(int sel){        //0-9 цвета в палитре
-        PixelReader randColRead = palette.getPixelReader();
+    Color colSel(int sel){        //0-9 цвета в палитре
+        PixelReader randColRead = parentDTO.getPalette().getPixelReader();
         return randColRead.getColor(sel,0);}
 
     private Image toImage(int[][] CORD){
@@ -201,7 +200,7 @@ public class Output {
             }}
 
 
-        biggest = biggest/((int)palette.getWidth()); //делим на количество цветов в палитре, так, что значения в диапазоне 0-9
+        biggest = biggest/((int)parentDTO.getPalette().getWidth()); //делим на количество цветов в палитре, так, что значения в диапазоне 0-9
 
         for (int x = 0; x<width;x++){
             for (int y = 0; y<height;y++) {

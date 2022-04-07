@@ -9,6 +9,7 @@ import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -24,6 +25,8 @@ public class Sim implements Serializable {
     @Getter
     private final SimDTO dto;
     private final Output out;
+    public double[][] getGenPicture;
+    public boolean isPlain;
     double m;         //кг
     public GasTypes thisRunMaterial;
     double T, TSource;
@@ -89,6 +92,11 @@ public class Sim implements Serializable {
         CHA_SIZE[1] = dto.getYFrameLen();
         CHA_SIZE[2] = dto.getZFrameLen();
 
+        isPlain = dto.isPlainCharacteristic();
+
+        if(!isPlain) {
+            getGenPicture = dto.getGenImage();
+        }
         center = new Point3D(0,0,0);//Центр камеры для механики переизлучения
         //Размер генератора и мишени - сотая камеры, поэтому в очень низких камерах оно может не работать
         TAR_SIZE[0] = CHA_SIZE[0] * dto.getTarSizeX();

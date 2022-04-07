@@ -7,6 +7,7 @@ import javafx.scene.shape.*;
 import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -82,13 +83,29 @@ public class Particle{
         Arrays.fill(product,0);
         // Измерений может быть меньше трёх, но дальше есть код жёстко прописанный под 3Д. (Всё что связано с визуализацией, например)
         // Обнуление неиспользуемых измерений заставляет всё работать и не вызывает Array out of bounds & NullPointerException
-        for (int i = 0; i < parent.availableDimensions; i++) {
-            product[i] = (parent.GEN_SIZE[i])*Math.random() - parent.GEN_SIZE[i]/2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
+        if(parent.isPlain) {
+            for (int i = 0; i < parent.availableDimensions; i++) {
+                product[i] = (parent.GEN_SIZE[i]) * Math.random() - parent.GEN_SIZE[i] / 2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
+            }
+        } else{
+            double[] cords = generateCordsFromPicture(parent.getGenPicture);
+            product[0] = cords[0];//X
+            product[2] = cords[1];//Z
         }
         product[1] = parent.CHA_SIZE[1]/2 - parent.GEN_SIZE[1];
         return product;
     }
+    private double[] generateCordsFromPicture(double[][] alphaResolution){
+        int xMax =alphaResolution.length; // row
+        int zMax =alphaResolution[0].length; // col
+        int x,z;
 
+        do {
+            x = (int) (Math.random() * xMax);
+            z = (int) (Math.random() * zMax);
+        }while(Math.random() > alphaResolution[x][z]);
+        return new double[]{x,z};
+    }
     private double[] generateSpeed(boolean isFirstStep) {
         double[] product = new double[parent.maxDimensions]; //XYZ
         Arrays.fill(product,0);
