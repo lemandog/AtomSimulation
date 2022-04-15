@@ -135,6 +135,14 @@ public class EngineDraw {
         });
     }
     }
+    public void drawingThreadFire(Particle particle) {
+            Platform.runLater(()-> {
+                root.getChildren().remove(particle.drawObj);
+                particle.getCurrSphere();
+                particle.drawObj = engine3D(particle);
+                root.getChildren().add(particle.drawObj);
+            });
+    }
 
     public void CylinderThread(Cylinder path) {
         Platform.runLater(()-> root.getChildren().add(path));

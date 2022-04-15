@@ -28,6 +28,8 @@ public class Output {
     @Getter
     static int lastPrintStep = 0;
     static final DateTimeFormatter sdfF = DateTimeFormatter.ofPattern("dd MM yyyy HH mm");
+    @Setter
+    public static Image palette;
     static public Vector<Double> X = new Vector<>();
     static public Vector<Double> Z = new Vector<>();
     FileWriter Hits, enchantedHits;

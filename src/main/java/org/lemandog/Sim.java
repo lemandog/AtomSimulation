@@ -9,7 +9,6 @@ import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ public class Sim implements Serializable {
     @Getter
     private final SimDTO dto;
     private final Output out;
-    public double[][] getGenPicture;
+    public double[][] genImage;
     public boolean isPlain;
     double m;         //кг
     public GasTypes thisRunMaterial;
@@ -95,7 +94,7 @@ public class Sim implements Serializable {
         isPlain = dto.isPlainCharacteristic();
 
         if(!isPlain) {
-            getGenPicture = dto.getGenImage();
+            genImage = dto.getGenImage();
         }
         center = new Point3D(0,0,0);//Центр камеры для механики переизлучения
         //Размер генератора и мишени - сотая камеры, поэтому в очень низких камерах оно может не работать
@@ -125,6 +124,7 @@ public class Sim implements Serializable {
             calculator[i] = new Thread();
         }
         container = new Particle[N];
+        Output.palette = dto.getPalette();
     }
 
     public void genTest() {
@@ -132,7 +132,9 @@ public class Sim implements Serializable {
         for (int i = 0; i < N; i++) {
             container[i] = new Particle(i,this);
         }
-        getDraw().drawingThreadFire(container);
+        for (Particle part: container) {
+            draw.drawingThreadFire(part);
+        }
         mainContr = new Thread(); //Иначе будет NullPointerException. То же причины что и выше
     }
 

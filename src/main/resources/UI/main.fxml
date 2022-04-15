@@ -22,7 +22,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="598.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
+<AnchorPane prefHeight="631.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
    <children>
       <GridPane layoutX="14.0" layoutY="20.0" prefHeight="373.0" prefWidth="248.0">
          <columnConstraints>
@@ -111,17 +111,17 @@
             </Button>
          </children>
       </VBox>
-      <Pane layoutX="527.0" layoutY="153.0" onDragEntered="#selectConfig" prefHeight="240.0" prefWidth="281.0" style="-fx-background-color: #6830B2;" AnchorPane.bottomAnchor="205.0" AnchorPane.rightAnchor="14.0">
+      <Pane layoutX="528.0" layoutY="146.0" onDragEntered="#selectConfig" prefHeight="238.0" prefWidth="281.0" style="-fx-background-color: #6830B2;" AnchorPane.bottomAnchor="247.0" AnchorPane.rightAnchor="14.0">
          <children>
             <Text fx:id="configReaderStatus" fill="WHITE" layoutX="16.0" layoutY="115.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Переместите конфигурацию сюда" textAlignment="CENTER" wrappingWidth="248.423828125">
                <font>
                   <Font size="20.0" />
                </font>
             </Text>
-            <Button layoutX="35.0" layoutY="201.0" mnemonicParsing="false" onAction="#saveConfig" text="Сохранить текущую конфигурацию" />
+            <Button layoutX="34.0" layoutY="174.0" mnemonicParsing="false" onAction="#saveConfig" text="Сохранить текущую конфигурацию" />
          </children>
       </Pane>
-      <TabPane layoutX="10.0" layoutY="405.0" prefHeight="193.0" prefWidth="802.0" tabClosingPolicy="UNAVAILABLE">
+      <TabPane layoutX="10.0" layoutY="420.0" prefHeight="208.0" prefWidth="802.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="Визуализация и вывод">
             <content>
@@ -185,15 +185,15 @@
             </Tab>
             <Tab text="Очереди">
                <content>
-                  <Pane prefHeight="200.0" prefWidth="200.0">
+                  <Pane prefHeight="172.0" prefWidth="802.0">
                      <children>
-                        <Button layoutX="351.0" layoutY="49.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addToQueue" text="+" />
-                        <Button layoutX="429.0" layoutY="49.0" mnemonicParsing="false" onAction="#expungeQueue" text="-" />
+                        <Button layoutX="351.0" layoutY="49.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addToQueue" text="+" textAlignment="CENTER" />
+                        <Button layoutX="429.0" layoutY="49.0" mnemonicParsing="false" onAction="#expungeQueue" text="-" textAlignment="CENTER" />
                         <Text fx:id="numberInQueue" layoutX="386.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" textAlignment="CENTER" wrappingWidth="30.0" />
-                        <Button layoutX="300.0" layoutY="85.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add10ToQueue" prefHeight="25.0" prefWidth="76.0" text="+10" />
-                        <Button layoutX="301.0" layoutY="17.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#expungeAllQueue" prefHeight="25.0" prefWidth="201.0" text="Стереть очередь" />
-                        <Button layoutX="427.0" layoutY="85.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add100ToQueue" prefHeight="25.0" prefWidth="76.0" text="+100" />
-                        <Button layoutX="301.0" layoutY="123.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#reloadQueueCounter" prefHeight="25.0" prefWidth="200.0" text="Обновить счётчик" />
+                        <Button layoutX="300.0" layoutY="85.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add10ToQueue" prefHeight="25.0" prefWidth="76.0" text="+10" textAlignment="CENTER" />
+                        <Button layoutX="301.0" layoutY="17.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#expungeAllQueue" prefHeight="25.0" prefWidth="201.0" text="Стереть очередь" textAlignment="CENTER" />
+                        <Button layoutX="427.0" layoutY="85.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#add100ToQueue" prefHeight="25.0" prefWidth="76.0" text="+100" textAlignment="CENTER" />
+                        <Button layoutX="301.0" layoutY="123.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#reloadQueueCounter" prefHeight="25.0" prefWidth="200.0" text="Обновить счётчик" textAlignment="CENTER" />
                      </children>
                   </Pane>
                </content>
@@ -236,5 +236,6 @@
             </Tab>
         </tabs>
       </TabPane>
+      <Button layoutX="266.0" layoutY="393.0" mnemonicParsing="false" onAction="#loadGen" prefHeight="25.0" prefWidth="248.0" text="Загрузить конфигурацию генератора" textAlignment="CENTER" />
    </children>
 </AnchorPane>

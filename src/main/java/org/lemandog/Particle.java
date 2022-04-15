@@ -7,7 +7,6 @@ import javafx.scene.shape.*;
 import org.lemandog.util.Console;
 import org.lemandog.util.Output;
 
-import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -88,7 +87,7 @@ public class Particle{
                 product[i] = (parent.GEN_SIZE[i]) * Math.random() - parent.GEN_SIZE[i] / 2; //СЛУЧАЙНОЕ ПОЛОЖЕНИЕ ПО X ИЗ КООРДИНАТ ИЗЛУЧАТЕЛЯ
             }
         } else{
-            double[] cords = generateCordsFromPicture(parent.getGenPicture);
+            double[] cords = generateCordsFromPicture(parent.genImage);
             product[0] = cords[0];//X
             product[2] = cords[1];//Z
         }
@@ -104,7 +103,7 @@ public class Particle{
             x = (int) (Math.random() * xMax);
             z = (int) (Math.random() * zMax);
         }while(Math.random() > alphaResolution[x][z]);
-        return new double[]{x,z};
+        return new double[]{((x/(double)xMax)*parent.GEN_SIZE[0] - parent.GEN_SIZE[0]/2) ,((z/(double)zMax)*parent.GEN_SIZE[2] - parent.GEN_SIZE[2]/2)};
     }
     private double[] generateSpeed(boolean isFirstStep) {
         double[] product = new double[parent.maxDimensions]; //XYZ

@@ -4,9 +4,9 @@ import javafx.scene.image.Image;
 import lombok.*;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.Serializable;
+import java.util.Objects;
 
 @AllArgsConstructor
 public class SimDTO implements Serializable {
@@ -43,7 +43,7 @@ public class SimDTO implements Serializable {
         distCalc = false;
         serverAddress = "localhost";
         userEmail = "";
-
+        plainCharacteristic = true;
     }
     @Getter
     @Setter
@@ -94,7 +94,7 @@ public class SimDTO implements Serializable {
     @Setter
     boolean output, outputPic, outputRAWCord, outputPicCSVPost, outputCSV, output3D;
     public Image getPalette() {
-        return new Image(SimDTO.class.getResourceAsStream("/heatmaps/heatmap"+paletteNumber+".png"));
+        return new Image(Objects.requireNonNull(SimDTO.class.getResourceAsStream("/heatmaps/heatmap" + paletteNumber + ".png")));
     }
     public void setPalette(int paletteNumber) {
         this.paletteNumber = paletteNumber;

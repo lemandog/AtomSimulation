@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -21,6 +22,8 @@ import org.lemandog.util.LoadConfig;
 import org.lemandog.util.Output;
 import org.lemandog.util.Util;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -75,7 +78,7 @@ public class MainController {
     public Slider resolveSelect;
     public ScrollPane commandPane;
     public TextField resolutionField;
-
+    public double[][] genPic;
 
     public void initialize(){
         resolutionField.setText(String.valueOf(resolveSelect.getValue()));
@@ -105,6 +108,7 @@ public class MainController {
     }
 
     public static void startSim(SimDTO run, String address){
+        Sim.index = 1;
             if (run.isDistCalc()){
                 ArrayDeque<SimDTO> toSend = currentStream;
                 currentStream = new ArrayDeque<>();
@@ -155,6 +159,9 @@ public class MainController {
 
         materialChooser.setValue(input.getGas());
         numberInQueue.setText(String.valueOf(simQueue.size()));
+        if (input.getGenImage() == null){
+            genPic = input.getGenImage();
+        }
     }
     public SimDTO readDTO() { //Запись в DTO
         try {
@@ -185,20 +192,59 @@ public class MainController {
             result.setResolution((int) resolveSelect.getValue());
 
             result.setOutputPath(new File(pathToOutput.getText()));
-            result.setPalette((int) paletteSelect.getValue());
             result.setPaletteNumber((int) paletteSelect.getValue());//Вроде оно должно быть автоматически, но это на случай если не сработает
+            result.setPalette((int) paletteSelect.getValue());
 
             result.setServerAddress(serverAddress.getText());
             result.setUserEmail(userEmail.getText());
             result.setDistCalc(serverCalculate.isSelected());
 
             result.setGas(materialChooser.getValue());
+            result.setPlainCharacteristic(genPic != null);
+
+            if (genPic == null){
+                result.setPlainCharacteristic(true);
+            }else {
+                result.setPlainCharacteristic(false);
+                result.setGenImage(genPic);
+            }
             return result;
         }catch (NumberFormatException e ){
             System.out.println("MISMATCHED INPUT");
             System.out.println("НЕВЕРНЫЕ ЗНАЧЕНИЯ");
         }
         return null;
+    }
+
+    private double[][] pictureToAlpha(BufferedImage genPic) {
+        int pixel = genPic.getRGB(0,0);
+        boolean isTransparent = ((pixel>>24) == 0x00);
+        int width = genPic.getWidth();
+        int height = genPic.getHeight();
+        double[][] alphaChannel = new double[width][height];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                //get pixel value
+                int p = genPic.getRGB(x,y);
+                int value;
+                if (isTransparent){
+                    value = (p>>24) & 0xff;
+                }else{
+                    value = p;
+                }
+                alphaChannel[x][y] = value;
+            }
+        }
+        double biggest = 0;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                if(biggest>alphaChannel[x][y]) {biggest = alphaChannel[x][y];}
+            }}
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                alphaChannel[x][y] = alphaChannel[x][y]/biggest;
+            }}
+        return alphaChannel;
     }
 
     public void genTest() {
@@ -293,6 +339,22 @@ public class MainController {
         File path = pathfinder.showOpenDialog(new Stage());
         if (path != null){
             new Output(new Sim(readDTO())).loadFromFile(path);
+        } else{
+            System.out.println("NO FILE SELECTED!");
+        }
+    }
+
+    public void loadGen() {
+        FileChooser pathfinder = new FileChooser();
+        File path = pathfinder.showOpenDialog(new Stage());
+        if (path != null){
+            try {
+                File pngInput = new File(path.getAbsolutePath());
+                genPic = pictureToAlpha(ImageIO.read(pngInput));
+            } catch (Exception e) {
+                System.out.println("THAT FILE COULD NOT LOAD!: " + e.getMessage());
+            }
+
         } else{
             System.out.println("NO FILE SELECTED!");
         }
