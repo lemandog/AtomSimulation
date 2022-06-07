@@ -56,7 +56,7 @@ public class EngineDraw {
         draw.getIcons().add(icon);
 
         multiToFill = scene.getHeight()/(Arrays.stream(parent.CHA_SIZE).max().getAsDouble()); // Множитель для установки размера окна в зависимости от размера монитора
-        scene.setFill(Color.BLACK);
+        scene.setFill(Color.LIGHTGRAY);
         chamberR = new Box((parent.CHA_SIZE[0]),(parent.CHA_SIZE[1]),(parent.CHA_SIZE[2]));
 
         targetR = new Box((parent.TAR_SIZE[0]),(parent.TAR_SIZE[1]),(parent.TAR_SIZE[2]));

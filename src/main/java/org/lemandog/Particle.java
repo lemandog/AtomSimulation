@@ -58,20 +58,15 @@ public class Particle{
     double calcRandLen(boolean isFirstStep) {
         double xMAX;
         if(isFirstStep){xMAX = 5*parent.lambdaNSource;} else{xMAX = 5*parent.lambdaN;}
-
-        double lambda= Math.random()*xMAX; //vxR
-        double awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
-                *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х
-
-        double possibleMax = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
-                *Math.pow(parent.lambdaN,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х максимально возможное
-        double vyR = Math.random()*possibleMax;
-        while(vyR>awaitedNum){
+        double vyR,awaitedNum,lambda,possibleMax;
+        do{
             lambda= Math.random()*xMAX; //vxR
+            possibleMax = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
+                    *Math.pow(parent.lambdaN,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х максимально возможное
             vyR = Math.random()*possibleMax;
             awaitedNum = ((double) 4/(Math.sqrt(Math.PI)*Math.pow(parent.lambdaN,3))
                     *Math.pow(lambda,2) *Math.exp(-Math.pow((lambda/parent.lambdaN),2))); //Значение функции в Х
-        }
+        }while(vyR>awaitedNum);
         return lambda;
     }
 
