@@ -9,6 +9,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.util.Objects;
 
 public class Console {
     @Getter
@@ -31,9 +32,9 @@ public class Console {
         else
             model = reader.read(
                     new InputStreamReader(
-                            Application.class.getResourceAsStream(
+                            Objects.requireNonNull(Application.class.getResourceAsStream(
                                     "/META-INF/maven/org.lemandog/AtomSim/pom.xml"
-                            )
+                            ))
                     )
             );
         ver = model.getVersion();

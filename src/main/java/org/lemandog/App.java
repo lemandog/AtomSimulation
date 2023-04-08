@@ -18,7 +18,7 @@ public class App extends Application {
         try {
         Stage userControlWindows = new Stage();
         userControlWindows.setResizable(false);
-        FXMLLoader loader = new FXMLLoader(App.class.getResource("/UI/main.fxml"));
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("resources/UI/main.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
         userControlWindows.setScene(scene);

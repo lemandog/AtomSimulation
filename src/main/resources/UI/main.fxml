@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Tab?>
@@ -22,7 +24,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="631.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
+<AnchorPane prefHeight="631.0" prefWidth="826.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.lemandog.MainController">
    <children>
       <GridPane layoutX="14.0" layoutY="20.0" prefHeight="373.0" prefWidth="248.0">
          <columnConstraints>
@@ -232,6 +234,37 @@
                         </VBox>
                      </children>
                   </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="CPU/GPU">
+               <content>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <VBox alignment="CENTER" prefHeight="179.0" prefWidth="413.0">
+                           <children>
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#CheckAndInstallPython" prefHeight="25.0" prefWidth="242.0" text="Проверить наличие питона" textAlignment="CENTER" />
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#launchPyServ" prefHeight="25.0" prefWidth="242.0" text="Запустить вычислительный сервер" textAlignment="CENTER" />
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#CheckGPU" prefHeight="25.0" prefWidth="242.0" text="Проверить наличие GPU" textAlignment="CENTER" />
+                              <RadioButton fx:id="CUDASelectButton" mnemonicParsing="false" onAction="#CUDASelect" prefHeight="17.0" text="Считать на CUDA (Python)" textAlignment="CENTER" />
+                              <Label fx:id="CUDAData" prefHeight="17.0" prefWidth="402.0" text="Label" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="32.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" prefWidth="413.0">
+                           <children>
+                              <RadioButton fx:id="CPUSelectButton" mnemonicParsing="false" onAction="#CPUSelect" text="Считать на CPU (JAVA)" textAlignment="CENTER" />
+                              <Label fx:id="CPUData" contentDisplay="CENTER" prefHeight="17.0" prefWidth="409.0" text="Label" textAlignment="CENTER">
+                                 <font>
+                                    <Font size="32.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
                </content>
             </Tab>
         </tabs>

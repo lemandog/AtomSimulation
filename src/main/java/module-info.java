@@ -18,4 +18,5 @@ module AtomSimulation {
     requires maven.model;
     requires plexus.utils;
     requires zip4j;
+    requires org.hyperic.sigar;
 }

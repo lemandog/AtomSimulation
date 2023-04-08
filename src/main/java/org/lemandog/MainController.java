@@ -2,11 +2,11 @@ package org.lemandog;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
@@ -16,6 +16,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.SneakyThrows;
 import org.lemandog.Server.ServerHandler;
 import org.lemandog.Server.ServerRunner;
 import org.lemandog.util.LoadConfig;
@@ -26,8 +27,11 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.SigarException;
 
 public class MainController {
     public TextField targetSizeZ;
@@ -79,8 +83,17 @@ public class MainController {
     public ScrollPane commandPane;
     public TextField resolutionField;
     public double[][] genPic;
+    public Label cpuData;
+    public Label CUDAData;
+    public RadioButton CUDASelectButton;
+    public RadioButton CPUSelectButton;
+    public Label CPUData;
 
+    @SneakyThrows
     public void initialize(){
+        CUDAData.setText(PythonCuda.getCUDAData());
+        org.hyperic.sigar.CpuInfo[] cpuInfoList = new Sigar().getCpuInfoList();
+        cpuData.setText("Модель процессора: " + cpuInfoList[0].getModel());
         resolutionField.setText(String.valueOf(resolveSelect.getValue()));
         configView.getEngine().loadContent(Util.getContent());
         commandPane.setContent(LoadConfig.constructConfigInfoFrame());
@@ -358,5 +371,23 @@ public class MainController {
         } else{
             System.out.println("NO FILE SELECTED!");
         }
+    }
+
+    public void CUDASelect(ActionEvent actionEvent) {
+        CPUSelectButton.setSelected(false);
+    }
+    public void CPUSelect(ActionEvent actionEvent) {
+        CUDASelectButton.setSelected(false);
+    }
+
+    public void CheckAndInstallPython(ActionEvent actionEvent) {
+        PythonCuda.checkAndInstall();
+    }
+
+    public void launchPyServ(ActionEvent actionEvent) {
+        PythonCuda.startServer();
+    }
+
+    public void CheckGPU(ActionEvent actionEvent) {
     }
 }

@@ -24,6 +24,11 @@
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
         <dependency>
+        <groupId>io.klib.tools</groupId>
+        <artifactId>org.hyperic.sigar</artifactId>
+        <version>1.6.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
             <version>3.2.4</version>
