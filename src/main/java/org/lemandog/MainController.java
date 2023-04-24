@@ -27,11 +27,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.SigarException;
 
 public class MainController {
     public TextField targetSizeZ;
@@ -87,14 +84,11 @@ public class MainController {
     public Label CUDAData;
     public RadioButton CUDASelectButton;
     public RadioButton CPUSelectButton;
-    public Label CPUData;
 
     @SneakyThrows
     public void initialize(){
-        CUDAData.setText(PythonCuda.getCUDAData());
-        org.hyperic.sigar.CpuInfo[] cpuInfoList = new Sigar().getCpuInfoList();
-        cpuData.setText("Модель процессора: " + cpuInfoList[0].getModel());
         resolutionField.setText(String.valueOf(resolveSelect.getValue()));
+        CPUSelectButton.fire();
         configView.getEngine().loadContent(Util.getContent());
         commandPane.setContent(LoadConfig.constructConfigInfoFrame());
         materialChooser.setItems(FXCollections.observableArrayList(GasTypes.values()));
@@ -374,10 +368,14 @@ public class MainController {
     }
 
     public void CUDASelect(ActionEvent actionEvent) {
+        CUDASelectButton.setSelected(true);
         CPUSelectButton.setSelected(false);
+        threadCount.setDisable(true);
     }
     public void CPUSelect(ActionEvent actionEvent) {
+        CPUSelectButton.setSelected(true);
         CUDASelectButton.setSelected(false);
+        threadCount.setDisable(false);
     }
 
     public void CheckAndInstallPython(ActionEvent actionEvent) {
@@ -389,5 +387,6 @@ public class MainController {
     }
 
     public void CheckGPU(ActionEvent actionEvent) {
+        CUDAData.setText(PythonCuda.getCUDAData());
     }
 }

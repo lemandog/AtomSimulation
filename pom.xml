@@ -6,16 +6,15 @@
 
     <groupId>org.lemandog</groupId>
     <artifactId>AtomSim</artifactId>
-    <version>0.4.9</version>
+    <version>0.5.0</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.22</lombok.version>
-        <maven.compiler.release>17</maven.compiler.release>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <javafx.version>17.0.0.1</javafx.version>
+        <maven.compiler.release>18</maven.compiler.release>
+        <maven.compiler.source>18</maven.compiler.source>
+        <maven.compiler.target>18</maven.compiler.target>
+        <javafx.version>18</javafx.version>
         <org.springframework-version>5.3.14</org.springframework-version>
     </properties>
 
@@ -31,7 +30,7 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -54,18 +53,10 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/net.lingala.zip4j/zip4j -->
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
-            <version>2.9.1</version>
+            <version>2.10.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
@@ -78,9 +69,14 @@
             <version>${org.springframework-version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.15</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>2.7.5</version>
         </dependency>
 
     </dependencies>
@@ -90,7 +86,7 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
             <release>${maven.compiler.release}</release>
             <source>${java.version}</source>
@@ -99,7 +95,7 @@
             <path>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
+                <version>1.18.24</version>
             </path>
             </annotationProcessorPaths>
         </configuration>

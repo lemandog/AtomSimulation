@@ -248,7 +248,7 @@
                               <RadioButton fx:id="CUDASelectButton" mnemonicParsing="false" onAction="#CUDASelect" prefHeight="17.0" text="Считать на CUDA (Python)" textAlignment="CENTER" />
                               <Label fx:id="CUDAData" prefHeight="17.0" prefWidth="402.0" text="Label" textAlignment="CENTER">
                                  <font>
-                                    <Font size="32.0" />
+                                    <Font size="14.0" />
                                  </font>
                               </Label>
                            </children>
@@ -258,7 +258,7 @@
                               <RadioButton fx:id="CPUSelectButton" mnemonicParsing="false" onAction="#CPUSelect" text="Считать на CPU (JAVA)" textAlignment="CENTER" />
                               <Label fx:id="CPUData" contentDisplay="CENTER" prefHeight="17.0" prefWidth="409.0" text="Label" textAlignment="CENTER">
                                  <font>
-                                    <Font size="32.0" />
+                                    <Font size="14.0" />
                                  </font>
                               </Label>
                            </children>

@@ -18,14 +18,17 @@ public class App extends Application {
         try {
         Stage userControlWindows = new Stage();
         userControlWindows.setResizable(false);
-        FXMLLoader loader = new FXMLLoader(App.class.getResource("resources/UI/main.fxml"));
+        FXMLLoader loader = new FXMLLoader(App.class.getResource("/UI/main.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
         userControlWindows.setScene(scene);
         Image icon = new Image(Objects.requireNonNull(App.class.getResourceAsStream("/icons/atomSim.png")));
         userControlWindows.getIcons().add(icon);
         userControlWindows.setTitle("Контроль " + Console.getVer());
-        userControlWindows.setOnCloseRequest(event -> System.exit(0));
+        userControlWindows.setOnCloseRequest(event -> {
+                PythonCuda.endServer();
+                System.exit(0);
+        });
         userControlWindows.show();
         } catch (IOException e) {
             System.out.println("CANNOT LOAD RESOURCES FROM- CHECK INTEGRITY! - IO EXCEPTION");

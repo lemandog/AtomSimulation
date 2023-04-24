@@ -2,7 +2,6 @@ module AtomSimulation {
     requires javafx.base;
     requires javafx.controls;
     requires javafx.graphics;
-    requires java.desktop;
     requires java.sql;
     exports org.lemandog;
     exports org.lemandog.util;
@@ -19,4 +18,6 @@ module AtomSimulation {
     requires plexus.utils;
     requires zip4j;
     requires org.hyperic.sigar;
+    requires java.desktop;
+    requires okhttp;
 }

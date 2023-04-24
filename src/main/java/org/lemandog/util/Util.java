@@ -8,11 +8,38 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Util {
+    public static File getResourceAsFile(String resourcePath) {
+        try {
+            InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(resourcePath);
+            if (in == null) {
+                return null;
+            }
+            File tempFile = Files.createFile(Paths.get(System.getProperty("user.home") + "\\"+ in.hashCode() +".file")).toFile();
+            tempFile.deleteOnExit();
+            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                //copy stream
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+            return tempFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     public static void constructAWin() {
         Stage info = new Stage();
         VBox layout = new VBox();

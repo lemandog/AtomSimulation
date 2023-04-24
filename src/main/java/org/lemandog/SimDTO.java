@@ -41,7 +41,7 @@ public class SimDTO implements Serializable {
         bounceGenChance = 1;
         output3D = true;
         distCalc = false;
-        serverAddress = "localhost";
+        serverAddress = "http://localhost";
         userEmail = "";
         plainCharacteristic = true;
     }

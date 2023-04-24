@@ -12,7 +12,10 @@ import java.io.InputStreamReader;
 import java.util.Objects;
 
 public class Console {
-    @Getter
+    public static String getVer() {
+        return ver;
+    }
+
     static String ver;
     static final int CON_WIDTH = 120;
 
@@ -27,8 +30,8 @@ public class Console {
     public static void ready(){
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model;
-        if ((new File("/pom.xml")).exists())
-            model = reader.read(new FileReader("/pom.xml"));
+        if ((new File("pom.xml")).exists())
+            model = reader.read(new FileReader("pom.xml"));
         else
             model = reader.read(
                     new InputStreamReader(
